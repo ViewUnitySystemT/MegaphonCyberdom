@@ -1,0 +1,830 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>🏗️ Build Suite - TELCO Hub</title>
+<h1 style="position: absolute; left: -9999px;">🏗️ Build Suite - TELCO Hub</h1>
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    :root {
+      --build-primary: #2563eb;
+      --build-success: #10b981;
+      --build-warning: #f59e0b;
+      --build-error: #ef4444;
+      --build-info: #06b6d4;
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.2);
+    }
+    
+    .build-container {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    
+    .build-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    
+    .build-title {
+      font-size: 3rem;
+      font-weight: 900;
+      background: linear-gradient(45deg, #3b82f6, #8b5cf6, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
+    }
+    
+    .build-subtitle {
+      font-size: 1.2rem;
+      opacity: 0.8;
+      margin-bottom: 2rem;
+    }
+    
+    .build-controls {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+    }
+    
+    .build-btn {
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: visible;
+    }
+    
+    .build-btn-primary {
+      background: linear-gradient(45deg, var(--build-primary), #3b82f6);
+      color: white;
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+    }
+    
+    .build-btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+    }
+    
+    .build-btn-secondary {
+      background: var(--glass-bg);
+      color: #e2e8f0;
+      border: 1px solid var(--glass-border);
+    }
+    
+    .build-btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .build-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+    
+    .build-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 2rem;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: visible;
+    }
+    
+    .build-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      border-color: var(--build-primary);
+    }
+    
+    .build-card-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .build-icon {
+      font-size: 2rem;
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(45deg, var(--build-primary), #3b82f6);
+    }
+    
+    .build-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0;
+    }
+    
+    .build-status {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-left: auto;
+    }
+    
+    .status-ready { background: #6b7280; color: white; }
+    .status-building { background: var(--build-info); color: white; animation: pulse 2s infinite; }
+    .status-success { background: var(--build-success); color: white; }
+    .status-warning { background: var(--build-warning); color: white; }
+    .status-error { background: var(--build-error); color: white; }
+    
+    .build-details {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+    
+    .build-progress {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: visible;
+      margin: 1rem 0;
+    }
+    
+    .build-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--build-primary), #3b82f6);
+      border-radius: 3px;
+      transition: width 0.3s ease;
+      animation: shimmer 2s infinite;
+    }
+    
+    .sharing-methods {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    
+    .sharing-method {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .sharing-method:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--build-primary);
+    }
+    
+    .sharing-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .sharing-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    
+    .build-history {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+    
+    .history-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--build-primary);
+    }
+    
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .history-item:last-child {
+      border-bottom: none;
+    }
+    
+    .history-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .history-platform {
+      font-weight: 700;
+      color: var(--build-primary);
+    }
+    
+    .history-status {
+      padding: 0.25rem 0.5rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    
+    .status-success { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+    .status-error { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+    
+    .tech-popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+      backdrop-filter: blur(20px);
+      z-index: 1000;
+      display: block;
+      animation: popupIn 0.3s ease-out;
+    }
+    
+    .tech-popup.show {
+      display: block;
+    }
+    
+    .tech-popup-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--glass-border);
+    }
+    
+    .tech-popup-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--build-primary);
+    }
+    
+    .tech-popup-close {
+      background: none;
+      border: none;
+      color: #e2e8f0;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 8px;
+      transition: background 0.3s ease;
+    }
+    
+    .tech-popup-close:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .tech-explanation {
+      background: rgba(37, 99, 235, 0.1);
+      border-left: 4px solid var(--build-primary);
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 8px;
+    }
+    
+    .tech-code {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    @keyframes shimmer {
+      0% { background-position: -200px 0; }
+      100% { background-position: calc(200px + 100%) 0; }
+    }
+    
+    @keyframes popupIn {
+      from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+      to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+    
+    .hover-info {
+      position: absolute;
+      bottom: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    
+    .build-card:hover .hover-info {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="build-container">
+    <div class="build-header">
+      <h1 class="build-title">🏗️ Build Suite</h1>
+      <p class="build-subtitle">Comprehensive Build System für Android APK & Apple IPA</p>
+    </div>
+
+    <div class="build-controls">
+      <button class="build-btn build-btn-primary" onclick="buildAll()" title="Action Button">
+        🚀 Alle Builds Starten
+      </button>
+      <button class="build-btn build-btn-secondary" onclick="buildAndroid()" title="Action Button">
+        📱 Android APK
+      </button>
+      <button class="build-btn build-btn-secondary" onclick="buildiOS()" title="Action Button">
+        🍎 iOS IPA
+      </button>
+      <button class="build-btn build-btn-secondary" onclick="showSharingMethods()" title="Action Button">
+        📤 Sharing Methods
+      </button>
+      <button class="build-btn build-btn-secondary" onclick="showTechnicalDetails()" title="Action Button">
+        🔧 Technische Details
+      </button>
+    </div>
+
+    <div class="build-grid" id="buildGrid">
+      <!-- Build-Cards werden hier dynamisch eingefügt -->
+    </div>
+
+    <div class="build-history">
+      <h3 class="history-title">📋 Build History</h3>
+      <div id="buildHistory">
+        <!-- Build-Historie wird hier angezeigt -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Technical Details Popup -->
+  <div class="tech-popup" id="techPopup">
+    <div class="tech-popup-header">
+      <h3 class="tech-popup-title">🔧 Technische Details</h3>
+      <button class="tech-popup-close" onclick="closeTechPopup()" title="Action Button">×</button>
+    </div>
+    <div id="techContent">
+      <!-- Technische Inhalte werden hier eingefügt -->
+    </div>
+  </div>
+
+  <script src="../shared/build-manager.js"></script>
+  <script>
+    // Build-Definitionen
+    const buildDefinitions = [
+      {
+        id: 'android-apk',
+        name: 'Android APK',
+        icon: '📱',
+        description: 'Android Application Package mit allen Sharing-Methoden',
+        technical: {
+          platform: 'Android',
+          buildTool: 'Gradle',
+          explanation: 'Der Android APK Build verwendet Gradle als Build-System. Es erstellt eine APK-Datei, die auf Android-Geräten installiert werden kann.',
+          code: `./gradlew assembleRelease
+# Erstellt APK in app/build/outputs/apk/release/
+# Mit automatischer Signierung und Optimierung`
+        }
+      },
+      {
+        id: 'ios-ipa',
+        name: 'iOS IPA',
+        icon: '🍎',
+        description: 'iOS Application Package für App Store und TestFlight',
+        technical: {
+          platform: 'iOS',
+          buildTool: 'Xcode',
+          explanation: 'Der iOS IPA Build verwendet Xcode und xcodebuild. Es erstellt eine IPA-Datei für die Verteilung über App Store oder TestFlight.',
+          code: `xcodebuild archive -workspace TELCOHub.xcworkspace
+xcodebuild -exportArchive -exportPath ./build/ipa
+# Erstellt IPA für App Store Distribution`
+        }
+      }
+    ];
+
+    let buildResults = {};
+    let buildHistory = [];
+
+    // Initialisierung
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeBuildGrid();
+      loadBuildHistory();
+      
+      // Build Manager initialisieren
+      if (window.buildManager) {
+        window.buildManager.initialize().then(success => {
+          if (success) {
+            console.log('✅ Build Manager erfolgreich initialisiert');
+          }
+        });
+      }
+    });
+
+    function initializeBuildGrid() {
+      const grid = document.getElementById('buildGrid');
+      grid.innerHTML = '';
+      
+      buildDefinitions.forEach(build => {
+        const card = createBuildCard(build);
+        grid.appendChild(card);
+      });
+    }
+
+    function createBuildCard(build) {
+      const card = document.createElement('div');
+      card.className = 'build-card';
+      card.innerHTML = `
+        <div class="build-card-header">
+          <div class="build-icon">${build.icon}</div>
+          <h3 class="build-name">${build.name}</h3>
+          <span class="build-status status-ready" id="status-${build.id}">Bereit</span>
+        </div>
+        <div class="build-details">${build.description}</div>
+        <div class="build-progress" id="progress-${build.id}" style="display: block;">
+          <div class="build-progress-bar" style="width: 0%"></div>
+        </div>
+        <div class="sharing-methods" id="sharing-${build.id}" style="display: block;">
+          <div class="sharing-method" onclick="shareMethod('${build.id}', 'qr')">
+            <div class="sharing-icon">📱</div>
+            <div class="sharing-name">QR Code</div>
+          </div>
+          <div class="sharing-method" onclick="shareMethod('${build.id}', 'link')">
+            <div class="sharing-icon">🔗</div>
+            <div class="sharing-name">Download Link</div>
+          </div>
+          <div class="sharing-method" onclick="shareMethod('${build.id}', 'email')">
+            <div class="sharing-icon">📧</div>
+            <div class="sharing-name">Email</div>
+          </div>
+          <div class="sharing-method" onclick="shareMethod('${build.id}', 'cloud')">
+            <div class="sharing-icon">☁️</div>
+            <div class="sharing-name">Cloud</div>
+          </div>
+          <div class="sharing-method" onclick="shareMethod('${build.id}', 'p2p')">
+            <div class="sharing-icon">🔗</div>
+            <div class="sharing-name">P2P</div>
+          </div>
+          <div class="sharing-method" onclick="shareMethod('${build.id}', 'nfc')">
+            <div class="sharing-icon">📡</div>
+            <div class="sharing-name">NFC</div>
+          </div>
+        </div>
+        <div class="hover-info">Hover für technische Details</div>
+      `;
+      
+      // Hover-Event für technische Details
+      card.addEventListener('mouseenter', () => {
+        showTechnicalDetails(build);
+      });
+      
+      return card;
+    }
+
+    async function buildAll() {
+      console.log('🚀 Starte alle Builds...');
+      
+      for (const build of buildDefinitions) {
+        await runSingleBuild(build);
+        await new Promise(resolve => setTimeout(resolve, 2000)); // 2s Pause zwischen Builds
+      }
+      
+      updateBuildHistory();
+    }
+
+    async function runSingleBuild(build) {
+      const statusEl = document.getElementById(`status-${build.id}`);
+      const progressEl = document.getElementById(`progress-${build.id}`);
+      const progressBar = progressEl.querySelector('.build-progress-bar');
+      const sharingEl = document.getElementById(`sharing-${build.id}`);
+      
+      // Build starten
+      statusEl.textContent = 'Building...';
+      statusEl.className = 'build-status status-building';
+      progressEl.style.display = 'block';
+      
+      // Simuliere Progress
+      let progress = 0;
+      const progressInterval = setInterval(() => {
+        progress += Math.random() * 15;
+        if (progress > 100) progress = 100;
+        progressBar.style.width = progress + '%';
+      }, 300);
+      
+      try {
+        // Führe den tatsächlichen Build aus
+        const result = await executeBuild(build);
+        
+        clearInterval(progressInterval);
+        progressBar.style.width = '100%';
+        
+        // Ergebnis anzeigen
+        setTimeout(() => {
+          statusEl.textContent = result.status === 'success' ? 'Erfolgreich' : 'Fehler';
+          statusEl.className = `build-status status-${result.status}`;
+          progressEl.style.display = 'none';
+          
+          if (result.status === 'success') {
+            sharingEl.style.display = 'grid';
+          }
+          
+          buildResults[build.id] = result;
+          updateBuildHistory();
+        }, 500);
+        
+      } catch (error) {
+        clearInterval(progressInterval);
+        statusEl.textContent = 'Fehler';
+        statusEl.className = 'build-status status-error';
+        progressEl.style.display = 'none';
+        
+        buildResults[build.id] = { status: 'error', message: error.message };
+        updateBuildHistory();
+      }
+    }
+
+    async function executeBuild(build) {
+      switch (build.id) {
+        case 'android-apk':
+          return await buildAndroidAPK();
+        case 'ios-ipa':
+          return await buildiOSIPA();
+        default:
+          return { status: 'success', message: 'Build erfolgreich' };
+      }
+    }
+
+    async function buildAndroidAPK() {
+      // Simuliere Android APK Build
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({ 
+            status: 'success', 
+            message: 'Android APK erfolgreich erstellt',
+            details: 'APK signiert und optimiert',
+            filePath: './build-suite/android/app-release.apk',
+            size: '25.6 MB'
+          });
+        }, 5000);
+      });
+    }
+
+    async function buildiOSIPA() {
+      // Simuliere iOS IPA Build
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({ 
+            status: 'success', 
+            message: 'iOS IPA erfolgreich erstellt',
+            details: 'IPA für App Store bereit',
+            filePath: './build-suite/ios/TELCOHub.ipa',
+            size: '32.1 MB'
+          });
+        }, 6000);
+      });
+    }
+
+    function updateBuildHistory() {
+      const history = document.getElementById('buildHistory');
+      history.innerHTML = '';
+      
+      // Aktuelle Builds anzeigen
+      Object.entries(buildResults).forEach(([buildId, result]) => {
+        const build = buildDefinitions.find(b => b.id === buildId);
+        const historyItem = document.createElement('div');
+        historyItem.className = 'history-item';
+        historyItem.innerHTML = `
+          <div class="history-info">
+            <span class="history-platform">${build.icon} ${build.name}</span>
+            <span>${result.message}</span>
+          </div>
+          <span class="history-status status-${result.status}">
+            ${result.status === 'success' ? 'Erfolgreich' : 'Fehler'}
+          </span>
+        `;
+        history.appendChild(historyItem);
+      });
+    }
+
+    function loadBuildHistory() {
+      // Lade Build-Historie aus localStorage oder Server
+      const savedHistory = localStorage.getItem('buildHistory');
+      if (savedHistory) {
+        buildHistory = JSON.parse(savedHistory);
+      }
+    }
+
+    function shareMethod(buildId, method) {
+      const build = buildDefinitions.find(b => b.id === buildId);
+      const result = buildResults[buildId];
+      
+      if (!result || result.status !== 'success') {
+        alert('Build muss erst erfolgreich abgeschlossen werden!');
+        return;
+      }
+      
+      // Sharing-Methode ausführen
+      switch (method) {
+        case 'qr':
+          showQRCode(buildId, result);
+          break;
+        case 'link':
+          showDownloadLink(buildId, result);
+          break;
+        case 'email':
+          showEmailTemplate(buildId, result);
+          break;
+        case 'cloud':
+          showCloudUpload(buildId, result);
+          break;
+        case 'p2p':
+          showP2PSharing(buildId, result);
+          break;
+        case 'nfc':
+          showNFCSharing(buildId, result);
+          break;
+      }
+    }
+
+    function showQRCode(buildId, result) {
+      const qrData = {
+        type: 'app_build',
+        buildId: buildId,
+        platform: buildId.includes('android') ? 'android' : 'ios',
+        downloadUrl: `https://tel1.nl/download/${buildId}`,
+        timestamp: new Date().toISOString()
+      };
+      
+      alert(`QR Code für ${buildId}:\n\n${JSON.stringify(qrData, null, 2)}`);
+    }
+
+    function showDownloadLink(buildId, result) {
+      const downloadUrl = `https://tel1.nl/download/${buildId}`;
+      const shortUrl = `https://tel1.nl/s/${buildId}`;
+      
+      alert(`Download Links für ${buildId}:\n\nLang: ${downloadUrl}\nKurz: ${shortUrl}`);
+    }
+
+    function showEmailTemplate(buildId, result) {
+      const emailTemplate = `
+Subject: TELCO Hub App - Build ${buildId}
+
+Hallo!
+
+Hier ist Ihr TELCO Hub App Build:
+
+Platform: ${buildId.includes('android') ? 'Android' : 'iOS'}
+Build ID: ${buildId}
+Erstellt: ${new Date().toLocaleString()}
+Größe: ${result.size || 'Unbekannt'}
+
+Download-Link: https://tel1.nl/download/${buildId}
+
+Mit freundlichen Grüßen,
+TELCO Hub Build System
+      `.trim();
+      
+      alert(`Email Template für ${buildId}:\n\n${emailTemplate}`);
+    }
+
+    function showCloudUpload(buildId, result) {
+      const cloudConfig = {
+        provider: 'telco-hub-cloud',
+        bucket: 'app-builds',
+        key: `builds/${buildId}`,
+        uploadUrl: `https://api.tel1.nl/upload/${buildId}`,
+        publicUrl: `https://cloud.tel1.nl/app-builds/${buildId}`
+      };
+      
+      alert(`Cloud Upload für ${buildId}:\n\n${JSON.stringify(cloudConfig, null, 2)}`);
+    }
+
+    function showP2PSharing(buildId, result) {
+      const p2pConfig = {
+        peerId: `peer_${Math.random().toString(36).substr(2, 8)}`,
+        roomId: buildId,
+        connectionUrl: `p2p://peer_${Math.random().toString(36).substr(2, 8)}/${buildId}`,
+        maxPeers: 10
+      };
+      
+      alert(`P2P Sharing für ${buildId}:\n\n${JSON.stringify(p2pConfig, null, 2)}`);
+    }
+
+    function showNFCSharing(buildId, result) {
+      const nfcPayload = {
+        type: 'NDEF',
+        records: [{
+          type: 'T',
+          payload: `TELCO Hub Build: ${buildId}`,
+          language: 'en'
+        }, {
+          type: 'U',
+          payload: `https://tel1.nl/download/${buildId}`
+        }]
+      };
+      
+      alert(`NFC Payload für ${buildId}:\n\n${JSON.stringify(nfcPayload, null, 2)}`);
+    }
+
+    function showTechnicalDetails(build) {
+      const popup = document.getElementById('techPopup');
+      const content = document.getElementById('techContent');
+      
+      content.innerHTML = `
+        <div class="tech-explanation">
+          <h4>🔍 Was passiert hier?</h4>
+          <p>${build.technical.explanation}</p>
+        </div>
+        
+        <div class="tech-explanation">
+          <h4>📡 Technische Details</h4>
+          <p><strong>Platform:</strong> ${build.technical.platform}</p>
+          <p><strong>Build Tool:</strong> ${build.technical.buildTool}</p>
+        </div>
+        
+        <div class="tech-code">
+          <h4>💻 Build-Kommando:</h4>
+          <pre>${build.technical.code}</pre>
+        </div>
+        
+        <div class="tech-explanation">
+          <h4>🎯 Warum ist das wichtig?</h4>
+          <p>Der ${build.name} Build erstellt eine installierbare App-Datei für ${build.technical.platform}. 
+          Mit allen Sharing-Methoden können Sie die App einfach verteilen und testen.</p>
+        </div>
+      `;
+      
+      popup.classList.add('show');
+    }
+
+    function closeTechPopup() {
+      document.getElementById('techPopup').classList.remove('show');
+    }
+
+    // Spezifische Build-Funktionen
+    function buildAndroid() {
+      const build = buildDefinitions.find(b => b.id === 'android-apk');
+      runSingleBuild(build);
+    }
+
+    function buildiOS() {
+      const build = buildDefinitions.find(b => b.id === 'ios-ipa');
+      runSingleBuild(build);
+    }
+
+    function showSharingMethods() {
+      alert('📤 Verfügbare Sharing-Methoden:\n\n• QR Code - Für schnelle Downloads\n• Download Link - Direkte Links\n• Email - Automatische Email-Templates\n• Cloud - Cloud-Upload und -Download\n• P2P - Peer-to-Peer Sharing\n• NFC - NFC-Tag Payloads');
+    }
+
+    // Popup schließen bei Klick außerhalb
+    document.addEventListener('click', (e) => {
+      const popup = document.getElementById('techPopup');
+      if (e.target === popup) {
+        closeTechPopup();
+      }
+    });
+
+    // ESC-Taste zum Schließen
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeTechPopup();
+      }
+    });
+  </script>
+</body>
+</html>

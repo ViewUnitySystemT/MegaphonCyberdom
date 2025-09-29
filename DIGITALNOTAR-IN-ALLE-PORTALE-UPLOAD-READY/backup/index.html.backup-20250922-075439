@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIGITALNOTAR.IN - Alle Portale | Raymond Demitrio Tel</title>
+    <meta name="description" content="Vollständiges digitales Notariat mit allen Portalen - Gesetzeskonform nach eIDAS, BeurkG, DSGVO">
+    <meta name="keywords" content="digitales notariat, eidas, beurkung, elektronische signatur, tel portal">
+    <meta name="author" content="Raymond Demitrio Tel">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Gesetzeskonforme Meta-Tags -->
+    <meta name="legal-compliance" content="eIDAS Art.25, BeurkG §16a, DSGVO Art.25, StGB §263, §269, §303a">
+    <meta name="notariat-status" content="certified-digital-notary">
+    <meta name="version" content="3.0.0-eternal-ai">
+    <meta name="build-hash" content="digitalnotar-20250921-eternal">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FF6B35">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    
+    <style>
+        :root {
+            --primary: #FF6B35;
+            --primary-dark: #E55A2B;
+            --accent: #8B5CF6;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --error: #EF4444;
+            --background: #0F172A;
+            --surface: #1E293B;
+            --on-background: #F8FAFC;
+            --on-primary: #FFFFFF;
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--background);
+            color: var(--on-background);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            padding: var(--spacing-lg);
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: var(--spacing-sm);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .legal-badge {
+            background: rgba(255,255,255,0.2);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            backdrop-filter: blur(10px);
+            display: inline-block;
+            margin: var(--spacing-xs);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-xl);
+        }
+
+        .portal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .portal-card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .portal-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .portal-card h3 {
+            color: var(--primary);
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .portal-card .description {
+            color: var(--on-background);
+            opacity: 0.8;
+            margin-bottom: var(--spacing-md);
+            font-size: 0.9rem;
+        }
+
+        .portal-card .category {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .portal-link {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .portal-link:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        .portal-link.direct {
+            background: var(--success);
+        }
+
+        .portal-link.direct:hover {
+            background: #059669;
+        }
+
+        .section-header {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: var(--spacing-xl) 0 var(--spacing-lg) 0;
+            color: var(--primary);
+            text-align: center;
+        }
+
+        .legal-compliance {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+            border-left: 4px solid var(--success);
+        }
+
+        .legal-compliance h3 {
+            color: var(--success);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .legal-compliance ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .legal-compliance li {
+            padding: var(--spacing-xs) 0;
+            color: var(--on-background);
+            opacity: 0.9;
+        }
+
+        .legal-compliance li:before {
+            content: "✅ ";
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: var(--spacing-xs);
+        }
+
+        .status-indicator.online {
+            background: var(--success);
+            box-shadow: 0 0 10px var(--success);
+        }
+
+        .status-indicator.testing {
+            background: var(--warning);
+            box-shadow: 0 0 10px var(--warning);
+        }
+
+        .footer {
+            background: var(--surface);
+            padding: var(--spacing-lg);
+            text-align: center;
+            margin-top: var(--spacing-xl);
+            border-radius: var(--radius-lg);
+        }
+
+        .footer p {
+            opacity: 0.8;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .footer .copyright {
+            font-size: 0.9rem;
+            opacity: 0.6;
+        }
+
+        /* 🔎 Suche & Navigation */
+        .global-search { margin: var(--spacing-lg) auto 0 auto; max-width: 800px; display:flex; gap: var(--spacing-sm); }
+        .global-search input { flex:1; padding: var(--spacing-sm) var(--spacing-md); border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: var(--on-background); }
+        .global-search button { padding: var(--spacing-sm) var(--spacing-lg); border-radius: var(--radius-md); border:0; background: var(--primary); color:#fff; font-weight:700; cursor:pointer; }
+        .search-meta { text-align:center; opacity:.75; font-size:.9rem; margin-top: var(--spacing-sm); }
+
+        /* 🔒 Telemetrie Opt‑In */
+        .telemetry-banner{position:sticky; top:0; z-index:50; display:none; background:linear-gradient(90deg, rgba(16,185,129,.15), rgba(139,92,246,.15)); border:1px solid rgba(255,255,255,.15); padding: var(--spacing-sm) var(--spacing-md); border-radius: var(--radius-md); backdrop-filter: blur(8px);}
+        .telemetry-banner.active{display:flex; align-items:center; justify-content:space-between; gap: var(--spacing-md);} 
+        .telemetry-actions{display:flex; gap: var(--spacing-sm);} 
+        .btn{padding:.5rem 1rem; border-radius: var(--radius-md); border:1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.06); color:#fff; cursor:pointer; }
+        .btn.primary{ background: var(--success); border-color: transparent; }
+        .btn.ghost{ background: transparent; }
+
+        /* 🧩 Versteckte Tools */
+        .hidden-section{ display:none; }
+        .hidden-section.revealed{ display:block; animation: fadeIn .4s ease-out both; }
+        @keyframes fadeIn{ from{opacity:0; transform: translateY(4px);} to{opacity:1; transform:none;} }
+
+        /* ⭕ Offline-Badge */
+        .offline-badge{ position:fixed; bottom: 1rem; left: 1rem; background: #ef4444; color:#fff; padding:.4rem .6rem; border-radius:999px; box-shadow: var(--shadow-md); display:none; }
+        .offline-badge.show{ display:inline-block; }
+    
+        /* 🪄 Schwebende UI/UX Overlay - VERGRÖSSERT */
+        .float-launcher{position:fixed; right:1rem; bottom:1rem; z-index:60; background:var(--primary); color:#fff; border:none; border-radius:999px; padding:1.5rem 2rem; font-weight:800; font-size:1.2rem; box-shadow:var(--shadow-lg); cursor:pointer; min-width:120px; text-align:center}
+        .float-panel{position:fixed; right:1rem; bottom:6rem; width:min(95vw, 720px); max-height:min(85vh, 900px); overflow:auto; z-index:60; background:rgba(30,41,59,.95); border:1px solid rgba(255,255,255,.12); border-radius:1rem; box-shadow:0 20px 40px rgba(0,0,0,.35); backdrop-filter: blur(12px); display:none;}
+        .float-panel.show{display:block; animation:fadeIn .2s ease-out both}
+        .fp-head{display:flex; align-items:center; justify-content:space-between; gap:.5rem; padding:1rem; border-bottom:1px solid rgba(255,255,255,.08)}
+        .fp-title{font-weight:800}
+        .fp-tabs{display:flex; gap:.25rem; padding:.5rem}
+        .fp-tabs button{background:transparent; border:1px solid rgba(255,255,255,.2); color:#fff; padding:.4rem .6rem; border-radius:.6rem; cursor:pointer}
+        .fp-tabs button.active{background:var(--accent); border-color:transparent}
+        .fp-body{padding:1rem}
+        .list{display:grid; gap:.5rem}
+        .row{display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.6rem .8rem; border:1px dashed rgba(255,255,255,.15); border-radius:.6rem}
+        .pill{display:inline-block; font-size:.8rem; opacity:.8}
+
+        /* Settings modal inside panel */
+        .setting{display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.6rem .8rem; border:1px solid rgba(255,255,255,.1); border-radius:.6rem}
+        .toggle{appearance:none; width:42px; height:24px; background:#475569; border-radius:999px; position:relative; outline:none; cursor:pointer}
+        .toggle:checked{background:var(--success)}
+        .toggle:before{content:''; position:absolute; top:3px; left:3px; width:18px; height:18px; background:#fff; border-radius:50%; transition:transform .2s}
+        .toggle:checked:before{transform:translateX(18px)}
+
+        /* Install banner */
+        .install-banner{position:fixed; right:1rem; bottom:5rem; z-index:55; background:rgba(16,185,129,.95); color:#04130d; border-radius:.75rem; padding:.6rem .8rem; display:none; box-shadow:var(--shadow-lg)}
+        
+        /* 🔍 KRITISCHE BUG-REPARATUR: Search Highlight Styles */
+        .portal-card.search-highlight {
+            border: 2px solid var(--primary) !important;
+            background: rgba(255, 107, 53, 0.1) !important;
+            transform: scale(1.02) !important;
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.3) !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .portal-card.search-highlight h3 {
+            color: var(--primary) !important;
+            font-weight: 700 !important;
+        }
+        
+        .portal-card.search-highlight .description {
+            color: rgba(248, 250, 252, 0.9) !important;
+        }
+        .install-banner.show{display:block}
+
+        /* File download badge */
+        .download-link{display:inline-block; margin-left:.5rem; font-size:.9rem}
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .portal-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: var(--spacing-md);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>🏛️ DIGITALNOTAR.IN</h1>
+        <p class="subtitle">Vollständiges Digitales Notariat - Alle Portale & Erweiterungen</p>
+        <div>
+            <span class="legal-badge">eIDAS Art.25 ✅</span>
+            <span class="legal-badge">BeurkG §16a ✅</span>
+            <span class="legal-badge">DSGVO Art.25 ✅</span>
+            <span class="legal-badge">StGB §§263,269,303a ✅</span>
+            <span class="legal-badge">AI Eternal Maintain ✅</span>
+        </div>
+        <p><span class="status-indicator online"></span> Alle Portale Online & Gesetzeskonform & Erweiterbar</p>
+        <div class="global-search" role="search">
+            <input id="searchInput" type="search" placeholder="Suche in 1.000.000.000 Tools und Anwendungen … (Tippe: /, Enter)" aria-label="Globale Suche">
+            <button id="searchBtn" type="button" title="Suchen">Suchen</button>
+        </div>
+        <p class="search-meta" id="searchMeta">Tipp: Drücke "/" zum Fokussieren • Filtert Karten, Titel & Beschreibungen in Echtzeit</p>
+    </header>
+
+    <!-- 🪄 Schwebende UI/UX Launcher & Panel -->
+    <button id="floatLauncher" class="float-launcher" title="Schwebende Steuerung öffnen">☰ Tools</button>
+    <div id="floatPanel" class="float-panel" role="dialog" aria-modal="true" aria-label="Schwebende Steuerung">
+      <div class="fp-head">
+        <div class="fp-title">Schwebende UI/UX • Omni‑Control</div>
+        <div class="fp-tabs" role="tablist">
+          <button data-tab="quick" class="active" role="tab" aria-selected="true">Quick</button>
+          <button data-tab="hidden" role="tab">Hidden</button>
+          <button data-tab="settings" role="tab">Settings</button>
+          <button data-tab="traces" role="tab">Traces</button>
+          <button data-tab="auth" role="tab">Login</button>
+        </div>
+      </div>
+      <div class="fp-body">
+        <!-- Quick -->
+        <section data-pane="quick" class="list">
+          <div class="row"><span>Globale Suche fokussieren</span><button class="btn" data-action="focusSearch">Fokussieren</button></div>
+          <div class="row"><span>Versteckte Tools einblenden</span><button class="btn" data-action="revealHidden">Einblenden</button></div>
+          <div class="row"><span>PWA installieren</span><button class="btn" data-action="installPWA">Installieren</button></div>
+        </section>
+        <!-- Hidden -->
+        <section data-pane="hidden" class="list" hidden>
+          <div class="row"><span>Feature Flags öffnen</span><a class="portal-link" href="apps/feature-flags.html">Öffnen</a></div>
+          <div class="row"><span>Maintainé AI Control</span><a class="portal-link" href="apps/maintaine-ai.html">Öffnen</a></div>
+          <div class="row"><span>Gitarre HTML UI/UX Bericht</span><a class="portal-link" href="../guitar-test.html">Versionierter Bericht</a></div>
+          <div class="row"><span>Digitalnotar UI/UX Bericht</span><a class="portal-link" href="../DIGITALNOTAR-ANALYSE-FUER-SPAETER-V2025.09.18.md">Versionierter Bericht</a></div>
+        </section>
+        <!-- Settings / Privacy Center -->
+        <section data-pane="settings" class="list" hidden>
+          <div class="setting"><div>
+            <strong>Telemetrie</strong><div class="pill">Opt‑In (DSGVO Art.25)</div>
+          </div><input id="toggleTelemetry" type="checkbox" class="toggle"></div>
+          <div class="setting"><div>
+            <strong>Privacy‑Export</strong><div class="pill">JSON Download</div>
+          </div><button class="btn" data-action="exportData">Exportieren</button></div>
+          <div class="setting"><div>
+            <strong>Alle Daten löschen</strong><div class="pill">LocalStorage/Cache</div>
+          </div><button class="btn" data-action="deleteData">Löschen</button></div>
+        </section>
+        <!-- Traces / OTLP -->
+        <section data-pane="traces" class="list" hidden>
+          <div class="setting" style="flex-direction:column; align-items:stretch">
+            <label for="otlpEndpoint"><strong>OTLP/HTTP Endpoint</strong> (z.B. https://collector.example.com/v1/traces)</label>
+            <input id="otlpEndpoint" placeholder="https://collector …" style="padding:.6rem; border-radius:.5rem; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.06); color:#fff">
+          </div>
+          <div class="row"><span>Traces senden (JSON)</span><button class="btn" data-action="sendTraces">Senden</button></div>
+          <div class="row"><span>Traces als Datei exportieren</span><button class="btn" data-action="downloadTraces">Download</button></div>
+        </section>
+        <!-- WebAuthn Login -->
+        <section data-pane="auth" class="list" hidden>
+          <div class="row"><span>WebAuthn registrieren</span><button class="btn" data-action="webauthnRegister">Registrieren</button></div>
+          <div class="row"><span>WebAuthn anmelden</span><button class="btn" data-action="webauthnLogin">Login</button></div>
+          <p class="pill">Erfordert HTTPS & kompatiblen Browser. Demo nutzt lokale Challenges.</p>
+        </section>
+      </div>
+    </div>
+
+    <div id="installBanner" class="install-banner">App installieren? <button class="btn" id="btnInstallNow">Jetzt</button></div>
+
+    <div class="container">
+        <!-- 🔒 DSGVO-konforme Telemetrie: echtes Opt‑In -->
+        <div id="telemetryBanner" class="telemetry-banner" role="dialog" aria-live="polite">
+            <div>
+                <strong>Optionale Nutzungsanalyse</strong> – Hilf uns, Portale zu verbessern. Wir messen nur anonyme Events (kein Tracking außerhalb der App). Du kannst jederzeit in den Einstellungen widerrufen.
+            </div>
+            <div class="telemetry-actions">
+                <button id="btnTelemetryAllow" class="btn primary">Zustimmen</button>
+                <button id="btnTelemetryDecline" class="btn ghost">Ablehnen</button>
+            </div>
+        </div>
+        <div class="legal-compliance">
+            <h3>⚖️ Gesetzeskonforme Zertifizierung & AI Maintain</h3>
+            <ul>
+                <li>eIDAS-Verordnung Art. 25 - Elektronische Signatur</li>
+                <li>Beurkundungsgesetz § 16a - Elektronische Beurkundung</li>
+                <li>DSGVO Art. 25 - Datenschutz durch Technikgestaltung</li>
+                <li>Strafgesetzbuch §§ 263, 269, 303a - Betrugsschutz</li>
+                <li>Notariat-Recht - Vollständige Compliance</li>
+                <li>Maintain-AI-API System - Aktiv für immer</li>
+            </ul>
+        </div>
+
+        <h2 class="section-header">🔍 Erweiterte Navigation & Suche</h2>
+        <div class="portal-grid">
+            <div class="portal-card">
+                <div class="category">Navigation</div>
+                <h3>Globale Suche</h3>
+                <p class="description">Finde Tools, versteckte Anwendungen und geheime Funktionen sofort.</p>
+                <a href="apps/global-search.html" class="portal-link direct">Globale Suche öffnen</a>
+            </div>
+            <div class="portal-card">
+                <div class="category">Navigation</div>
+                <h3>Erweiterter Index</h3>
+                <p class="description">Kompletter Index aller sichtbaren und unsichtbaren Portale.</p>
+                <a href="apps/extended-index.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+        </div>
+
+        <h2 class="section-header">🛡️ Maintain-AI-System</h2>
+        <div class="portal-grid">
+            <div class="portal-card">
+                <div class="category">AI</div>
+                <h3>Eternal Maintain Core</h3>
+                <p class="description">Automatische Wartung, Optimierung und Aktivierung versteckter Tools.</p>
+                <a href="apps/eternal-maintain-core.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+            <div class="portal-card">
+                <div class="category">AI</div>
+                <h3>Self-Healing Engine</h3>
+                <p class="description">Selbstheilung aller Module und Portale, nie wieder Ausfall.</p>
+                <a href="apps/self-healing-engine.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+        </div>
+
+        <h2 class="section-header">📱 Kommunikation & WebRTC Portale</h2>
+        <div class="portal-grid">
+            <div class="portal-card">
+                <div class="category">Kommunikation</div>
+                <h3>Konferenz Portal</h3>
+                <p class="description">Vollständige Konferenz-App mit allen Features und Bildschirmfreigabe</p>
+                <a href="apps/conference-full.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+
+            <div class="portal-card">
+                <div class="category">Kommunikation</div>
+                <h3>PeerLink Portal</h3>
+                <p class="description">Vollständige PeerLink-App mit P2P-Verbindung, Chat und WebRTC</p>
+                <a href="apps/peerlink-full.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+
+            <div class="portal-card">
+                <div class="category">Kommunikation</div>
+                <h3>JamSession Portal</h3>
+                <p class="description">Kollaborative Musik-Session mit Echtzeit-Audio</p>
+                <a href="apps/jamssession.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+
+            <div class="portal-card">
+                <div class="category">Kommunikation</div>
+                <h3>PeerCam & Live Chat</h3>
+                <p class="description">P2P Video-Chat mit Kamera, Screenshots und Live-Messaging</p>
+                <a href="apps/peer-cam-chat.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+        </div>
+
+        <h2 class="section-header">🔗 Verbindung & QR Portale</h2>
+        <div class="portal-grid">
+            <div class="portal-card">
+                <div class="category">Verbindung</div>
+                <h3>QR Generator</h3>
+                <p class="description">QR-Codes für alle Verbindungstypen erstellen</p>
+                <a href="apps/qr-generator.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+
+            <div class="portal-card">
+                <div class="category">Verbindung</div>
+                <h3>QR Scanner</h3>
+                <p class="description">QR-Codes scannen für schnelle Verbindungen</p>
+                <a href="apps/qr-scanner.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+
+            <div class="portal-card">
+                <div class="category">Verbindung</div>
+                <h3>Connection Hub</h3>
+                <p class="description">Alle verfügbaren Verbindungsarten</p>
+                <a href="apps/connection-hub.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+
+            <div class="portal-card">
+                <div class="category">Verbindung</div>
+                <h3>Device Manager</h3>
+                <p class="description">Alle Geräte verwalten und überwachen</p>
+                <a href="apps/device-manager.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+
+            <div class="portal-card">
+                <div class="category">Verbindung</div>
+                <h3>NFC Hub</h3>
+                <p class="description">NFC-Verbindungen und Datenaustausch über Near Field Communication</p>
+                <a href="apps/nfc-hub.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+        </div>
+
+        <h2 class="section-header">🏗️ System & Admin Portale</h2>
+        <div class="portal-grid">
+            <div class="portal-card">
+                <div class="category">System</div>
+                <h3>Admin Dashboard</h3>
+                <p class="description">Zentrale Verwaltung aller Tools und Services</p>
+                <a href="apps/admin-dashboard.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+
+            <div class="portal-card">
+                <div class="category">System</div>
+                <h3>Server Dashboard</h3>
+                <p class="description">Live-Monitoring aller Server mit Netzwerk-Tools und Wartungsplan</p>
+                <a href="apps/server-dashboard.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+
+            <div class="portal-card">
+                <div class="category">System</div>
+                <h3>Monitoring Portal</h3>
+                <p class="description">System-Daten & Metriken ansehen</p>
+                <a href="apps/monitor.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+
+            <div class="portal-card">
+                <div class="category">System</div>
+                <h3>TURN Server</h3>
+                <p class="description">TURN-Server Status und Konfiguration</p>
+                <a href="apps/turn-status.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+
+            <div class="portal-card">
+                <div class="category">System</div>
+                <h3>Redis Viewer</h3>
+                <p class="description">Session-Management und Cache-Status</p>
+                <a href="apps/redis-viewer.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+
+            <div class="portal-card">
+                <div class="category">System</div>
+                <h3>Live Test Suite</h3>
+                <p class="description">Real-time System Monitoring & Comprehensive Testing</p>
+                <a href="apps/live-test-suite.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+        </div>
+
+        <h2 class="section-header">🧠 AI & Automation Portale</h2>
+        <div class="portal-grid">
+            <div class="portal-card">
+                <div class="category">AI</div>
+                <h3>MAIPS Explorer</h3>
+                <p class="description">Multi-AI-Platform-System Explorer - OMNISTACK Universal Core</p>
+                <a href="apps/maips-explorer.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+
+            <div class="portal-card">
+                <div class="category">AI</div>
+                <h3>Visual Scientific Monitor</h3>
+                <p class="description">3D-Visualisierung mit Morphing, Stereoide & Real-Time Monitoring</p>
+                <a href="apps/visual-scientific-monitor.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+
+            <div class="portal-card">
+                <div class="category">AI</div>
+                <h3>Integrated System Monitor</h3>
+                <p class="description">App-Begleitung für System-Überwachung mit visuellen Effekten</p>
+                <a href="apps/integrated-system-monitor.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+        </div>
+
+        <h2 class="section-header">🚀 Space & Research Portale</h2>
+        <div class="portal-grid">
+            <div class="portal-card">
+                <div class="category">Space</div>
+                <h3>Space Watcher</h3>
+                <p class="description">Live Astronauten APIs, Hackathons & Funding Calls Tracker</p>
+                <a href="apps/space-watcher.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+
+            <div class="portal-card">
+                <div class="category">Space</div>
+                <h3>Real Space APIs</h3>
+                <p class="description">Echte NASA/ISS Verbindungen - Keine Platzhalter!</p>
+                <a href="apps/real-space-apis.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+
+            <div class="portal-card">
+                <div class="category">Space</div>
+                <h3>Space Watcher System</h3>
+                <p class="description">Live Astronauten APIs, Hackathons & Space-Time Management</p>
+                <a href="apps/space-watcher-system.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+        </div>
+
+        <h2 class="section-header">🏦 Business & Banking Portale</h2>
+        <div class="portal-grid">
+            <div class="portal-card">
+                <div class="category">Banking</div>
+                <h3>Banking API Explorer</h3>
+                <p class="description">PSD2 & GoBD Compliance - Multi-Banking-Platform-System</p>
+                <a href="apps/banking-api-explorer.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+        </div>
+
+        <h2 class="section-header">🎵 Media & Producer Portale</h2>
+        <div class="portal-grid">
+            <div class="portal-card">
+                <div class="category">Media</div>
+                <h3>Media Gallery</h3>
+                <p class="description">Medien ansehen und verwalten</p>
+                <a href="apps/media-gallery.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+
+            <div class="portal-card">
+                <div class="category">Media</div>
+                <h3>File Manager</h3>
+                <p class="description">Dateien hochladen, verwalten und teilen</p>
+                <a href="apps/files.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+
+            <div class="portal-card">
+                <div class="category">Musik</div>
+                <h3>Stage Toolbox</h3>
+                <p class="description">Professionelle Musik-Toolbox mit Tuner, Metronom, Kompass</p>
+                <a href="apps/stage-toolbox.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+        </div>
+
+        <h2 class="section-header">🏛️ Notariat & Legal Portale</h2>
+        <div class="portal-grid">
+            <div class="portal-card">
+                <div class="category">Notariat</div>
+                <h3>Digitalnotariat Portal</h3>
+                <p class="description">Vollständiges digitales Notariat mit eIDAS-Compliance</p>
+                <a href="apps/digitalnotariat.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+
+            <div class="portal-card">
+                <div class="category">Notariat</div>
+                <h3>Gitarre HTML Notariat</h3>
+                <p class="description">Spezialisiertes Notariat für Musik-Dokumentation</p>
+                <a href="apps/guitar-html-notariat.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+
+            <div class="portal-card">
+                <div class="category">Notariat</div>
+                <h3>NASSIS Modul</h3>
+                <p class="description">Notariat-Assistenz-System für intelligente Services</p>
+                <a href="apps/nassis-module.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+        </div>
+
+        <h2 class="section-header">🔧 Development & Tools Portale</h2>
+        <div class="portal-grid">
+            <div class="portal-card">
+                <div class="category">Tools</div>
+                <h3>Build Suite</h3>
+                <p class="description">Comprehensive Build System für Android APK & Apple IPA</p>
+                <a href="apps/build-suite.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+
+            <div class="portal-card">
+                <div class="category">Tools</div>
+                <h3>WebRTC Test Harness</h3>
+                <p class="description">OmniRTC Reference Node - No-Account Rendezvous</p>
+                <a href="apps/webrtc-test-harness.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+
+            <div class="portal-card">
+                <div class="category">Tools</div>
+                <h3>Techniques Management</h3>
+                <p class="description">Techniken-Liste für alle dokumentierten Software-Implementierungen</p>
+                <a href="apps/techniques-management.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+
+            <div class="portal-card">
+                <div class="category">Tools</div>
+                <h3>Provider Management</h3>
+                <p class="description">Provider-Liste für alle SIP, Map, Routing und Media-Provider</p>
+                <a href="apps/provider-management.html" class="portal-link direct">Direkt öffnen</a>
+            </div>
+        </div>
+
+        <!-- 🧩 Versteckte/Erweiterte Tools (werden per Feature-Flag sichtbar) -->
+        <h2 class="section-header">🧩 Erweiterte & Versteckte Tools</h2>
+        <div id="hiddenTools" class="portal-grid hidden-section" aria-hidden="true">
+            <div class="portal-card">
+                <div class="category">DevOps</div>
+                <h3>Feature Flag Console</h3>
+                <p class="description">Schalte experimentelle Module (A/B), Progressive Rollouts, Kill-Switch.</p>
+                <a href="apps/feature-flags.html" class="portal-link">Öffnen</a>
+            </div>
+            <div class="portal-card">
+                <div class="category">Security</div>
+                <h3>Zero‑Trust Policy Center</h3>
+                <p class="description">Rollen, Rechte, Audit Trails & Live‑Attestierung (WebAuthn/FIDO2).</p>
+                <a href="apps/zero-trust-center.html" class="portal-link">Öffnen</a>
+            </div>
+            <div class="portal-card">
+                <div class="category">AI Ops</div>
+                <h3>Maintainé AI Control</h3>
+                <p class="description">Selbstheilung, Backoff, Circuit‑Breaker, Heartbeats, Offline‑Queue.</p>
+                <a href="apps/maintaine-ai.html" class="portal-link">Öffnen</a>
+            </div>
+            <div class="portal-card">
+                <div class="category">Observability</div>
+                <h3>Telemetry Studio</h3>
+                <p class="description">Opt‑In Metriken, Traces (OTLP/OTel), Privacy Filters, Data Export.</p>
+                <a href="apps/telemetry-studio.html" class="portal-link">Öffnen</a>
+            </div>
+        </div>
+
+        <div id="offlineBadge" class="offline-badge">Offline‑Modus aktiv</div>
+    </div>
+
+    <footer class="footer">
+        <p><strong>🏛️ DIGITALNOTAR.IN</strong> - Vollständiges Digitales Notariat & AI Maintain</p>
+        <p>Alle Portale gesetzeskonform nach eIDAS, BeurkG, DSGVO, StGB & Eternal Maintain AI</p>
+        <p class="copyright">© 2025 Raymond Demitrio Tel - Magnitudo Musica Mundo</p>
+    </footer>
+
+    <!-- Gesetzeskonforme AI API Integration -->
+    <script src="AI-API-SYSTEM-UNIVERSAL.js"></script>
+    <script src="NIE-WIEDER-AUS-SERVER-SYSTEM.js"></script>
+    <script src="real-metrics-api.js"></script>
+    <script src="build-hash-system.js"></script>
+    <script src="eternal-maintain-ai.js"></script>
+    <script src="ai-link-control-system.js"></script>
+    <script src="navigation-gap-fixer.js"></script>
+    <script src="enhanced-ui-system.js"></script>
+
+    <script>
+// ===============================
+// 🧠 Maintainé AI + Floating UI + PWA + Telemetrie + OTLP + WebAuthn
+// ===============================
+(function(){
+  const LS = window.localStorage;
+  const qs = (s, r=document)=>r.querySelector(s);
+  const qsa = (s, r=document)=>Array.from(r.querySelectorAll(s));
+  const on = (el, ev, fn)=> el && el.addEventListener(ev, fn);
+  const log = (...args)=> console.log('🏛️', ...args);
+
+  // ----- Global Suche -----
+  function applySearchFilter(term){
+    const norm = (term||'').trim().toLowerCase(); let visible=0;
+    qsa('.portal-card').forEach(card=>{ const text=card.innerText.toLowerCase(); const show=!norm||text.includes(norm); card.style.display=show?'':'none'; if(show) visible++; });
+    const meta = qs('#searchMeta'); if(meta) meta.textContent = norm?`${visible} Treffer`:'Tipp: Drücke "/" zum Fokussieren • Filtert Karten, Titel & Beschreibungen in Echtzeit';
+  }
+  on(qs('#searchBtn'),'click',()=>applySearchFilter(qs('#searchInput').value));
+  on(qs('#searchInput'),'input', e=> applySearchFilter(e.target.value));
+  on(document,'keydown', e=>{ if(e.key === '/'){ e.preventDefault(); qs('#searchInput')?.focus(); }});
+
+  // ----- Telemetry Opt‑In -----
+  const CONSENT_KEY='telemetryConsent'; const banner=qs('#telemetryBanner'); const consent=LS.getItem(CONSENT_KEY);
+  if(!consent){ banner?.classList.add('active'); }
+  on(qs('#btnTelemetryAllow'),'click',()=>{ LS.setItem(CONSENT_KEY,'granted'); banner?.classList.remove('active'); syncToggle(); log('🔎 Telemetry: granted'); });
+  on(qs('#btnTelemetryDecline'),'click',()=>{ LS.setItem(CONSENT_KEY,'denied'); banner?.classList.remove('active'); syncToggle(); log('🔎 Telemetry: declined'); });
+  function track(eventName,payload={}){ if(LS.getItem(CONSENT_KEY)!=='granted') return; window.__telemetryQueue=window.__telemetryQueue||[]; window.__telemetryQueue.push({ts:Date.now(),event:eventName,payload}); }
+
+  // ----- Floating UI -----
+  const panel=qs('#floatPanel'); const launcher=qs('#floatLauncher'); on(launcher,'click',()=>panel.classList.toggle('show'));
+  qsa('.fp-tabs button').forEach(btn=> on(btn,'click',()=>{ qsa('.fp-tabs button').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); const tab=btn.dataset.tab; qsa('[data-pane]').forEach(p=>{ p.hidden = p.dataset.pane!==tab; }); }));
+  on(qs('[data-action="focusSearch"]'),'click',()=> qs('#searchInput')?.focus());
+  on(qs('[data-action="revealHidden"]'),'click',()=>{ const h=qs('#hiddenTools'); h?.classList.add('revealed'); h?.setAttribute('aria-hidden','false'); LS.setItem('featuresAll','1'); track('FEATURES_UNLOCKED'); });
+
+  // ----- Settings (Privacy Center) -----
+  function syncToggle(){ const t=qs('#toggleTelemetry'); if(!t) return; t.checked = LS.getItem(CONSENT_KEY)==='granted'; }
+  syncToggle();
+  on(qs('#toggleTelemetry'),'change', e=>{ LS.setItem(CONSENT_KEY, e.target.checked?'granted':'denied'); log('🔎 Telemetry toggle =>', e.target.checked); });
+  on(qs('[data-action="exportData"]'),'click',()=>{
+    const data = { telemetryQueue: window.__telemetryQueue||[], settings:{ consent: LS.getItem(CONSENT_KEY), featuresAll: LS.getItem('featuresAll') } };
+    const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='digitalnotar-privacy-export.json'; a.click(); URL.revokeObjectURL(url);
+  });
+  on(qs('[data-action="deleteData"]'),'click',()=>{ ['featuresAll',CONSENT_KEY].forEach(k=>LS.removeItem(k)); window.__telemetryQueue=[]; caches.keys().then(keys=> keys.forEach(k=>caches.delete(k))); alert('Lokale Daten gelöscht.'); syncToggle(); });
+
+  // ----- OTLP/HTTP Export (JSON simplified) -----
+  on(qs('[data-action="sendTraces"]'),'click', async ()=>{
+    try{
+      const endpoint = qs('#otlpEndpoint')?.value?.trim(); if(!endpoint) return alert('Bitte Endpoint angeben.');
+      const payload = {resource:{service:'digitalnotar.in'}, traces: (window.__telemetryQueue||[]) };
+      const res = await fetch(endpoint, {method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify(payload)});
+      alert(res.ok? 'Traces gesendet.' : `Fehler: ${res.status}`);
+    }catch(e){ alert('Fehler beim Senden: '+ e.message); }
+  });
+  on(qs('[data-action="downloadTraces"]'),'click',()=>{
+    const blob = new Blob([JSON.stringify(window.__telemetryQueue||[],null,2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='digitalnotar-traces.json'; a.click(); URL.revokeObjectURL(url);
+  });
+
+  // ----- PWA Install Prompt -----
+  let deferredPrompt=null; const iBanner=qs('#installBanner');
+  window.addEventListener('beforeinstallprompt', (e)=>{ e.preventDefault(); deferredPrompt=e; iBanner.classList.add('show'); });
+  on(qs('#btnInstallNow'),'click', async ()=>{ if(!deferredPrompt) return; deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; iBanner.classList.remove('show'); track('PWA_INSTALL', {outcome}); deferredPrompt=null; });
+
+  // ----- Service Worker for Offline -----
+  async function registerInlineServiceWorker(){ if(!('serviceWorker' in navigator)) return; const sw=`self.addEventListener('install',e=>{e.waitUntil(caches.open('dn-static-v2').then(c=>c.addAll(['./'])))}); self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{const copy=res.clone(); caches.open('dn-dyn-v2').then(c=>c.put(e.request,copy)); return res;}).catch(()=>caches.match('./'))))});`; const blob=new Blob([sw],{type:'text/javascript'}); const url=URL.createObjectURL(blob); try{ await navigator.serviceWorker.register(url);}catch(e){ console.warn('SW fail', e);} }
+  registerInlineServiceWorker();
+
+  // ----- Offline Badge -----
+  const offlineBadge = qs('#offlineBadge'); function updateOnline(){ if(navigator.onLine){ offlineBadge?.classList.remove('show'); } else { offlineBadge?.classList.add('show'); } } ['online','offline'].forEach(ev=> on(window, ev, updateOnline)); updateOnline();
+
+  // ----- Maintainé AI Heartbeat -----
+  const MaintainAI={ heartbeatMs:15000, tries:0, baseDelay:1000, maxBackoff:5*60*1000, healthy:false, auditTrail:[], ensureAPI(){ if(!window.universalAIAPI){ window.universalAIAPI={ auditTrail:{events:[]}, health:()=>Promise.resolve({status:'degraded'})}; } return window.universalAIAPI; }, async ping(){ const api=this.ensureAPI(); try{ const res= await (api.health? api.health(): Promise.resolve({status:'ok'})); this.healthy= !!res; this.tries=0; this.audit('HEARTBEAT', res.status||'ok'); }catch(e){ this.healthy=false; this.audit('HEARTBEAT_FAIL', e?.message||'error'); this.retry(); } }, retry(){ this.tries++; const d=Math.min(this.maxBackoff, this.baseDelay*2**(this.tries-1)); setTimeout(()=>this.ping(), d); }, audit(type,detail){ const evt={ts:Date.now(), type, detail}; this.auditTrail.push(evt); window.universalAIAPI?.auditTrail?.events.push({timestamp:new Date(), type, detail, severity:'info'}); track('AI_'+type,{detail}); }, start(){ this.ping(); setInterval(()=>this.ping(), this.heartbeatMs); document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) this.ping(); }); } }; MaintainAI.start();
+
+  // ----- WebAuthn (Demo - benötigt HTTPS & Server für echte Challenges) -----
+  async function webauthnRegister(){
+    if(!('credentials' in navigator)) return alert('WebAuthn nicht unterstützt.');
+    try{
+      const publicKey = { challenge: Uint8Array.from(self.crypto.getRandomValues(new Uint8Array(32))), rp: { name: 'DIGITALNOTAR.IN' }, user: { id: Uint8Array.from(self.crypto.getRandomValues(new Uint8Array(16))), name: 'user@example.com', displayName: 'User' }, pubKeyCredParams: [{type:'public-key', alg:-7}], authenticatorSelection:{ userVerification:'preferred' } };
+      const cred = await navigator.credentials.create({ publicKey });
+      LS.setItem('webauthnRegistered','1'); track('WEBAUTHN_REGISTER'); alert('WebAuthn registriert (Demo).');
+    }catch(e){ alert('WebAuthn Fehler: '+ e.message); }
+  }
+  async function webauthnLogin(){
+    if(!('credentials' in navigator)) return alert('WebAuthn nicht unterstützt.');
+    try{
+      const publicKey = { challenge: Uint8Array.from(self.crypto.getRandomValues(new Uint8Array(32))), userVerification: 'preferred' };
+      const assertion = await navigator.credentials.get({ publicKey });
+      track('WEBAUTHN_LOGIN'); alert('WebAuthn Login (Demo).');
+    }catch(e){ alert('WebAuthn Fehler: '+ e.message); }
+  }
+  on(qs('[data-action="webauthnRegister"]'),'click', webauthnRegister);
+  on(qs('[data-action="webauthnLogin"]'),'click', webauthnLogin);
+
+  // ----- Portal click tracking -----
+  qsa('.portal-link').forEach(link=> on(link,'click',()=>{ const portalName=link.closest('.portal-card')?.querySelector('h3')?.textContent||'Unbekannt'; track('PORTAL_ACCESS',{portal:portalName}); }));
+
+  // ----- KRITISCHE BUG-REPARATUR: Globale Suche System -----
+  const searchInput = qs('#searchInput');
+  const searchMeta = qs('#searchMeta');
+  let searchTimeout = null;
+  let searchAbortController = null;
+  
+  // Cleanup function für Event-Listener
+  function cleanupSearchListeners() {
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+      searchTimeout = null;
+    }
+    if (searchAbortController) {
+      searchAbortController.abort();
+      searchAbortController = null;
+    }
+  }
+  
+  // Keyboard shortcuts mit Cleanup
+  document.addEventListener('keydown', function(e) {
+    // "/" zum Fokussieren der globalen Suche
+    if (e.key === '/' && !e.ctrlKey && !e.altKey && !e.metaKey) {
+      if (document.activeElement !== searchInput && searchInput) {
+        e.preventDefault();
+        searchInput.focus();
+        searchInput.select();
+        log('🔍 Suche fokussiert via "/" Tastatur-Shortcut');
+      }
+    }
+    
+    // "Esc" zum Leeren der Suche
+    if (e.key === 'Escape' && searchInput) {
+      cleanupSearchListeners();
+      searchInput.value = '';
+      searchInput.blur();
+      resetSearchResults();
+      log('🔍 Suche geleert via "Esc" Tastatur-Shortcut');
+    }
+  });
+
+  // Reset search results function
+  function resetSearchResults() {
+    const allCards = qsa('.portal-card');
+    allCards.forEach(card => {
+      card.style.display = 'block';
+      card.classList.remove('search-highlight');
+    });
+    if (searchMeta) {
+      searchMeta.textContent = 'Tipp: Drücke "/" zum Fokussieren • Filtert Karten, Titel & Beschreibungen in Echtzeit';
+    }
+  }
+
+  // Advanced search with debounce and API integration
+  if (searchInput) {
+    on(searchInput, 'input', function() {
+      const query = this.value.toLowerCase().trim();
+      
+      // Cleanup previous search
+      cleanupSearchListeners();
+      
+      // Debounce search
+      searchTimeout = setTimeout(async () => {
+        if (query === '') {
+          resetSearchResults();
+          return;
+        }
+        
+        log('🔍 Erweiterte Suche gestartet:', query);
+        
+        // Try API search first
+        try {
+          searchAbortController = new AbortController();
+          const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`, {
+            signal: searchAbortController.signal,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            if (data.status === 'success') {
+              displayApiSearchResults(data.results, query);
+              log('🔍 API-Suche erfolgreich:', `${data.count} Ergebnisse`);
+              return;
+            }
+          }
+        } catch (error) {
+          if (error.name !== 'AbortError') {
+            console.warn('🔍 API-Suche fehlgeschlagen, verwende lokale Suche:', error.message);
+          }
+        }
+        
+        // Fallback: Local search
+        performLocalSearch(query);
+        
+      }, 250); // 250ms debounce
+    });
+    
+    // Suche-Button Event
+    const searchBtn = qs('#searchBtn');
+    if (searchBtn) {
+      on(searchBtn, 'click', function() {
+        searchInput.focus();
+        searchInput.select();
+        log('🔍 Suche-Button geklickt');
+      });
+    }
+  }
+
+  // API search results display
+  function displayApiSearchResults(results, query) {
+    const allCards = qsa('.portal-card');
+    let visibleCount = 0;
+    
+    // Hide all cards first
+    allCards.forEach(card => {
+      card.style.display = 'none';
+      card.classList.remove('search-highlight');
+    });
+    
+    // Show matching cards
+    results.forEach(result => {
+      const matchingCard = Array.from(allCards).find(card => {
+        const title = card.querySelector('h3')?.textContent?.toLowerCase() || '';
+        return title.includes(result.title.toLowerCase());
+      });
+      
+      if (matchingCard) {
+        matchingCard.style.display = 'block';
+        matchingCard.classList.add('search-highlight');
+        visibleCount++;
+      }
+    });
+    
+    // Update search meta
+    if (searchMeta) {
+      searchMeta.textContent = `🔍 ${visibleCount} API-Ergebnisse für "${query}" • Drücke "Esc" zum Zurücksetzen`;
+    }
+    
+    log('🔍 API-Suchergebnisse angezeigt:', `${visibleCount} Karten`);
+  }
+
+  // Local search fallback
+  function performLocalSearch(query) {
+    const allCards = qsa('.portal-card');
+    let visibleCount = 0;
+    
+    allCards.forEach(card => {
+      const title = card.querySelector('h3')?.textContent?.toLowerCase() || '';
+      const description = card.querySelector('.description')?.textContent?.toLowerCase() || '';
+      const category = card.querySelector('.category')?.textContent?.toLowerCase() || '';
+      
+      if (title.includes(query) || description.includes(query) || category.includes(query)) {
+        card.style.display = 'block';
+        card.classList.add('search-highlight');
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+        card.classList.remove('search-highlight');
+      }
+    });
+    
+    // Update search meta
+    if (searchMeta) {
+      searchMeta.textContent = `🔍 ${visibleCount} lokale Ergebnisse für "${query}" • Drücke "Esc" zum Zurücksetzen`;
+    }
+    
+    log('🔍 Lokale Suche abgeschlossen:', `${visibleCount} Ergebnisse gefunden`);
+  }
+
+  // ----- Navigation-Reparatur für Home-Button -----
+  window.addEventListener('pageshow', function() {
+    console.log('🔄 Hauptseite geladen - Suche neu initialisiert');
+    // Suche nach Navigation neu initialisieren
+    if (searchInput) {
+      searchInput.focus();
+      console.log('🔍 Suche nach Navigation fokussiert');
+    }
+  });
+
+  // Cache-Busting für alle Links um sicherzustellen, dass die neueste Version geladen wird
+  qsa('a[href*=".html"]').forEach(link => {
+    if (!link.href.includes('?')) {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const originalUrl = this.getAttribute('href');
+        const url = new URL(originalUrl, window.location.origin);
+        url.searchParams.set('t', Date.now());
+        console.log('🔗 Link mit Cache-Busting:', url.toString());
+        window.location.href = url.toString();
+      });
+    }
+  });
+
+  log('✅ Schwebende UI/UX aktiv • Privacy Center • OTLP Export • PWA Install • WebAuthn Demo bereit • Globale Suche mit / Shortcut • Navigation repariert');
+})();
+
+    <script>
+        // Gesetzeskonforme Initialisierung
+        // Gesetzeskonforme Initialisierung
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🏛️ DIGITALNOTAR.IN - Gesetzeskonforme Initialisierung mit Eternal AI');
+            
+            // AI API System aktivieren
+            if (window.universalAIAPI) {
+                console.log('✅ AI API System aktiv');
+            }
+            
+            // Nie-wieder-aus Server System aktivieren
+            if (window.nieWiederAusServer) {
+                console.log('✅ Nie-wieder-aus Server System aktiv');
+            }
+            
+            // Eternal Maintain AI System aktivieren
+            if (window.MaintainAI) {
+                console.log('✅ Eternal Maintain AI System aktiv');
+            }
+            
+            console.log('✅ Alle Portale bereit und gesetzeskonform mit Eternal AI Maintain');
+        });
+    </script>
+</body>
+</html>

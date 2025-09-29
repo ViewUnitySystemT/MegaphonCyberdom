@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stakeholder Manager - TELCO Hub</title>
+    <link rel="stylesheet" href="../shared/styles.css">
+    <style>
+        .stakeholder-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 10px 0;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        
+        .stakeholder-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .stakeholder-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .stakeholder-name {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin: 0;
+        }
+        
+        .stakeholder-role {
+            background: var(--accent-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        
+        .stakeholder-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .info-label {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .info-value {
+            font-size: 0.95em;
+            color: var(--text-primary);
+            word-break: break-word;
+        }
+        
+        .stakeholder-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.85em;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-edit {
+            background: var(--warning-color);
+            color: white;
+        }
+        
+        .btn-delete {
+            background: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-contact {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .btn-small:hover {
+            opacity: 0.8;
+            transform: translateY(-1px);
+        }
+        
+        .add-stakeholder-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 500;
+            cursor: pointer;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .add-stakeholder-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .filter-controls {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .filter-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+        }
+        
+        .filter-select {
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            min-width: 150px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+        
+        .stat-number {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .stat-label {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+        
+        .modal {
+            display: block;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background: var(--card-bg);
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            font-size: 1em;
+        }
+        
+        .form-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            font-size: 1em;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .btn-secondary {
+            background: var(--text-secondary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .availability-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .available { background: var(--success-color); }
+        .busy { background: var(--warning-color); }
+        .offline { background: var(--text-secondary); }
+        
+        .company-badge {
+            background: var(--accent-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            display: inline-block;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>👥 Stakeholder Manager</h1>
+            <p>Verwalten Sie alle Stakeholder, Kontakte und Verantwortlichkeiten</p>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="total-stakeholders">0</div>
+                <div class="stat-label">Gesamt Stakeholder</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="active-stakeholders">0</div>
+                <div class="stat-label">Aktive Stakeholder</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="companies-count">0</div>
+                <div class="stat-label">Unternehmen</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="roles-count">0</div>
+                <div class="stat-label">Rollen</div>
+            </div>
+        </div>
+
+        <div class="filter-controls">
+            <input type="text" id="search-input" class="filter-input" placeholder="Stakeholder suchen..." aria-label="Input Field">
+            <select id="role-filter" class="filter-select">
+                <option value="">Alle Rollen</option>
+            </select>
+            <select id="company-filter" class="filter-select">
+                <option value="">Alle Unternehmen</option>
+            </select>
+            <select id="availability-filter" class="filter-select">
+                <option value="">Alle Verfügbarkeiten</option>
+                <option value="available">Verfügbar</option>
+                <option value="busy">Beschäftigt</option>
+                <option value="offline">Offline</option>
+            </select>
+        </div>
+
+        <button class="add-stakeholder-btn" onclick="openAddModal()" title="Action Button">
+            ➕ Neuen Stakeholder hinzufügen
+        </button>
+
+        <div id="stakeholders-container">
+            <!-- Stakeholder werden hier dynamisch geladen -->
+        </div>
+    </div>
+
+    <!-- Modal für Hinzufügen/Bearbeiten -->
+    <div id="stakeholder-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title">Neuen Stakeholder hinzufügen</h2>
+                <button class="close-btn" onclick="closeModal()" title="Action Button">&times;</button>
+            </div>
+            
+            <form id="stakeholder-form">
+                <div class="form-group">
+                    <label class="form-label" for="stakeholder-name">Name *</label>
+                    <input type="text" id="stakeholder-name" class="form-input" required aria-label="Input Field">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="stakeholder-role">Rolle *</label>
+                    <select id="stakeholder-role" class="form-select" required>
+                        <option value="">Rolle auswählen</option>
+                        <option value="Backend-Entwickler">Backend-Entwickler</option>
+                        <option value="Frontend-Lead">Frontend-Lead</option>
+                        <option value="Full-Stack-Entwickler">Full-Stack-Entwickler</option>
+                        <option value="DevOps-Engineer">DevOps-Engineer</option>
+                        <option value="UI/UX-Designer">UI/UX-Designer</option>
+                        <option value="Product-Manager">Product-Manager</option>
+                        <option value="Projekt-Manager">Projekt-Manager</option>
+                        <option value="QA-Tester">QA-Tester</option>
+                        <option value="System-Administrator">System-Administrator</option>
+                        <option value="Security-Spezialist">Security-Spezialist</option>
+                        <option value="Datenbank-Administrator">Datenbank-Administrator</option>
+                        <option value="Mobile-Entwickler">Mobile-Entwickler</option>
+                        <option value="Cloud-Architekt">Cloud-Architekt</option>
+                        <option value="Technical-Lead">Technical-Lead</option>
+                        <option value="Scrum-Master">Scrum-Master</option>
+                        <option value="Business-Analyst">Business-Analyst</option>
+                        <option value="Stakeholder-Manager">Stakeholder-Manager</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="stakeholder-responsibility">Verantwortungsbereich *</label>
+                    <textarea id="stakeholder-responsibility" class="form-input form-textarea" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="stakeholder-email">E-Mail</label>
+                    <input type="email" id="stakeholder-email" class="form-input" aria-label="Input Field">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="stakeholder-phone">Telefon</label>
+                    <input type="tel" id="stakeholder-phone" class="form-input" aria-label="Input Field">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="stakeholder-company">Unternehmen</label>
+                    <input type="text" id="stakeholder-company" class="form-input" aria-label="Input Field">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="stakeholder-department">Abteilung</label>
+                    <input type="text" id="stakeholder-department" class="form-input" aria-label="Input Field">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="stakeholder-availability">Verfügbarkeit</label>
+                    <select id="stakeholder-availability" class="form-select">
+                        <option value="available">Verfügbar</option>
+                        <option value="busy">Beschäftigt</option>
+                        <option value="offline">Offline</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="stakeholder-working-hours">Arbeitszeiten</label>
+                    <input type="text" id="stakeholder-working-hours" class="form-input" placeholder="z.B. Mo-Fr 9:00-17:00" aria-label="Input Field">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="stakeholder-timezone">Zeitzone</label>
+                    <select id="stakeholder-timezone" class="form-select">
+                        <option value="CET">CET (Central European Time)</option>
+                        <option value="CEST">CEST (Central European Summer Time)</option>
+                        <option value="UTC">UTC (Coordinated Universal Time)</option>
+                        <option value="EST">EST (Eastern Standard Time)</option>
+                        <option value="PST">PST (Pacific Standard Time)</option>
+                        <option value="GMT">GMT (Greenwich Mean Time)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="stakeholder-notes">Notizen</label>
+                    <textarea id="stakeholder-notes" class="form-input form-textarea"></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal()" title="Action Button">Abbrechen</button>
+                    <button type="submit" class="btn-primary" title="Action Button">Speichern</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../shared/common-functions.js"></script>
+    <script>
+        class StakeholderManager {
+            constructor() {
+                this.stakeholders = [];
+                this.currentEditId = null;
+                this.init();
+            }
+
+            init() {
+                this.loadStakeholders();
+                this.setupEventListeners();
+                this.renderStakeholders();
+                this.updateStatistics();
+                this.populateFilters();
+            }
+
+            setupEventListeners() {
+                // Suchfunktion
+                document.getElementById('search-input').addEventListener('input', (e) => {
+                    this.filterStakeholders();
+                });
+
+                // Filter
+                document.getElementById('role-filter').addEventListener('change', () => {
+                    this.filterStakeholders();
+                });
+
+                document.getElementById('company-filter').addEventListener('change', () => {
+                    this.filterStakeholders();
+                });
+
+                document.getElementById('availability-filter').addEventListener('change', () => {
+                    this.filterStakeholders();
+                });
+
+                // Formular
+                document.getElementById('stakeholder-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.saveStakeholder();
+                });
+
+                // Modal schließen bei Klick außerhalb
+                document.getElementById('stakeholder-modal').addEventListener('click', (e) => {
+                    if (e.target.id === 'stakeholder-modal') {
+                        this.closeModal();
+                    }
+                });
+            }
+
+            loadStakeholders() {
+                const saved = localStorage.getItem('stakeholders');
+                if (saved) {
+                    this.stakeholders = JSON.parse(saved);
+                } else {
+                    // Beispiel-Stakeholder für Demo
+                    this.stakeholders = [
+                        {
+                            id: '1',
+                            name: 'Max Mustermann',
+                            role: 'Backend-Entwickler',
+                            responsibility: 'WebRTC-Server, Signaling-Server, TURN-Server Konfiguration',
+                            email: 'max.mustermann@telcotelekom.de',
+                            phone: '+49 30 12345678',
+                            company: 'TELCOTELEKOM',
+                            department: 'Entwicklung',
+                            availability: 'available',
+                            workingHours: 'Mo-Fr 9:00-17:00',
+                            timezone: 'CET',
+                            notes: 'Spezialist für WebRTC und P2P-Kommunikation',
+                            createdAt: new Date().toISOString()
+                        },
+                        {
+                            id: '2',
+                            name: 'Anna Schmidt',
+                            role: 'Frontend-Lead',
+                            responsibility: 'React/Compose UI, Progressive Web App, Responsive Design',
+                            email: 'anna.schmidt@telcotelekom.de',
+                            phone: '+49 30 87654321',
+                            company: 'TELCOTELEKOM',
+                            department: 'Frontend',
+                            availability: 'busy',
+                            workingHours: 'Mo-Fr 8:00-16:00',
+                            timezone: 'CET',
+                            notes: 'Leitet das Frontend-Team und ist verantwortlich für die Benutzeroberfläche',
+                            createdAt: new Date().toISOString()
+                        },
+                        {
+                            id: '3',
+                            name: 'Dr. Thomas Weber',
+                            role: 'DevOps-Engineer',
+                            responsibility: 'Docker-Infrastruktur, CI/CD-Pipeline, Monitoring-System',
+                            email: 'thomas.weber@telcotelekom.de',
+                            phone: '+49 30 11223344',
+                            company: 'TELCOTELEKOM',
+                            department: 'DevOps',
+                            availability: 'available',
+                            workingHours: 'Mo-Fr 7:00-15:00',
+                            timezone: 'CET',
+                            notes: 'Experte für Container-Orchestrierung und Automatisierung',
+                            createdAt: new Date().toISOString()
+                        }
+                    ];
+                    this.saveStakeholders();
+                }
+            }
+
+            saveStakeholders() {
+                localStorage.setItem('stakeholders', JSON.stringify(this.stakeholders));
+            }
+
+            renderStakeholders() {
+                const container = document.getElementById('stakeholders-container');
+                container.innerHTML = '';
+
+                if (this.stakeholders.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); margin: 40px 0;">Keine Stakeholder gefunden. Fügen Sie den ersten Stakeholder hinzu!</p>';
+                    return;
+                }
+
+                this.stakeholders.forEach(stakeholder => {
+                    const card = this.createStakeholderCard(stakeholder);
+                    container.appendChild(card);
+                });
+            }
+
+            createStakeholderCard(stakeholder) {
+                const card = document.createElement('div');
+                card.className = 'stakeholder-card';
+                card.innerHTML = `
+                    <div class="stakeholder-header">
+                        <h3 class="stakeholder-name">${stakeholder.name}</h3>
+                        <span class="stakeholder-role">${stakeholder.role}</span>
+                    </div>
+                    
+                    <div class="stakeholder-info">
+                        <div class="info-item">
+                            <span class="info-label">Verantwortungsbereich</span>
+                            <span class="info-value">${stakeholder.responsibility}</span>
+                        </div>
+                        
+                        <div class="info-item">
+                            <span class="info-label">Kontakt</span>
+                            <span class="info-value">
+                                ${stakeholder.email ? `📧 ${stakeholder.email}<br>` : ''}
+                                ${stakeholder.phone ? `📞 ${stakeholder.phone}` : ''}
+                            </span>
+                        </div>
+                        
+                        <div class="info-item">
+                            <span class="info-label">Organisation</span>
+                            <span class="info-value">
+                                ${stakeholder.company ? `<span class="company-badge">${stakeholder.company}</span><br>` : ''}
+                                ${stakeholder.department || ''}
+                            </span>
+                        </div>
+                        
+                        <div class="info-item">
+                            <span class="info-label">Verfügbarkeit</span>
+                            <span class="info-value">
+                                <span class="availability-indicator ${stakeholder.availability}"></span>
+                                ${this.getAvailabilityText(stakeholder.availability)}
+                                ${stakeholder.workingHours ? `<br><small>${stakeholder.workingHours}</small>` : ''}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    ${stakeholder.notes ? `
+                        <div class="info-item">
+                            <span class="info-label">Notizen</span>
+                            <span class="info-value">${stakeholder.notes}</span>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="stakeholder-actions">
+                        <button class="btn-small btn-edit" onclick="stakeholderManager.editStakeholder('${stakeholder.id}')" title="Action Button">
+                            ✏️ Bearbeiten
+                        </button>
+                        <button class="btn-small btn-contact" onclick="stakeholderManager.contactStakeholder('${stakeholder.id}')" title="Action Button">
+                            📧 Kontaktieren
+                        </button>
+                        <button class="btn-small btn-delete" onclick="stakeholderManager.deleteStakeholder('${stakeholder.id}')" title="Action Button">
+                            🗑️ Löschen
+                        </button>
+                    </div>
+                `;
+                return card;
+            }
+
+            getAvailabilityText(availability) {
+                const texts = {
+                    'available': 'Verfügbar',
+                    'busy': 'Beschäftigt',
+                    'offline': 'Offline'
+                };
+                return texts[availability] || 'Unbekannt';
+            }
+
+            filterStakeholders() {
+                const searchTerm = document.getElementById('search-input').value.toLowerCase();
+                const roleFilter = document.getElementById('role-filter').value;
+                const companyFilter = document.getElementById('company-filter').value;
+                const availabilityFilter = document.getElementById('availability-filter').value;
+
+                const filtered = this.stakeholders.filter(stakeholder => {
+                    const matchesSearch = !searchTerm || 
+                        stakeholder.name.toLowerCase().includes(searchTerm) ||
+                        stakeholder.role.toLowerCase().includes(searchTerm) ||
+                        stakeholder.responsibility.toLowerCase().includes(searchTerm) ||
+                        (stakeholder.email && stakeholder.email.toLowerCase().includes(searchTerm)) ||
+                        (stakeholder.company && stakeholder.company.toLowerCase().includes(searchTerm));
+
+                    const matchesRole = !roleFilter || stakeholder.role === roleFilter;
+                    const matchesCompany = !companyFilter || stakeholder.company === companyFilter;
+                    const matchesAvailability = !availabilityFilter || stakeholder.availability === availabilityFilter;
+
+                    return matchesSearch && matchesRole && matchesCompany && matchesAvailability;
+                });
+
+                this.renderFilteredStakeholders(filtered);
+            }
+
+            renderFilteredStakeholders(stakeholders) {
+                const container = document.getElementById('stakeholders-container');
+                container.innerHTML = '';
+
+                if (stakeholders.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); margin: 40px 0;">Keine Stakeholder entsprechen den Filterkriterien.</p>';
+                    return;
+                }
+
+                stakeholders.forEach(stakeholder => {
+                    const card = this.createStakeholderCard(stakeholder);
+                    container.appendChild(card);
+                });
+            }
+
+            updateStatistics() {
+                const total = this.stakeholders.length;
+                const active = this.stakeholders.filter(s => s.availability === 'available').length;
+                const companies = [...new Set(this.stakeholders.map(s => s.company).filter(Boolean))].length;
+                const roles = [...new Set(this.stakeholders.map(s => s.role))].length;
+
+                document.getElementById('total-stakeholders').textContent = total;
+                document.getElementById('active-stakeholders').textContent = active;
+                document.getElementById('companies-count').textContent = companies;
+                document.getElementById('roles-count').textContent = roles;
+            }
+
+            populateFilters() {
+                // Rollen-Filter
+                const roleFilter = document.getElementById('role-filter');
+                const roles = [...new Set(this.stakeholders.map(s => s.role))].sort();
+                roles.forEach(role => {
+                    const option = document.createElement('option');
+                    option.value = role;
+                    option.textContent = role;
+                    roleFilter.appendChild(option);
+                });
+
+                // Unternehmen-Filter
+                const companyFilter = document.getElementById('company-filter');
+                const companies = [...new Set(this.stakeholders.map(s => s.company).filter(Boolean))].sort();
+                companies.forEach(company => {
+                    const option = document.createElement('option');
+                    option.value = company;
+                    option.textContent = company;
+                    companyFilter.appendChild(option);
+                });
+            }
+
+            openAddModal() {
+                this.currentEditId = null;
+                document.getElementById('modal-title').textContent = 'Neuen Stakeholder hinzufügen';
+                document.getElementById('stakeholder-form').reset();
+                document.getElementById('stakeholder-modal').style.display = 'block';
+            }
+
+            editStakeholder(id) {
+                const stakeholder = this.stakeholders.find(s => s.id === id);
+                if (!stakeholder) return;
+
+                this.currentEditId = id;
+                document.getElementById('modal-title').textContent = 'Stakeholder bearbeiten';
+                
+                // Formular mit Daten füllen
+                document.getElementById('stakeholder-name').value = stakeholder.name;
+                document.getElementById('stakeholder-role').value = stakeholder.role;
+                document.getElementById('stakeholder-responsibility').value = stakeholder.responsibility;
+                document.getElementById('stakeholder-email').value = stakeholder.email || '';
+                document.getElementById('stakeholder-phone').value = stakeholder.phone || '';
+                document.getElementById('stakeholder-company').value = stakeholder.company || '';
+                document.getElementById('stakeholder-department').value = stakeholder.department || '';
+                document.getElementById('stakeholder-availability').value = stakeholder.availability;
+                document.getElementById('stakeholder-working-hours').value = stakeholder.workingHours || '';
+                document.getElementById('stakeholder-timezone').value = stakeholder.timezone || 'CET';
+                document.getElementById('stakeholder-notes').value = stakeholder.notes || '';
+
+                document.getElementById('stakeholder-modal').style.display = 'block';
+            }
+
+            saveStakeholder() {
+                const formData = {
+                    name: document.getElementById('stakeholder-name').value,
+                    role: document.getElementById('stakeholder-role').value,
+                    responsibility: document.getElementById('stakeholder-responsibility').value,
+                    email: document.getElementById('stakeholder-email').value,
+                    phone: document.getElementById('stakeholder-phone').value,
+                    company: document.getElementById('stakeholder-company').value,
+                    department: document.getElementById('stakeholder-department').value,
+                    availability: document.getElementById('stakeholder-availability').value,
+                    workingHours: document.getElementById('stakeholder-working-hours').value,
+                    timezone: document.getElementById('stakeholder-timezone').value,
+                    notes: document.getElementById('stakeholder-notes').value
+                };
+
+                if (this.currentEditId) {
+                    // Bearbeiten
+                    const index = this.stakeholders.findIndex(s => s.id === this.currentEditId);
+                    if (index !== -1) {
+                        this.stakeholders[index] = { ...this.stakeholders[index], ...formData };
+                    }
+                } else {
+                    // Neu hinzufügen
+                    const newStakeholder = {
+                        id: Date.now().toString(),
+                        ...formData,
+                        createdAt: new Date().toISOString()
+                    };
+                    this.stakeholders.push(newStakeholder);
+                }
+
+                this.saveStakeholders();
+                this.renderStakeholders();
+                this.updateStatistics();
+                this.populateFilters();
+                this.closeModal();
+            }
+
+            deleteStakeholder(id) {
+                if (confirm('Sind Sie sicher, dass Sie diesen Stakeholder löschen möchten?')) {
+                    this.stakeholders = this.stakeholders.filter(s => s.id !== id);
+                    this.saveStakeholders();
+                    this.renderStakeholders();
+                    this.updateStatistics();
+                    this.populateFilters();
+                }
+            }
+
+            contactStakeholder(id) {
+                const stakeholder = this.stakeholders.find(s => s.id === id);
+                if (!stakeholder) return;
+
+                let contactMethods = [];
+                if (stakeholder.email) {
+                    contactMethods.push(`📧 E-Mail: ${stakeholder.email}`);
+                }
+                if (stakeholder.phone) {
+                    contactMethods.push(`📞 Telefon: ${stakeholder.phone}`);
+                }
+
+                if (contactMethods.length === 0) {
+                    alert('Keine Kontaktinformationen verfügbar.');
+                    return;
+                }
+
+                const message = `Kontaktinformationen für ${stakeholder.name}:\n\n${contactMethods.join('\n')}`;
+                alert(message);
+            }
+
+            closeModal() {
+                document.getElementById('stakeholder-modal').style.display = 'none';
+                this.currentEditId = null;
+            }
+        }
+
+        // Globale Funktionen für HTML-Event-Handler
+        function openAddModal() {
+            stakeholderManager.openAddModal();
+        }
+
+        function closeModal() {
+            stakeholderManager.closeModal();
+        }
+
+        // Initialisierung
+        let stakeholderManager;
+        document.addEventListener('DOMContentLoaded', () => {
+            stakeholderManager = new StakeholderManager();
+        });
+    </script>
+</body>
+</html>

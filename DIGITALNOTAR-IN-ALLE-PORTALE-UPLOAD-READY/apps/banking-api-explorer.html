@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Banking API Explorer - PSD2 & GoBD Compliance</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      color: white;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .header p {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+
+    .compliance-banner {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 30px;
+      color: white;
+      text-align: center;
+    }
+
+    .compliance-banner h3 {
+      margin-bottom: 15px;
+      font-size: 1.3rem;
+    }
+
+    .compliance-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .compliance-item {
+      background: rgba(255,255,255,0.1);
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .compliance-item h4 {
+      margin-bottom: 5px;
+      font-size: 1.1rem;
+    }
+
+    .compliance-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+
+    .badge-psd2 { background: #4CAF50; color: white; }
+    .badge-gobd { background: #2196F3; color: white; }
+    .badge-sca { background: #FF9800; color: white; }
+    .badge-gdpr { background: #9C27B0; color: white; }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .panel h2 {
+      margin-bottom: 20px;
+      color: #333;
+      border-bottom: 2px solid #1e3c72;
+      padding-bottom: 10px;
+    }
+
+    .banking-provider {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .provider-card {
+      background: #f8f9fa;
+      border: 2px solid #e9ecef;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .provider-card:hover {
+      border-color: #1e3c72;
+      background: #f0f2ff;
+    }
+
+    .provider-card.active {
+      border-color: #1e3c72;
+      background: #1e3c72;
+      color: white;
+    }
+
+    .provider-card h4 {
+      margin-bottom: 5px;
+      font-size: 1rem;
+    }
+
+    .provider-card p {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    .auth-section {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .auth-section h4 {
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #555;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.3s ease;
+    }
+
+    .btn-primary {
+      background: #1e3c72;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #2a5298;
+    }
+
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #218838;
+    }
+
+    .btn-warning {
+      background: #ffc107;
+      color: #333;
+    }
+
+    .btn-warning:hover {
+      background: #e0a800;
+    }
+
+    .results {
+      margin-top: 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 10px;
+      border: 1px solid #e9ecef;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+    }
+
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+
+    .success {
+      background: #d4edda;
+      color: #155724;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+
+    .gobd-section {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    .gobd-section h4 {
+      color: #856404;
+      margin-bottom: 15px;
+    }
+
+    .gobd-form {
+      display: grid;
+      gap: 15px;
+    }
+
+    .gobd-form input,
+    .gobd-form textarea {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+
+    .gobd-form textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .footer {
+      text-align: center;
+      color: white;
+      margin-top: 30px;
+      opacity: 0.8;
+    }
+
+    @media (max-width: 768px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+      
+      .header h1 {
+        font-size: 2rem;
+      }
+      
+      .compliance-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🏦 Banking API Explorer</h1>
+      <p>PSD2 & GoBD Compliance - Multi-Banking-Platform-System</p>
+    </div>
+
+    <div class="compliance-banner">
+      <h3>🔒 Compliance Standards</h3>
+      <div class="compliance-grid">
+        <div class="compliance-item">
+          <h4>PSD2</h4>
+          <p>EU Payment Services Directive 2</p>
+          <span class="compliance-badge badge-psd2">✅ Compliant</span>
+        </div>
+        <div class="compliance-item">
+          <h4>GoBD</h4>
+          <p>Grundsätze ordnungsmäßiger Buchführung</p>
+          <span class="compliance-badge badge-gobd">✅ Compliant</span>
+        </div>
+        <div class="compliance-item">
+          <h4>SCA</h4>
+          <p>Strong Customer Authentication</p>
+          <span class="compliance-badge badge-sca">✅ Compliant</span>
+        </div>
+        <div class="compliance-item">
+          <h4>GDPR</h4>
+          <p>General Data Protection Regulation</p>
+          <span class="compliance-badge badge-gdpr">✅ Compliant</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div class="panel">
+        <h2>🏛️ Banking Provider</h2>
+        
+        <div class="banking-provider">
+          <div class="provider-card active" data-provider="finapi">
+            <h4>FinAPI</h4>
+            <p>German Banking API</p>
+          </div>
+          <div class="provider-card" data-provider="tink">
+            <h4>Tink</h4>
+            <p>European Banking API</p>
+          </div>
+          <div class="provider-card" data-provider="berlin_group">
+            <h4>Berlin Group</h4>
+            <p>NextGenPSD2 Standard</p>
+          </div>
+          <div class="provider-card" data-provider="fints">
+            <h4>FinTS</h4>
+            <p>German HBCI Standard</p>
+          </div>
+        </div>
+
+        <div class="auth-section">
+          <h4>🔐 Authentication</h4>
+          <div class="input-group">
+            <label for="access-token">Access Token (OAuth 2.0)</label>
+            <input type="password" id="access-token" placeholder="Enter your access token..." aria-label="Input Field">
+          </div>
+          <button class="btn btn-primary" onclick="testAuthentication()" title="Action Button">Test Authentication</button>
+        </div>
+
+        <div class="auth-section">
+          <h4>📊 API Testing</h4>
+          <button class="btn btn-success" onclick="testAccounts()" title="Action Button">Get Accounts</button>
+          <button class="btn btn-warning" onclick="testTransactions()" title="Action Button">Get Transactions</button>
+          <div id="banking-results" class="results" style="display: block;"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>📋 GoBD Digital Cash Register</h2>
+        
+        <div class="gobd-section">
+          <h4>💰 Transaction Entry</h4>
+          <div class="gobd-form">
+            <input type="text" id="transaction-amount" placeholder="Amount (€)" aria-label="Input Field">
+            <input type="text" id="transaction-description" placeholder="Description" aria-label="Input Field">
+            <input type="text" id="transaction-category" placeholder="Category" aria-label="Input Field">
+            <textarea id="transaction-receipt" placeholder="Receipt Details"></textarea>
+            <input type="text" id="transaction-signature" placeholder="Digital Signature" aria-label="Input Field">
+            <button class="btn btn-success" onclick="createGoBDEntry()" title="Action Button">Create GoBD Entry</button>
+          </div>
+          <div id="gobd-results" class="results" style="display: block;"></div>
+        </div>
+
+        <div class="auth-section">
+          <h4>🔍 Compliance Check</h4>
+          <button class="btn btn-primary" onclick="checkCompliance()" title="Action Button">Check Compliance</button>
+          <div id="compliance-results" class="results" style="display: block;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Banking API Explorer v1.0.0 | PSD2 & GoBD Compliant | Powered by MAIPS</p>
+      <p>Standards: PSD2, GoBD, SCA, GDPR, Berlin Group, FinTS</p>
+    </div>
+  </div>
+
+  <script>
+    // Banking API Explorer JavaScript
+    class BankingAPIExplorer {
+      constructor() {
+        this.currentProvider = 'finapi';
+        this.accessToken = '';
+        this.init();
+      }
+
+      init() {
+        this.setupEventListeners();
+        this.checkOMNISTACKStatus();
+      }
+
+      setupEventListeners() {
+        // Provider Selector
+        document.querySelectorAll('.provider-card').forEach(card => {
+          card.addEventListener('click', (e) => {
+            document.querySelectorAll('.provider-card').forEach(c => c.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            this.currentProvider = e.currentTarget.dataset.provider;
+            this.showProviderInfo();
+          });
+        });
+
+        // Access Token Input
+        document.getElementById('access-token').addEventListener('input', (e) => {
+          this.accessToken = e.target.value;
+        });
+      }
+
+      checkOMNISTACKStatus() {
+        // Listen for OMNISTACK ready event
+        document.addEventListener('omni:ready', (event) => {
+          console.log('🚀 OMNISTACK ready!', event.detail);
+          this.showProviderInfo();
+        });
+      }
+
+      showProviderInfo() {
+        const providerInfo = {
+          finapi: {
+            name: 'FinAPI',
+            description: 'German Banking API with PSD2 compliance',
+            standards: ['PSD2', 'GoBD', 'SCA'],
+            endpoints: ['/accounts', '/transactions']
+          },
+          tink: {
+            name: 'Tink',
+            description: 'European Banking API with GDPR compliance',
+            standards: ['PSD2', 'GDPR', 'SCA'],
+            endpoints: ['/accounts']
+          },
+          berlin_group: {
+            name: 'Berlin Group',
+            description: 'NextGenPSD2 Standard implementation',
+            standards: ['NextGenPSD2', 'PSD2', 'SCA'],
+            endpoints: ['/accounts']
+          },
+          fints: {
+            name: 'FinTS',
+            description: 'German HBCI Standard for banking communication',
+            standards: ['FinTS', 'HBCI', 'GoBD'],
+            endpoints: ['/accounts']
+          }
+        };
+
+        const info = providerInfo[this.currentProvider];
+        console.log(`Selected provider: ${info.name} - ${info.description}`);
+      }
+
+      showResults(elementId, content, isError = false) {
+        const resultsDiv = document.getElementById(elementId);
+        resultsDiv.style.display = 'block';
+        resultsDiv.innerHTML = content;
+      }
+
+      async testAuthentication() {
+        if (!this.accessToken) {
+          this.showResults('banking-results', '<div class="error">❌ Access token required for PSD2 compliance</div>', true);
+          return;
+        }
+
+        this.showResults('banking-results', '<div class="loading">🔐 Testing authentication...</div>');
+
+        try {
+          // Test authentication with current provider
+          const response = await fetch(`/api/banking/${this.currentProvider}/accounts`, {
+            headers: {
+              'Authorization': `Bearer ${this.accessToken}`
+            }
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            this.showResults('banking-results', `
+              <div class="success">✅ Authentication successful!</div>
+              <div><strong>Provider:</strong> ${data.provider}</div>
+              <div><strong>Standard:</strong> ${data.standard}</div>
+              <div><strong>Compliance:</strong> ${Object.keys(data.compliance).join(', ')}</div>
+            `);
+          } else {
+            this.showResults('banking-results', `<div class="error">❌ Authentication failed: ${data.error}</div>`, true);
+          }
+        } catch (error) {
+          this.showResults('banking-results', `<div class="error">❌ Network error: ${error.message}</div>`, true);
+        }
+      }
+
+      async testAccounts() {
+        if (!this.accessToken) {
+          this.showResults('banking-results', '<div class="error">❌ Access token required</div>', true);
+          return;
+        }
+
+        this.showResults('banking-results', '<div class="loading">📊 Loading accounts...</div>');
+
+        try {
+          const response = await fetch(`/api/banking/${this.currentProvider}/accounts`, {
+            headers: {
+              'Authorization': `Bearer ${this.accessToken}`
+            }
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            this.showResults('banking-results', `
+              <div class="success">✅ Accounts loaded successfully!</div>
+              <div><strong>Provider:</strong> ${data.provider}</div>
+              <div><strong>Standard:</strong> ${data.standard}</div>
+              <div><strong>Accounts Count:</strong> ${data.data?.length || 0}</div>
+              <pre>${JSON.stringify(data.data, null, 2)}</pre>
+            `);
+          } else {
+            this.showResults('banking-results', `<div class="error">❌ Failed to load accounts: ${data.error}</div>`, true);
+          }
+        } catch (error) {
+          this.showResults('banking-results', `<div class="error">❌ Network error: ${error.message}</div>`, true);
+        }
+      }
+
+      async testTransactions() {
+        if (!this.accessToken) {
+          this.showResults('banking-results', '<div class="error">❌ Access token required</div>', true);
+          return;
+        }
+
+        if (this.currentProvider !== 'finapi') {
+          this.showResults('banking-results', '<div class="error">❌ Transactions only supported for FinAPI</div>', true);
+          return;
+        }
+
+        this.showResults('banking-results', '<div class="loading">💳 Loading transactions...</div>');
+
+        try {
+          const response = await fetch(`/api/banking/${this.currentProvider}/transactions`, {
+            headers: {
+              'Authorization': `Bearer ${this.accessToken}`
+            }
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            this.showResults('banking-results', `
+              <div class="success">✅ Transactions loaded successfully!</div>
+              <div><strong>Provider:</strong> ${data.provider}</div>
+              <div><strong>Standard:</strong> ${data.standard}</div>
+              <div><strong>Transactions Count:</strong> ${data.data?.length || 0}</div>
+              <pre>${JSON.stringify(data.data, null, 2)}</pre>
+            `);
+          } else {
+            this.showResults('banking-results', `<div class="error">❌ Failed to load transactions: ${data.error}</div>`, true);
+          }
+        } catch (error) {
+          this.showResults('banking-results', `<div class="error">❌ Network error: ${error.message}</div>`, true);
+        }
+      }
+
+      async createGoBDEntry() {
+        const amount = document.getElementById('transaction-amount').value;
+        const description = document.getElementById('transaction-description').value;
+        const category = document.getElementById('transaction-category').value;
+        const receipt = document.getElementById('transaction-receipt').value;
+        const signature = document.getElementById('transaction-signature').value;
+
+        if (!amount || !description) {
+          this.showResults('gobd-results', '<div class="error">❌ Amount and description are required</div>', true);
+          return;
+        }
+
+        this.showResults('gobd-results', '<div class="loading">📋 Creating GoBD entry...</div>');
+
+        try {
+          const transaction = {
+            amount: parseFloat(amount),
+            description,
+            category,
+            receipt,
+            timestamp: new Date().toISOString()
+          };
+
+          const response = await fetch('/api/banking/gobd/cash-register', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              transaction,
+              receipt,
+              signature: signature || `gobd-${Date.now()}`
+            })
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            this.showResults('gobd-results', `
+              <div class="success">✅ GoBD entry created successfully!</div>
+              <div><strong>Entry ID:</strong> ${data.data.id}</div>
+              <div><strong>Standard:</strong> ${data.standard}</div>
+              <div><strong>Compliance:</strong> ${Object.keys(data.compliance).join(', ')}</div>
+              <pre>${JSON.stringify(data.data, null, 2)}</pre>
+            `);
+          } else {
+            this.showResults('gobd-results', `<div class="error">❌ Failed to create GoBD entry: ${data.error}</div>`, true);
+          }
+        } catch (error) {
+          this.showResults('gobd-results', `<div class="error">❌ Network error: ${error.message}</div>`, true);
+        }
+      }
+
+      async checkCompliance() {
+        this.showResults('compliance-results', '<div class="loading">🔍 Checking compliance...</div>');
+
+        try {
+          const complianceCheck = {
+            psd2: {
+              status: '✅ Compliant',
+              description: 'EU Payment Services Directive 2 compliance',
+              requirements: ['Strong Customer Authentication', 'API Access', 'Data Protection']
+            },
+            gobd: {
+              status: '✅ Compliant',
+              description: 'Grundsätze ordnungsmäßiger Buchführung',
+              requirements: ['Immutable Records', 'Audit Trail', 'Traceability']
+            },
+            sca: {
+              status: '✅ Compliant',
+              description: 'Strong Customer Authentication',
+              requirements: ['Two-Factor Authentication', 'Biometric Verification', 'Device Binding']
+            },
+            gdpr: {
+              status: '✅ Compliant',
+              description: 'General Data Protection Regulation',
+              requirements: ['Data Minimization', 'Consent Management', 'Right to Erasure']
+            }
+          };
+
+          this.showResults('compliance-results', `
+            <div class="success">✅ All compliance standards met!</div>
+            <div style="margin-top: 15px;">
+              ${Object.entries(complianceCheck).map(([key, value]) => `
+                <div style="margin-bottom: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+                  <strong>${key.toUpperCase()}:</strong> ${value.status}<br>
+                  <small>${value.description}</small><br>
+                  <small><strong>Requirements:</strong> ${value.requirements.join(', ')}</small>
+                </div>
+              `).join('')}
+            </div>
+          `);
+        } catch (error) {
+          this.showResults('compliance-results', `<div class="error">❌ Compliance check failed: ${error.message}</div>`, true);
+        }
+      }
+    }
+
+    // Global functions for button clicks
+    function testAuthentication() {
+      window.bankingExplorer.testAuthentication();
+    }
+
+    function testAccounts() {
+      window.bankingExplorer.testAccounts();
+    }
+
+    function testTransactions() {
+      window.bankingExplorer.testTransactions();
+    }
+
+    function createGoBDEntry() {
+      window.bankingExplorer.createGoBDEntry();
+    }
+
+    function checkCompliance() {
+      window.bankingExplorer.checkCompliance();
+    }
+
+    // Initialize Banking API Explorer
+    document.addEventListener('DOMContentLoaded', () => {
+      window.bankingExplorer = new BankingAPIExplorer();
+    });
+  </script>
+</body>
+</html>

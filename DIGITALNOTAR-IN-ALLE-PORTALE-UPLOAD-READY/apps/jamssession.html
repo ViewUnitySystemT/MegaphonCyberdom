@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TELCO Hub - JamSession</title>
+<h1 style="position: absolute; left: -9999px;">TELCO Hub - JamSession</h1>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .jam-container {
+            padding: 1rem;
+        }
+        .jam-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .jam-control-card {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            text-align: center;
+        }
+        .jam-button {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            margin: 0.5rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .jam-button:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-md);
+        }
+        .jam-button.recording {
+            background: var(--error);
+            color: var(--on-error);
+            animation: pulse 1s infinite;
+        }
+        .jam-button.play {
+            background: var(--success);
+            color: var(--on-success);
+        }
+        .jam-button.stop {
+            background: var(--error);
+            color: var(--on-error);
+        }
+        .jam-button.mute {
+            background: var(--warning);
+            color: var(--on-warning);
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .jam-visualizer {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-bottom: 2rem;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: visible;
+        }
+        .audio-bars {
+            display: flex;
+            align-items: end;
+            gap: 2px;
+            height: 150px;
+        }
+        .audio-bar {
+            width: 8px;
+            background: var(--primary);
+            border-radius: 4px 4px 0 0;
+            animation: audioWave 0.5s ease-in-out infinite alternate;
+        }
+        .audio-bar:nth-child(odd) {
+            animation-delay: 0.1s;
+        }
+        .audio-bar:nth-child(even) {
+            animation-delay: 0.3s;
+        }
+        @keyframes audioWave {
+            0% { height: 20px; }
+            100% { height: 120px; }
+        }
+        .jam-session-info {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+        .session-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .stat-item {
+            text-align: center;
+            padding: 0.5rem;
+            background: var(--surface-variant);
+            border-radius: var(--radius-sm);
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--on-surface-variant);
+        }
+        .participants-list {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .participant-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--outline);
+        }
+        .participant-item:last-child {
+            border-bottom: none;
+        }
+        .participant-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .participant-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: var(--on-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        .participant-status {
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        .status-muted { background: var(--error-container); color: var(--on-error-container); }
+        .status-speaking { background: var(--success-container); color: var(--on-success-container); }
+        .status-listening { background: var(--info-container); color: var(--on-info-container); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="top-app-bar">
+            <div class="top-app-bar-content">
+                <button class="icon-button" onclick="window.history.back()" title="Action Button">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </button>
+                <h1 class="top-app-bar-title">🎵 JamSession</h1>
+                <div class="top-app-bar-actions"><button class="icon-button" onclick="window.history.forward()" title="Vorwärts" title="Action Button">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M4 11v2h12.17l-5.59 5.59L12 20l8-8-8-8-1.41 1.41L16.17 11H4z"/></svg>
+                    </button>
+                    
+                    <button class="icon-button" onclick="refreshJamSession()" title="Action Button">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="jam-container">
+            <!-- JamSession Info -->
+            <div class="jam-session-info">
+                <h3>🎵 JamSession "Creative Collab"</h3>
+                <p>Kollaborative Musik-Session mit Echtzeit-Audio-Streaming</p>
+                <div class="session-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="session-duration">12:34</div>
+                        <div class="stat-label">Session Zeit</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="participant-count">4</div>
+                        <div class="stat-label">Teilnehmer</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="audio-quality">HQ</div>
+                        <div class="stat-label">Audio Qualität</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="latency">45ms</div>
+                        <div class="stat-label">Latenz</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audio Visualizer -->
+            <div class="jam-visualizer">
+                <div class="audio-bars" id="audio-visualizer">
+                    <!-- Audio bars werden hier dynamisch generiert -->
+                </div>
+            </div>
+
+            <!-- Jam Controls -->
+            <div class="jam-controls">
+                <div class="jam-control-card">
+                    <h4>🎙️ Mikrofon</h4>
+                    <button class="jam-button mute" id="mic-button" onclick="toggleMicrophone()" title="Action Button">🎤</button>
+                    <p id="mic-status">An</p>
+                </div>
+                <div class="jam-control-card">
+                    <h4>🔊 Lautsprecher</h4>
+                    <button class="jam-button play" id="speaker-button" onclick="toggleSpeaker()" title="Action Button">🔊</button>
+                    <p id="speaker-status">An</p>
+                </div>
+                <div class="jam-control-card">
+                    <h4>📹 Aufnahme</h4>
+                    <button class="jam-button stop" id="record-button" onclick="toggleRecording()" title="Action Button">⏺️</button>
+                    <p id="record-status">Stopp</p>
+                </div>
+                <div class="jam-control-card">
+                    <h4>🎵 Metronom</h4>
+                    <button class="jam-button" id="metronome-button" onclick="toggleMetronome()" title="Action Button">🎼</button>
+                    <p id="metronome-status">Aus</p>
+                </div>
+            </div>
+
+            <!-- Participants -->
+            <div class="participants-list">
+                <h3>👥 Teilnehmer</h3>
+                <div id="participants-list">
+                    <!-- Teilnehmer werden hier dynamisch geladen -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        class JamSession {
+            constructor() {
+                this.isRecording = false;
+                this.isMicrophoneOn = true;
+                this.isSpeakerOn = true;
+                this.isMetronomeOn = false;
+                this.sessionStartTime = new Date();
+                this.participants = [];
+                this.init();
+            }
+
+            init() {
+                this.loadSampleParticipants();
+                this.renderParticipants();
+                this.startAudioVisualizer();
+                this.startSessionTimer();
+                this.startAudioSimulation();
+            }
+
+            loadSampleParticipants() {
+                this.participants = [
+                    {
+                        id: 'user1',
+                        name: 'Max Mustermann',
+                        avatar: 'MM',
+                        status: 'speaking',
+                        instrument: 'Gitarre',
+                        volume: 85
+                    },
+                    {
+                        id: 'user2',
+                        name: 'Anna Schmidt',
+                        avatar: 'AS',
+                        status: 'listening',
+                        instrument: 'Keyboard',
+                        volume: 72
+                    },
+                    {
+                        id: 'user3',
+                        name: 'Tom Weber',
+                        avatar: 'TW',
+                        status: 'muted',
+                        instrument: 'Schlagzeug',
+                        volume: 0
+                    },
+                    {
+                        id: 'user4',
+                        name: 'Lisa Müller',
+                        avatar: 'LM',
+                        status: 'speaking',
+                        instrument: 'Bass',
+                        volume: 68
+                    }
+                ];
+            }
+
+            renderParticipants() {
+                const participantsList = document.getElementById('participants-list');
+                participantsList.innerHTML = '';
+
+                this.participants.forEach(participant => {
+                    const item = document.createElement('div');
+                    item.className = 'participant-item';
+                    
+                    const statusClass = `status-${participant.status}`;
+                    const statusText = {
+                        'speaking': 'Spricht',
+                        'listening': 'Hört zu',
+                        'muted': 'Stumm'
+                    }[participant.status];
+                    
+                    item.innerHTML = `
+                        <div class="participant-info">
+                            <div class="participant-avatar">${participant.avatar}</div>
+                            <div>
+                                <div style="font-weight: 600; color: var(--on-surface);">${participant.name}</div>
+                                <div style="font-size: 0.9rem; color: var(--on-surface-variant);">${participant.instrument}</div>
+                            </div>
+                        </div>
+                        <div class="participant-status ${statusClass}">
+                            ${statusText} • ${participant.volume}%
+                        </div>
+                    `;
+                    
+                    participantsList.appendChild(item);
+                });
+
+                document.getElementById('participant-count').textContent = this.participants.length;
+            }
+
+            startAudioVisualizer() {
+                const visualizer = document.getElementById('audio-visualizer');
+                
+                // Erstelle 20 Audio-Bars
+                for (let i = 0; i < 20; i++) {
+                    const bar = document.createElement('div');
+                    bar.className = 'audio-bar';
+                    bar.style.animationDelay = `${i * 0.05}s`;
+                    visualizer.appendChild(bar);
+                }
+            }
+
+            startSessionTimer() {
+                setInterval(() => {
+                    const now = new Date();
+                    const duration = now - this.sessionStartTime;
+                    const minutes = Math.floor(duration / 60000);
+                    const seconds = Math.floor((duration % 60000) / 1000);
+                    document.getElementById('session-duration').textContent = 
+                        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }, 1000);
+            }
+
+            startAudioSimulation() {
+                setInterval(() => {
+                    // Simuliere Latenz-Änderungen
+                    const latency = Math.floor(Math.random() * 30) + 30;
+                    document.getElementById('latency').textContent = latency + 'ms';
+
+                    // Simuliere Audio-Qualität
+                    const quality = Math.random() > 0.8 ? 'HD' : 'HQ';
+                    document.getElementById('audio-quality').textContent = quality;
+
+                    // Simuliere Teilnehmer-Status-Änderungen
+                    if (Math.random() > 0.9) {
+                        this.simulateParticipantActivity();
+                    }
+                }, 2000);
+            }
+
+            simulateParticipantActivity() {
+                const participant = this.participants[Math.floor(Math.random() * this.participants.length)];
+                const statuses = ['speaking', 'listening', 'muted'];
+                participant.status = statuses[Math.floor(Math.random() * statuses.length)];
+                participant.volume = participant.status === 'muted' ? 0 : Math.floor(Math.random() * 40) + 60;
+                
+                this.renderParticipants();
+            }
+
+            toggleMicrophone() {
+                this.isMicrophoneOn = !this.isMicrophoneOn;
+                const button = document.getElementById('mic-button');
+                const status = document.getElementById('mic-status');
+                
+                if (this.isMicrophoneOn) {
+                    button.className = 'jam-button mute';
+                    button.textContent = '🎤';
+                    status.textContent = 'An';
+                } else {
+                    button.className = 'jam-button recording';
+                    button.textContent = '🎤';
+                    status.textContent = 'Stumm';
+                }
+            }
+
+            toggleSpeaker() {
+                this.isSpeakerOn = !this.isSpeakerOn;
+                const button = document.getElementById('speaker-button');
+                const status = document.getElementById('speaker-status');
+                
+                if (this.isSpeakerOn) {
+                    button.className = 'jam-button play';
+                    button.textContent = '🔊';
+                    status.textContent = 'An';
+                } else {
+                    button.className = 'jam-button stop';
+                    button.textContent = '🔇';
+                    status.textContent = 'Aus';
+                }
+            }
+
+            toggleRecording() {
+                this.isRecording = !this.isRecording;
+                const button = document.getElementById('record-button');
+                const status = document.getElementById('record-status');
+                
+                if (this.isRecording) {
+                    button.className = 'jam-button recording';
+                    button.textContent = '⏹️';
+                    status.textContent = 'Aufnahme läuft';
+                } else {
+                    button.className = 'jam-button stop';
+                    button.textContent = '⏺️';
+                    status.textContent = 'Stopp';
+                }
+            }
+
+            toggleMetronome() {
+                this.isMetronomeOn = !this.isMetronomeOn;
+                const button = document.getElementById('metronome-button');
+                const status = document.getElementById('metronome-status');
+                
+                if (this.isMetronomeOn) {
+                    button.className = 'jam-button recording';
+                    status.textContent = 'An (120 BPM)';
+                } else {
+                    button.className = 'jam-button';
+                    status.textContent = 'Aus';
+                }
+            }
+        }
+
+        // Globale Funktionen
+        function toggleMicrophone() {
+            window.jamSession.toggleMicrophone();
+        }
+
+        function toggleSpeaker() {
+            window.jamSession.toggleSpeaker();
+        }
+
+        function toggleRecording() {
+            window.jamSession.toggleRecording();
+        }
+
+        function toggleMetronome() {
+            window.jamSession.toggleMetronome();
+        }
+
+        function refreshJamSession() {
+            location.reload();
+        }
+
+        // Initialisiere JamSession
+        document.addEventListener('DOMContentLoaded', () => {
+            window.jamSession = new JamSession();
+        });
+    </script>
+</body>
+</html>
+
+
+

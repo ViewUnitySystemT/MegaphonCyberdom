@@ -1,0 +1,1164 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>🔧 Techniken Management - TELCO Hub</title>
+<h1 style="position: absolute; left: -9999px;">🔧 Techniken Management - TELCO Hub</h1>
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    :root {
+      --techniques-primary: #059669;
+      --techniques-success: #10b981;
+      --techniques-warning: #f59e0b;
+      --techniques-error: #ef4444;
+      --techniques-info: #06b6d4;
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.2);
+    }
+    
+    .techniques-container {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 0;
+      position: relative;
+      overflow: visible;
+    }
+    
+    .techniques-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 1rem;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .techniques-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--techniques-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .techniques-controls {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    
+    .techniques-btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+      background: var(--glass-bg);
+      color: #e2e8f0;
+      border: 1px solid var(--glass-border);
+    }
+    
+    .techniques-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+    
+    .techniques-btn-primary {
+      background: linear-gradient(45deg, var(--techniques-primary), #10b981);
+      color: white;
+      border: none;
+    }
+    
+    .techniques-btn-primary:hover {
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+    }
+    
+    .techniques-content {
+      margin-top: 80px;
+      padding: 2rem;
+      max-width: 1400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .techniques-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .technique-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      backdrop-filter: blur(20px);
+      transition: all 0.3s ease;
+    }
+    
+    .technique-card:hover {
+      border-color: var(--techniques-primary);
+      box-shadow: 0 8px 25px rgba(5, 150, 105, 0.2);
+    }
+    
+    .technique-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .technique-name {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--techniques-primary);
+    }
+    
+    .technique-category {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      background: rgba(5, 150, 105, 0.2);
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+    }
+    
+    .technique-info {
+      display: grid;
+      gap: 0.75rem;
+    }
+    
+    .info-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    
+    .info-label {
+      font-weight: 600;
+      min-width: 120px;
+      opacity: 0.8;
+    }
+    
+    .info-value {
+      color: #e2e8f0;
+      flex: 1;
+    }
+    
+    .info-value a {
+      color: var(--techniques-info);
+      text-decoration: none;
+    }
+    
+    .info-value a:hover {
+      text-decoration: underline;
+    }
+    
+    .complexity-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    
+    .complexity-beginner {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--techniques-success);
+    }
+    
+    .complexity-intermediate {
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--techniques-warning);
+    }
+    
+    .complexity-advanced {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--techniques-error);
+    }
+    
+    .complexity-expert {
+      background: rgba(139, 92, 246, 0.2);
+      color: #8b5cf6;
+    }
+    
+    .technique-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .action-btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .action-btn-primary {
+      background: var(--techniques-primary);
+      color: white;
+    }
+    
+    .action-btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #e2e8f0;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .action-btn:hover {
+      transform: translateY(-1px);
+    }
+    
+    .filter-section {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(20px);
+    }
+    
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .filter-label {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    
+    .filter-select {
+      padding: 0.5rem;
+      border: 1px solid var(--glass-border);
+      border-radius: 6px;
+      background: var(--glass-bg);
+      color: #e2e8f0;
+      font-size: 0.9rem;
+    }
+    
+    .filter-select:focus {
+      outline: none;
+      border-color: var(--techniques-primary);
+      box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.2);
+    }
+    
+    .stats-section {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(20px);
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+    }
+    
+    .stat-item {
+      text-align: center;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+    }
+    
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--techniques-primary);
+      margin-bottom: 0.25rem;
+    }
+    
+    .stat-label {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+    
+    .search-section {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(20px);
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      background: var(--glass-bg);
+      color: #e2e8f0;
+      font-size: 1rem;
+    }
+    
+    .search-input::placeholder {
+      color: rgba(226, 232, 240, 0.6);
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: var(--techniques-primary);
+      box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.2);
+    }
+    
+    .code-snippet {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      padding: 0.75rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.8rem;
+      overflow-x: auto;
+      margin: 0.5rem 0;
+    }
+    
+    .implementation-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    
+    .status-implemented {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--techniques-success);
+    }
+    
+    .status-partial {
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--techniques-warning);
+    }
+    
+    .status-planned {
+      background: rgba(107, 114, 128, 0.2);
+      color: #6b7280;
+    }
+    
+    .status-deprecated {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--techniques-error);
+    }
+  </style>
+</head>
+<body>
+  <div class="techniques-container">
+    <div class="techniques-header">
+      <div class="techniques-title">
+        🔧 Techniken Management
+      </div>
+      <div class="techniques-controls">
+        <button class="techniques-btn" onclick="exportTechniques()" title="Action Button">📊 Export</button>
+        <button class="techniques-btn" onclick="importTechniques()" title="Action Button">📥 Import</button>
+        <button class="techniques-btn techniques-btn-primary" onclick="addTechnique()" title="Action Button">➕ Hinzufügen</button>
+      </div>
+    </div>
+
+    <div class="techniques-content">
+      <!-- Statistiken -->
+      <div class="stats-section">
+        <h3 style="margin-bottom: 1rem; color: var(--techniques-primary);">📊 Statistiken</h3>
+        <div class="stats-grid" id="statsGrid">
+          <!-- Statistiken werden hier dynamisch eingefügt -->
+        </div>
+      </div>
+
+      <!-- Suche -->
+      <div class="search-section">
+        <h3 style="margin-bottom: 1rem; color: var(--techniques-primary);">🔍 Suche</h3>
+        <input type="text" class="search-input" id="searchInput" placeholder="Technik suchen..." onkeyup="filterTechniques()" aria-label="Input Field">
+      </div>
+
+      <!-- Filter -->
+      <div class="filter-section">
+        <h3 style="margin-bottom: 1rem; color: var(--techniques-primary);">🔧 Filter</h3>
+        <div class="filter-grid">
+          <div class="filter-group">
+            <label class="filter-label">Kategorie</label>
+            <select class="filter-select" id="categoryFilter" onchange="filterTechniques()">
+              <option value="">Alle Kategorien</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Komplexität</label>
+            <select class="filter-select" id="complexityFilter" onchange="filterTechniques()">
+              <option value="">Alle Komplexitäten</option>
+              <option value="beginner">Anfänger</option>
+              <option value="intermediate">Fortgeschritten</option>
+              <option value="advanced">Experte</option>
+              <option value="expert">Profi</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Status</label>
+            <select class="filter-select" id="statusFilter" onchange="filterTechniques()">
+              <option value="">Alle Status</option>
+              <option value="implemented">Implementiert</option>
+              <option value="partial">Teilweise</option>
+              <option value="planned">Geplant</option>
+              <option value="deprecated">Veraltet</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Technologie</label>
+            <select class="filter-select" id="technologyFilter" onchange="filterTechniques()">
+              <option value="">Alle Technologien</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Techniken Liste -->
+      <div class="techniques-grid" id="techniquesGrid">
+        <!-- Techniken werden hier dynamisch eingefügt -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    class TechniquesManager {
+      constructor() {
+        this.techniques = [];
+        this.currentEditId = null;
+        this.init();
+      }
+
+      async init() {
+        await this.loadTechniques();
+        this.renderTechniques();
+        this.updateStats();
+        this.populateFilters();
+        this.setupEventListeners();
+      }
+
+      async loadTechniques() {
+        try {
+          const stored = localStorage.getItem('telco-hub-techniques');
+          if (stored) {
+            this.techniques = JSON.parse(stored);
+          } else {
+            // Standard-Techniken laden
+            this.techniques = this.getDefaultTechniques();
+            await this.saveTechniques();
+          }
+        } catch (error) {
+          console.error('Techniken-Loading Fehler:', error);
+          this.techniques = this.getDefaultTechniques();
+        }
+      }
+
+      getDefaultTechniques() {
+        return [
+          {
+            id: 'technique_1',
+            name: 'WebRTC Peer-to-Peer Kommunikation',
+            category: 'Kommunikation',
+            description: 'Real-time Kommunikation zwischen Browsern ohne Server',
+            complexity: 'intermediate',
+            status: 'implemented',
+            technology: 'WebRTC',
+            implementation: 'PeerLink, Conference, PeerCam & Live Chat',
+            codeExample: `const peerConnection = new RTCPeerConnection({
+  iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+});`,
+            documentation: 'https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API',
+            dependencies: ['RTCPeerConnection', 'RTCDataChannel', 'MediaStream'],
+            useCases: ['Video-Chat', 'Datei-Transfer', 'Live-Streaming'],
+            notes: 'Kern-Technologie für alle P2P-Features der App',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: 'technique_2',
+            name: 'WebSocket Signaling Server',
+            category: 'Backend',
+            description: 'Real-time Kommunikation zwischen Client und Server',
+            complexity: 'intermediate',
+            status: 'implemented',
+            technology: 'WebSocket',
+            implementation: 'server.js - Signaling Server mit Zod Validation',
+            codeExample: `const WebSocket = require('ws');
+const wss = new WebSocket.Server({ port: 8080 });
+wss.on('connection', (ws) => {
+  ws.on('message', (message) => {
+    // Message handling
+  });
+});`,
+            documentation: 'https://developer.mozilla.org/en-US/docs/Web/API/WebSocket',
+            dependencies: ['ws', 'zod', 'express'],
+            useCases: ['Signaling', 'Real-time Updates', 'Chat'],
+            notes: 'Backend für WebRTC Signaling und allgemeine Kommunikation',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: 'technique_3',
+            name: 'MapLibre GL JS Navigation',
+            category: 'Navigation',
+            description: 'FOSS Karten-Rendering für Offline-Navigation',
+            complexity: 'advanced',
+            status: 'implemented',
+            technology: 'MapLibre',
+            implementation: 'navigation.html - Kompass-Navigation mit Offline-Karten',
+            codeExample: `const map = new maplibregl.Map({
+  container: 'map',
+  style: {
+    version: 8,
+    sources: {
+      'basemap': {
+        type: 'vector',
+        url: 'pmtiles://world.pmtiles'
+      }
+    }
+  }
+});`,
+            documentation: 'https://maplibre.org/maplibre-gl-js/docs/',
+            dependencies: ['maplibre-gl', 'pmtiles'],
+            useCases: ['Offline-Karten', 'Navigation', 'Geocaching'],
+            notes: 'Kompass-Navigation mit PMTiles für Offline-Funktionalität',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: 'technique_4',
+            name: 'PMTiles Offline-Karten',
+            category: 'Navigation',
+            description: 'Ein-Datei-Karten-Archiv für Offline-Navigation',
+            complexity: 'intermediate',
+            status: 'implemented',
+            technology: 'PMTiles',
+            implementation: 'Service Worker Caching für Offline-Tiles',
+            codeExample: `import {Protocol} from 'https://cdn.skypack.dev/pmtiles@latest';
+const protocol = new Protocol();
+maplibregl.addProtocol('pmtiles', protocol.tile);`,
+            documentation: 'https://protomaps.com/docs/pmtiles',
+            dependencies: ['pmtiles', 'MapLibre'],
+            useCases: ['Offline-Karten', 'Mobile Navigation', 'Bandbreite-Sparen'],
+            notes: 'Serverlose Karten-Archivierung für Offline-Funktionalität',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: 'technique_5',
+            name: 'OSRM Offline-Routing',
+            category: 'Navigation',
+            description: 'Open Source Routing Machine für Offline-Routenberechnung',
+            complexity: 'advanced',
+            status: 'implemented',
+            technology: 'OSRM',
+            implementation: 'routing/osrm-setup.sh - Docker-basierte Installation',
+            codeExample: `docker run -d --name "telco-hub-osrm" -p 5000:5000 \\
+  -v $PWD/data:/data osrm/osrm-backend osrm-routed \\
+  --algorithm mld /data/germany.osrm`,
+            documentation: 'https://project-osrm.org/',
+            dependencies: ['Docker', 'OSM Data', 'OSRM Backend'],
+            useCases: ['Offline-Routing', 'Turn-by-Turn Navigation', 'Route-Optimierung'],
+            notes: 'Lokaler Routing-Server für Offline-Navigation',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: 'technique_6',
+            name: 'Geocaching System',
+            category: 'Navigation',
+            description: 'FOSS Geocaching ohne Account mit GPX-Support',
+            complexity: 'intermediate',
+            status: 'implemented',
+            technology: 'GPX/GeoJSON',
+            implementation: 'shared/geocaching.js - Geofencing und Cache-Management',
+            codeExample: `class GeocachingSystem {
+  calculateDistance(point1, point2) {
+    const R = 6371000; // Erdradius
+    const dLat = toRad(point2[1] - point1[1]);
+    const dLon = toRad(point2[0] - point1[0]);
+    // Haversine Formula
+  }
+}`,
+            documentation: 'https://www.topografix.com/GPX/1/1/',
+            dependencies: ['GPX Parser', 'Geolocation API', 'Geofencing'],
+            useCases: ['Schatzsuche', 'Outdoor-Aktivitäten', 'Community-Events'],
+            notes: 'Account-freies Geocaching mit lokaler Datenspeicherung',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: 'technique_7',
+            name: 'Service Worker Offline-Funktionalität',
+            category: 'PWA',
+            description: 'Offline-Funktionalität für Web-App',
+            complexity: 'advanced',
+            status: 'implemented',
+            technology: 'Service Worker',
+            implementation: 'sw.js - Caching für Tiles, Routen und Geocoding',
+            codeExample: `self.addEventListener('fetch', (event) => {
+  if (event.request.url.includes('.pmtiles')) {
+    event.respondWith(handleTileRequest(event.request));
+  }
+});`,
+            documentation: 'https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API',
+            dependencies: ['Cache API', 'Fetch API', 'Background Sync'],
+            useCases: ['Offline-Karten', 'Offline-Routing', 'Background Sync'],
+            notes: 'Kern-Technologie für Offline-Funktionalität',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: 'technique_8',
+            name: 'DeviceOrientationEvent Kompass',
+            category: 'Navigation',
+            description: 'Geräte-Kompass für Richtungsanzeige',
+            complexity: 'intermediate',
+            status: 'implemented',
+            technology: 'DeviceOrientationEvent',
+            implementation: 'navigation.html - Live-Kompass mit Smooth Animation',
+            codeExample: `window.addEventListener('deviceorientation', (event) => {
+  this.updateCompass(event.alpha);
+});
+
+updateCompass(heading) {
+  const needle = document.getElementById('compassNeedle');
+  needle.style.transform = \`rotate(\${heading}deg)\`;
+}`,
+            documentation: 'https://developer.mozilla.org/en-US/docs/Web/API/DeviceOrientationEvent',
+            dependencies: ['DeviceOrientationEvent', 'CSS Transforms'],
+            useCases: ['Kompass-Navigation', 'Richtungsanzeige', 'Outdoor-Navigation'],
+            notes: 'Echte Kompass-Funktionalität für Navigation',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: 'technique_9',
+            name: 'Zod Schema Validation',
+            category: 'Backend',
+            description: 'TypeScript-first Schema Validation für Server',
+            complexity: 'intermediate',
+            status: 'implemented',
+            technology: 'Zod',
+            implementation: 'server.js - Input Validation für alle Endpoints',
+            codeExample: `const MessageSchema = z.object({
+  type: z.string(),
+  data: z.any(),
+  timestamp: z.string()
+});
+
+const message = MessageSchema.parse(req.body);`,
+            documentation: 'https://zod.dev/',
+            dependencies: ['zod', 'express'],
+            useCases: ['Input Validation', 'API Security', 'Type Safety'],
+            notes: 'Robuste Input-Validierung für Server-Sicherheit',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: 'technique_10',
+            name: 'Shadow DOM Widgets',
+            category: 'Frontend',
+            description: 'Isolierte UI-Widgets mit Shadow DOM',
+            complexity: 'advanced',
+            status: 'implemented',
+            technology: 'Shadow DOM',
+            implementation: 'app.js - Live Test Suite und Build Suite Widgets',
+            codeExample: `const host = document.createElement('div');
+const shadow = host.attachShadow({mode:'open'});
+shadow.innerHTML = \`
+  <style>/* Isolated Styles */</style>
+  <div class="widget">/* Widget Content */</div>
+\`;`,
+            documentation: 'https://developer.mozilla.org/en-US/docs/Web/API/Shadow_DOM',
+            dependencies: ['Shadow DOM API', 'CSS Isolation'],
+            useCases: ['Widget Isolation', 'Style Encapsulation', 'Component Architecture'],
+            notes: 'Isolierte Widgets für Live Test Suite und Build Suite',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: 'technique_11',
+            name: 'Live Test Suite',
+            category: 'Testing',
+            description: 'Real-time System Monitoring und Testing',
+            complexity: 'advanced',
+            status: 'implemented',
+            technology: 'JavaScript Testing',
+            implementation: 'apps/live-test-suite.html - Interaktive Test-Suite',
+            codeExample: `async function runAllTests() {
+  const tests = ['health', 'websocket', 'youtube', 'provider'];
+  for (const test of tests) {
+    await runSingleTest(test);
+  }
+}`,
+            documentation: 'LIVE_TEST_SUITE_DOCUMENTATION.md',
+            dependencies: ['Fetch API', 'WebSocket', 'Test Framework'],
+            useCases: ['System Monitoring', 'Health Checks', 'Performance Testing'],
+            notes: 'Interaktive Test-Suite für Live-Monitoring',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: 'technique_12',
+            name: 'Build Suite System',
+            category: 'DevOps',
+            description: 'Comprehensive Build System für Android APK & Apple IPA',
+            complexity: 'expert',
+            status: 'implemented',
+            technology: 'Gradle/Xcode',
+            implementation: 'build-suite/ - Android und iOS Build Management',
+            codeExample: `class BuildManager {
+  async buildAndroidAPK() {
+    // Gradle Build Process
+    const result = await this.runGradleBuild();
+    return result;
+  }
+}`,
+            documentation: 'BUILD_SUITE_DOCUMENTATION.md',
+            dependencies: ['Gradle', 'Xcode CLI', 'CocoaPods'],
+            useCases: ['Mobile App Building', 'Release Management', 'CI/CD'],
+            notes: 'Vollständiges Build-System für Mobile Apps',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: 'technique_13',
+            name: 'Stakeholder Management',
+            category: 'Management',
+            description: 'Comprehensive Stakeholder Tracking System',
+            complexity: 'intermediate',
+            status: 'implemented',
+            technology: 'JavaScript Management',
+            implementation: 'apps/stakeholder-management.html - Stakeholder CRUD',
+            codeExample: `class StakeholderManager {
+  async saveStakeholder(formData) {
+    const stakeholder = {
+      id: this.currentEditId || \`stakeholder_\${Date.now()}\`,
+      name: formData.get('name'),
+      role: formData.get('role')
+    };
+  }
+}`,
+            documentation: 'Stakeholder Management System',
+            dependencies: ['LocalStorage', 'CRUD Operations'],
+            useCases: ['Project Management', 'Team Coordination', 'Contact Management'],
+            notes: 'Vollständiges Stakeholder-Management-System',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: 'technique_14',
+            name: 'YouTube API Integration',
+            category: 'Media',
+            description: 'YouTube Video Embedding und Error Management',
+            complexity: 'intermediate',
+            status: 'implemented',
+            technology: 'YouTube API',
+            implementation: 'test.js - YouTube Test Integration',
+            codeExample: `async function testYouTube() {
+  const iframe = document.createElement('iframe');
+  iframe.src = 'https://www.youtube.com/embed/dQw4w9WgXcQ';
+  iframe.onload = () => resolve('YouTube OK');
+}`,
+            documentation: 'https://developers.google.com/youtube/iframe_api_reference',
+            dependencies: ['YouTube IFrame API', 'CSP Headers'],
+            useCases: ['Video Embedding', 'Media Sharing', 'Content Display'],
+            notes: 'YouTube Integration mit CSP-konfigurierten Headers',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: 'technique_15',
+            name: 'SIP Provider Configurations',
+            category: 'Telekommunikation',
+            description: 'Konfigurationen für verschiedene SIP-Provider',
+            complexity: 'advanced',
+            status: 'implemented',
+            technology: 'SIP Protocol',
+            implementation: 'SIP Provider Configurations in App',
+            codeExample: `const sipProviders = {
+  free: {
+    server: 'sip.free-sip.org',
+    port: 5060,
+    protocol: 'udp'
+  },
+  business: {
+    server: 'sip.business-provider.com',
+    port: 5061,
+    protocol: 'tls'
+  }
+};`,
+            documentation: 'SIP Provider Documentation',
+            dependencies: ['SIP Protocol', 'WebRTC', 'E.164 Normalization'],
+            useCases: ['VoIP Calling', 'Business Communication', 'Emergency Services'],
+            notes: 'Umfassende SIP-Provider-Konfigurationen',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          }
+        ];
+      }
+
+      async saveTechniques() {
+        try {
+          localStorage.setItem('telco-hub-techniques', JSON.stringify(this.techniques));
+        } catch (error) {
+          console.error('Techniken-Saving Fehler:', error);
+        }
+      }
+
+      renderTechniques() {
+        const grid = document.getElementById('techniquesGrid');
+        grid.innerHTML = '';
+
+        this.techniques.forEach(technique => {
+          const card = this.createTechniqueCard(technique);
+          grid.appendChild(card);
+        });
+      }
+
+      createTechniqueCard(technique) {
+        const card = document.createElement('div');
+        card.className = 'technique-card';
+        
+        const complexityClass = `complexity-${technique.complexity}`;
+        const complexityText = technique.complexity === 'beginner' ? 'Anfänger' :
+                              technique.complexity === 'intermediate' ? 'Fortgeschritten' :
+                              technique.complexity === 'advanced' ? 'Experte' : 'Profi';
+        
+        const statusClass = `status-${technique.status}`;
+        const statusText = technique.status === 'implemented' ? 'Implementiert' :
+                          technique.status === 'partial' ? 'Teilweise' :
+                          technique.status === 'planned' ? 'Geplant' : 'Veraltet';
+
+        card.innerHTML = `
+          <div class="technique-card-header">
+            <div class="technique-name">${technique.name}</div>
+            <div class="technique-category">${technique.category}</div>
+          </div>
+          
+          <div class="technique-info">
+            <div class="info-item">
+              <span class="info-label">Beschreibung:</span>
+              <span class="info-value">${technique.description}</span>
+            </div>
+            
+            <div class="info-item">
+              <span class="info-label">Komplexität:</span>
+              <span class="info-value">
+                <span class="complexity-indicator ${complexityClass}">
+                  ${complexityText}
+                </span>
+              </span>
+            </div>
+            
+            <div class="info-item">
+              <span class="info-label">Status:</span>
+              <span class="info-value">
+                <span class="implementation-status ${statusClass}">
+                  ${statusText}
+                </span>
+              </span>
+            </div>
+            
+            <div class="info-item">
+              <span class="info-label">Technologie:</span>
+              <span class="info-value">${technique.technology}</span>
+            </div>
+            
+            <div class="info-item">
+              <span class="info-label">Implementierung:</span>
+              <span class="info-value">${technique.implementation}</span>
+            </div>
+            
+            <div class="info-item">
+              <span class="info-label">Dokumentation:</span>
+              <span class="info-value">
+                <a href="${technique.documentation}" target="_blank">${technique.documentation}</a>
+              </span>
+            </div>
+            
+            <div class="info-item">
+              <span class="info-label">Dependencies:</span>
+              <span class="info-value">${technique.dependencies.join(', ')}</span>
+            </div>
+            
+            <div class="info-item">
+              <span class="info-label">Use Cases:</span>
+              <span class="info-value">${technique.useCases.join(', ')}</span>
+            </div>
+            
+            ${technique.codeExample ? `
+            <div class="info-item">
+              <span class="info-label">Code Example:</span>
+              <div class="code-snippet">${technique.codeExample}</div>
+            </div>
+            ` : ''}
+            
+            ${technique.notes ? `
+            <div class="info-item">
+              <span class="info-label">Notizen:</span>
+              <span class="info-value">${technique.notes}</span>
+            </div>
+            ` : ''}
+          </div>
+          
+          <div class="technique-actions">
+            <button class="action-btn action-btn-primary" onclick="techniquesManager.editTechnique('${technique.id}')" title="Action Button">✏️ Bearbeiten</button>
+            <button class="action-btn action-btn-secondary" onclick="techniquesManager.deleteTechnique('${technique.id}')" title="Action Button">🗑️ Löschen</button>
+            <button class="action-btn action-btn-secondary" onclick="techniquesManager.viewDocumentation('${technique.id}')" title="Action Button">📚 Docs</button>
+          </div>
+        `;
+        
+        return card;
+      }
+
+      updateStats() {
+        const statsGrid = document.getElementById('statsGrid');
+        
+        const total = this.techniques.length;
+        const implemented = this.techniques.filter(t => t.status === 'implemented').length;
+        const categories = new Set(this.techniques.map(t => t.category)).size;
+        const technologies = new Set(this.techniques.map(t => t.technology)).size;
+        
+        statsGrid.innerHTML = `
+          <div class="stat-item">
+            <div class="stat-value">${total}</div>
+            <div class="stat-label">Gesamt</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">${implemented}</div>
+            <div class="stat-label">Implementiert</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">${categories}</div>
+            <div class="stat-label">Kategorien</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">${technologies}</div>
+            <div class="stat-label">Technologien</div>
+          </div>
+        `;
+      }
+
+      populateFilters() {
+        const categoryFilter = document.getElementById('categoryFilter');
+        const technologyFilter = document.getElementById('technologyFilter');
+        
+        // Kategorien
+        const categories = [...new Set(this.techniques.map(t => t.category))].sort();
+        categories.forEach(category => {
+          const option = document.createElement('option');
+          option.value = category;
+          option.textContent = category;
+          categoryFilter.appendChild(option);
+        });
+        
+        // Technologien
+        const technologies = [...new Set(this.techniques.map(t => t.technology))].sort();
+        technologies.forEach(technology => {
+          const option = document.createElement('option');
+          option.value = technology;
+          option.textContent = technology;
+          technologyFilter.appendChild(option);
+        });
+      }
+
+      filterTechniques() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const categoryFilter = document.getElementById('categoryFilter').value;
+        const complexityFilter = document.getElementById('complexityFilter').value;
+        const statusFilter = document.getElementById('statusFilter').value;
+        const technologyFilter = document.getElementById('technologyFilter').value;
+        
+        const filtered = this.techniques.filter(technique => {
+          const matchesSearch = !searchTerm || 
+            technique.name.toLowerCase().includes(searchTerm) ||
+            technique.description.toLowerCase().includes(searchTerm) ||
+            technique.technology.toLowerCase().includes(searchTerm) ||
+            technique.category.toLowerCase().includes(searchTerm);
+          
+          const matchesCategory = !categoryFilter || technique.category === categoryFilter;
+          const matchesComplexity = !complexityFilter || technique.complexity === complexityFilter;
+          const matchesStatus = !statusFilter || technique.status === statusFilter;
+          const matchesTechnology = !technologyFilter || technique.technology === technologyFilter;
+          
+          return matchesSearch && matchesCategory && matchesComplexity && matchesStatus && matchesTechnology;
+        });
+        
+        this.renderFilteredTechniques(filtered);
+      }
+
+      renderFilteredTechniques(techniques) {
+        const grid = document.getElementById('techniquesGrid');
+        grid.innerHTML = '';
+
+        techniques.forEach(technique => {
+          const card = this.createTechniqueCard(technique);
+          grid.appendChild(card);
+        });
+      }
+
+      addTechnique() {
+        this.currentEditId = null;
+        this.openModal();
+      }
+
+      editTechnique(id) {
+        const technique = this.techniques.find(t => t.id === id);
+        if (technique) {
+          this.currentEditId = id;
+          this.populateForm(technique);
+          this.openModal();
+        }
+      }
+
+      async deleteTechnique(id) {
+        if (confirm('Sind Sie sicher, dass Sie diese Technik löschen möchten?')) {
+          this.techniques = this.techniques.filter(t => t.id !== id);
+          await this.saveTechniques();
+          this.renderTechniques();
+          this.updateStats();
+          this.populateFilters();
+        }
+      }
+
+      viewDocumentation(id) {
+        const technique = this.techniques.find(t => t.id === id);
+        if (technique) {
+          window.open(technique.documentation, '_blank');
+        }
+      }
+
+      openModal() {
+        // Modal Implementation würde hier folgen
+        alert('Modal für Technik hinzufügen/bearbeiten wird implementiert');
+      }
+
+      closeModal() {
+        // Modal schließen
+      }
+
+      populateForm(technique) {
+        // Formular befüllen
+      }
+
+      clearForm() {
+        // Formular leeren
+      }
+
+      async saveTechnique(formData) {
+        // Technik speichern
+      }
+
+      exportTechniques() {
+        const data = {
+          techniques: this.techniques,
+          exportDate: new Date().toISOString(),
+          version: '1.0'
+        };
+        
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `telco-hub-techniques-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        
+        URL.revokeObjectURL(url);
+      }
+
+      importTechniques() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        
+        input.onchange = (event) => {
+          const file = event.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              try {
+                const data = JSON.parse(e.target.result);
+                if (data.techniques && Array.isArray(data.techniques)) {
+                  this.techniques = data.techniques;
+                  this.saveTechniques();
+                  this.renderTechniques();
+                  this.updateStats();
+                  this.populateFilters();
+                  alert('Techniken erfolgreich importiert!');
+                } else {
+                  alert('Ungültiges Dateiformat!');
+                }
+              } catch (error) {
+                alert('Fehler beim Importieren der Datei!');
+              }
+            };
+            reader.readAsText(file);
+          }
+        };
+        
+        input.click();
+      }
+
+      setupEventListeners() {
+        // Event Listeners Setup
+      }
+    }
+
+    // Globale Funktionen
+    let techniquesManager;
+
+    function addTechnique() {
+      techniquesManager.addTechnique();
+    }
+
+    function exportTechniques() {
+      techniquesManager.exportTechniques();
+    }
+
+    function importTechniques() {
+      techniquesManager.importTechniques();
+    }
+
+    function filterTechniques() {
+      techniquesManager.filterTechniques();
+    }
+
+    // Initialisierung
+    document.addEventListener('DOMContentLoaded', () => {
+      techniquesManager = new TechniquesManager();
+    });
+  </script>
+</body>
+</html>

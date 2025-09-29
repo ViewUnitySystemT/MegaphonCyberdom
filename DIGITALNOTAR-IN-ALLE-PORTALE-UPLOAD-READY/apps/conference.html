@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Konferenz - TELCO Hub</title>
+<h1 style="position: absolute; left: -9999px;">Konferenz - TELCO Hub</h1>
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    .controls{display:flex; gap:var(--spacing-sm); flex-wrap:wrap; margin-bottom:var(--spacing-md)}
+    input,button{padding:.6rem .9rem; border-radius:var(--radius-sm); border:1px solid var(--outline); background:var(--surface); color:var(--on-surface)}
+    .grid{display:grid; gap:var(--spacing-md); grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+    video{width:100%; aspect-ratio:16/9; background:#000; border-radius:var(--radius-md)}
+    .card{background:var(--surface); border:1px solid var(--outline); border-radius:var(--radius-lg); padding:var(--spacing-lg)}
+  </style>
+
+        <style>
+            .navigation-buttons {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                display: flex;
+                gap: 10px;
+                z-index: 1000;
+            }
+            
+            .nav-btn {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                border: none;
+                background: var(--primary, #007bff);
+                color: white;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                transition: all 0.3s ease;
+            }
+            
+            .nav-btn:hover {
+                transform: scale(1.1);
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            }
+            
+            .nav-btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+                transform: none;
+            }
+            
+            .nav-btn svg {
+                width: 20px;
+                height: 20px;
+            }
+        </style>
+
+    </head>
+<body>
+    
+        <header class="top-app-bar">
+            <div class="top-app-bar-content">
+                <button class="icon-button" onclick="window.history.back()" title="Zurück" title="Action Button">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </button>
+                <h1 class="top-app-bar-title">Navigation</h1>
+                <div class="top-app-bar-actions"><button class="icon-button" onclick="window.history.forward()" title="Vorwärts" title="Action Button">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M4 11v2h12.17l-5.59 5.59L12 20l8-8-8-8-1.41 1.41L16.17 11H4z"/></svg>
+                    </button>
+                    
+                    <button class="icon-button" onclick="window.history.forward()" title="Vorwärts" title="Action Button">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M4 11v2h12.17l-5.59 5.59L12 20l8-8-8-8-1.41 1.41L16.17 11H4z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+        <main class="main-content">
+
+  <div class="main-content">
+    <div class="card">
+      <h2>Konferenz</h2>
+      <div class="controls">
+        <input id="room" placeholder="Raum-ID"/ aria-label="Input Field">
+        <button id="open-peerlink" title="Action Button">Im PeerLink öffnen</button>
+        <button id="share" title="Action Button">Bildschirm teilen (aktiver Tab)</button>
+      </div>
+      <div class="grid">
+        <video id="local" autoplay playsinline muted></video>
+        <video id="remote" autoplay playsinline></video>
+      </div>
+    </div>
+  </div>
+  <script>
+    document.getElementById('open-peerlink').onclick = () => {
+      const r = document.getElementById('room').value || '';
+      location.href = 'peerlink-full.html' + (r ? '#'+encodeURIComponent(r) : '');
+    };
+    document.getElementById('share').onclick = async () => {
+      const v = document.getElementById('local');
+      const stream = await navigator.mediaDevices.getDisplayMedia({video:true, audio:true});
+      v.srcObject = stream;
+    };
+  </script>
+        </main>
+    
+        <script>
+            // Browser Navigation Enhancement
+            document.addEventListener('DOMContentLoaded', function() {
+                // Navigation-Status anzeigen
+                updateNavigationStatus();
+                
+                // Popstate Event für Browser-Navigation
+                window.addEventListener('popstate', function(event) {
+                    console.log('Browser Navigation:', event.state);
+                    updateNavigationStatus();
+                });
+                
+                // Navigation-Status aktualisieren
+                function updateNavigationStatus() {
+                    const canGoBack = window.history.length > 1;
+                    const canGoForward = window.history.length > 1; // Vereinfacht
+                    
+                    // Back-Button aktivieren/deaktivieren
+                    const backButtons = document.querySelectorAll('button[onclick*="history.back"]');
+                    backButtons.forEach(btn => {
+                        btn.disabled = !canGoBack;
+                        btn.style.opacity = canGoBack ? '1' : '0.5';
+                    });
+                    
+                    // Forward-Button aktivieren/deaktivieren
+                    const forwardButtons = document.querySelectorAll('button[onclick*="history.forward"]');
+                    forwardButtons.forEach(btn => {
+                        btn.disabled = !canGoForward;
+                        btn.style.opacity = canGoForward ? '1' : '0.5';
+                    });
+                }
+                
+                // Globale Navigation-Funktionen
+                window.goBack = function() {
+                    if (window.history.length > 1) {
+                        window.history.back();
+                    }
+                };
+                
+                window.goForward = function() {
+                    window.history.forward();
+                };
+                
+                window.goHome = function() {
+                    window.location.href = '/';
+                };
+            });
+        </script>
+
+    </body>
+</html>

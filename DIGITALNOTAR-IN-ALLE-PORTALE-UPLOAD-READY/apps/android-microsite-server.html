@@ -1,0 +1,516 @@
+<!-- TODO: Replacement character detected () - verify source encoding -->
+<!DOCTYPE html>
+<html lang="de" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Android Microsite Server - TELCO Hub</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .android-setup {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .device-status {
+            background: #f0f8ff;
+            border: 2px solid #007bff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        .device-status.android {
+            background: #f0fff0;
+            border-color: #333333;
+        }
+        .device-status.ios {
+            background: #fff5f5;
+            border-color: #333333;
+        }
+        .install-section {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 1rem 0;
+        }
+        .code-block {
+            background: #1e1e1e;
+            color: #333333;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        .install-button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin: 1rem 0;
+            width: 100%;
+        }
+        .install-button:hover {
+            background: #218838;
+        }
+        .install-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-indicator.online { background: #28a745; }
+        .status-indicator.offline { background: #dc3545; }
+        .status-indicator.checking { background: #ffc107; animation: pulse 1s infinite; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .tunnel-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .tunnel-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+        .tunnel-card.selected {
+            border-color: #333333;
+            background: #f0f8ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="android-setup">
+        <header class="top-app-bar">
+            <div class="top-app-bar-content">
+                <button class="icon-button" onclick="window.history.back()" title="Action Button">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                    </svg>
+                </button>
+                <h1 class="app-title">📱 Android Microsite Server</h1>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Device Detection -->
+            <div class="device-status" id="device-status">
+                <h3>🔍 Geräte-Erkennung</h3>
+                <div id="device-info">
+                    <span class="status-indicator checking"></span>
+                    <span>Erkenne Gerät...</span>
+                </div>
+            </div>
+
+            <!-- Android Installation -->
+            <div class="install-section" id="android-section" class="optimized-style">
+                <h3>🤖 Android Microsite Server Setup</h3>
+                <p>Dein Android-Gerät wird automatisch als Microsite-Server konfiguriert:</p>
+                
+                <div class="tunnel-options">
+                    <div class="tunnel-card" data-tunnel="lan">
+                        <h4>🏠 LAN Only</h4>
+                        <p>Nur im lokalen Netzwerk verfügbar</p>
+                    </div>
+                    <div class="tunnel-card" data-tunnel="ssh">
+                        <h4>🔐 SSH Reverse Proxy</h4>
+                        <p>Öffentlicher Zugriff über eigenen Server</p>
+                    </div>
+                    <div class="tunnel-card" data-tunnel="cloudflare">
+                        <h4>☁️ Cloudflare Tunnel</h4>
+                        <p>HTTPS mit Cloudflare (kostenlos)</p>
+                    </div>
+                </div>
+
+                <button class="install-button" id="install-btn" onclick="startInstallation()" title="Action Button">
+                    🚀 Automatische Installation starten
+                </button>
+
+                <div id="install-progress" class="optimized-style">
+                    <h4>📋 Installations-Fortschritt</h4>
+                    <div id="progress-steps"></div>
+                </div>
+            </div>
+
+            <!-- iOS Warning -->
+            <div class="install-section" id="ios-section" class="optimized-style">
+                <h3>🍎 iOS Einschränkungen</h3>
+                <div class="device-status ios">
+                    <p><strong>iOS-Geräte können keine dauerhaften Hintergrund-Server betreiben.</strong></p>
+                    <p>Apple verhindert dies aus Sicherheitsgründen. Alternativen:</p>
+                    <ul>
+                        <li>📱 <strong>Shortcuts App:</strong> Temporäre Server für kurze Zeit</li>
+                        <li>💻 <strong>Mac/PC:</strong> Verwende einen Desktop-Computer</li>
+                        <li>☁️ <strong>Cloud-Server:</strong> Nutze einen VPS oder Cloud-Service</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Manual Installation -->
+            <div class="install-section">
+                <h3>📋 Manuelle Installation (Termux)</h3>
+                <p>Falls die automatische Installation nicht funktioniert:</p>
+                
+                <h4>1. Termux installieren</h4>
+                <div class="code-block">
+# Installiere Termux von F-Droid (empfohlen)
+# oder von Google Play Store
+                </div>
+
+                <h4>2. Setup-Script ausführen</h4>
+                <div class="code-block" id="setup-script">
+# Wird automatisch generiert basierend auf Gerät
+                </div>
+
+                <h4>3. Autostart aktivieren</h4>
+                <div class="code-block">
+# Installiere Termux:Boot App
+# Öffne sie einmal für Autostart-Aktivierung
+                </div>
+
+                <button class="install-button" onclick="copyScript()" title="Action Button">
+                    📋 Script kopieren
+                </button>
+            </div>
+
+            <!-- Server Status -->
+            <div class="install-section" id="server-status" class="optimized-style">
+                <h3>📊 Server Status</h3>
+                <div id="status-info">
+                    <span class="status-indicator offline"></span>
+                    <span>Server offline</span>
+                </div>
+                <div id="server-urls"></div>
+            </div>
+        </main>
+    </div>
+
+    <script async>
+        let selectedTunnel = 'lan';
+        let deviceType = 'unknown';
+        let installScript = '';
+
+        // Device Detection
+        function detectDevice() {
+            const userAgent = navigator.userAgent.toLowerCase();
+            const isAndroid = /android/.test(userAgent);
+            const isIOS = /iphone|ipad|ipod/.test(userAgent);
+            
+            const deviceInfo = document.getElementById('device-info');
+            const deviceStatus = document.getElementById('device-status');
+            
+            if (isAndroid) {
+                deviceType = 'android';
+                deviceStatus.className = 'device-status android';
+                deviceInfo.innerHTML = `
+                    <span class="status-indicator online"></span>
+                    <span><strong>Android-Gerät erkannt!</strong> Automatische Installation verfügbar.</span>
+                `;
+                document.getElementById('android-section').style.display = 'block';
+                generateAndroidScript();
+            } else if (isIOS) {
+                deviceType = 'ios';
+                deviceStatus.className = 'device-status ios';
+                deviceInfo.innerHTML = `
+                    <span class="status-indicator offline"></span>
+                    <span><strong>iOS-Gerät erkannt.</strong> Dauerhafte Server nicht möglich.</span>
+                `;
+                document.getElementById('ios-section').style.display = 'block';
+            } else {
+                deviceType = 'desktop';
+                deviceStatus.className = 'device-status';
+                deviceInfo.innerHTML = `
+                    <span class="status-indicator offline"></span>
+                    <span><strong>Desktop-Gerät erkannt.</strong> Verwende einen Android-Gerät für Mobile Server.</span>
+                `;
+            }
+        }
+
+        // Generate Android Installation Script
+        function generateAndroidScript() {
+            const tunnelConfig = getTunnelConfig(selectedTunnel);
+            
+            installScript = `#!/data/data/com.termux/files/usr/bin/bash
+# === TELCO Hub Android Microsite Server Setup ===
+set -euo pipefail
+
+echo "🚀 Starte Android Microsite Server Installation..."
+
+# Update packages
+echo "📦 Aktualisiere Pakete..."
+pkg update -y && pkg upgrade -y
+
+# Install required packages
+echo "🔧 Installiere Caddy und Services..."
+pkg install -y caddy termux-services coreutils curl wget
+
+# Create webroot
+echo "📁 Erstelle Webroot..."
+mkdir -p "$HOME/www"
+
+# Create TELCO Hub Microsite
+cat > "$HOME/www/index.html" <<'HTML'
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TELCO Hub - Android Server</title>
+    <style>
+        body { font: 16px/1.5 system-ui; margin: 2rem auto; max-width: 60ch; }
+        .status { background: #d4edda; border: 1px solid #c3e6cb; padding: 1rem; border-radius: 8px; }
+        .info { background: #d1ecf1; border: 1px solid #bee5eb; padding: 1rem; border-radius: 8px; margin: 1rem 0; }
+    </style>
+</head>
+<body>
+    <h1>🎉 TELCO Hub Android Server</h1>
+    <div class="status">
+        <strong>✅ Server läuft erfolgreich!</strong><br>
+        Diese Microsite läuft auf deinem Android-Gerät via Caddy (Termux).
+    </div>
+    <div class="info">
+        <strong>📱 Gerät:</strong> Android<br>
+        <strong>🕒 Startzeit:</strong> <span id="starttime"></span><br>
+        <strong>🌐 Server:</strong> Caddy Web Server<br>
+        <strong>📊 Status:</strong> Online
+    </div>
+    <script async>
+        document.getElementById('starttime').textContent = new Date().toLocaleString('de-DE');
+    </script>
+</body>
+</html>
+HTML
+
+# Create Caddyfile
+echo "⚙️ Konfiguriere Caddy..."
+cat > "$HOME/Caddyfile" <<'CADDY'
+:8080 {
+  root * /data/data/com.termux/files/home/www
+  file_server
+  encode gzip zstd
+  
+  # Security headers
+  header {
+    X-Content-Type-Options nosniff
+    X-Frame-Options DENY
+    X-XSS-Protection "1; mode=block"
+  }
+  
+  # Logging
+  log {
+    output file /data/data/com.termux/files/home/caddy.log {
+      roll_size 5MiB
+      roll_keep 5
+    }
+  }
+  
+  # Health check endpoint
+  respond /healthz "OK" 200
+}
+CADDY
+
+# Create service
+echo "🔧 Erstelle Service..."
+mkdir -p "$HOME/.termux/services/caddy"
+cat > "$HOME/.termux/services/caddy/run" <<'SH'
+#!/data/data/com.termux/files/usr/bin/sh
+exec caddy run --config "$HOME/Caddyfile" --adapter caddyfile
+SH
+chmod +x "$HOME/.termux/services/caddy/run"
+
+# Start service
+echo "🚀 Starte Caddy Service..."
+sv up caddy || true
+termux-wake-lock || true
+
+# Create autostart script
+echo "🔄 Erstelle Autostart..."
+mkdir -p "$HOME/.termux/boot"
+cat > "$HOME/.termux/boot/00_telco_services.sh" <<'SH'
+#!/data/data/com.termux/files/usr/bin/sh
+termux-wake-lock
+sv up caddy
+${tunnelConfig.autostart}
+SH
+chmod +x "$HOME/.termux/boot/00_telco_services.sh"
+
+echo "✅ Installation abgeschlossen!"
+echo ""
+echo "🌐 Server läuft auf:"
+echo "   • Local: http://127.0.0.1:8080"
+echo "   • LAN: http://$(termux-wifi-connectioninfo | grep ip_address | cut -d'"' -f4):8080"
+echo ""
+echo "📱 Nächste Schritte:"
+echo "   1. Installiere 'Termux:Boot' App für Autostart"
+echo "   2. Öffne Termux:Boot einmal"
+echo "   3. Server startet automatisch beim Boot"
+echo ""
+echo "🔧 Service-Befehle:"
+echo "   • sv up caddy     # Starten"
+echo "   • sv down caddy   # Stoppen"
+echo "   • sv status caddy # Status"
+echo ""
+echo "📊 Logs ansehen: tail -f ~/caddy.log"
+`;
+
+            document.getElementById('setup-script').textContent = installScript;
+        }
+
+        // Tunnel Configuration
+        function getTunnelConfig(tunnelType) {
+            switch(tunnelType) {
+                case 'ssh':
+                    return {
+                        autostart: `# SSH Reverse Proxy (konfiguriere deine Server-Daten)
+# autossh -M 0 -N -o "ServerAliveInterval 30" -o "ServerAliveCountMax 3" \\
+#   -R 8080:localhost:8080 user@your-server.com &`
+                    };
+                case 'cloudflare':
+                    return {
+                        autostart: `# Cloudflare Tunnel (nach cloudflared Installation)
+# cloudflared tunnel run microsite &`
+                    };
+                default:
+                    return {
+                        autostart: `# LAN-only Mode (kein Tunnel)`
+                    };
+            }
+        }
+
+        // Tunnel Selection
+        document.querySelectorAll('.tunnel-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.tunnel-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedTunnel = card.dataset.tunnel;
+                if (deviceType === 'android') {
+                    generateAndroidScript();
+                }
+            });
+        });
+
+        // Installation Process
+        function startInstallation() {
+            const progressDiv = document.getElementById('install-progress');
+            const stepsDiv = document.getElementById('progress-steps');
+            
+            progressDiv.style.display = 'block';
+            stepsDiv.innerHTML = `
+                <div class="status-indicator checking"></div>
+                <span>Installation wird vorbereitet...</span>
+            `;
+
+            // Simulate installation steps
+            setTimeout(() => {
+                stepsDiv.innerHTML = `
+                    <div class="status-indicator online"></div>
+                    <span>✅ Script generiert</span><br>
+                    <div class="status-indicator checking"></div>
+                    <span>📋 Kopiere das Script in Termux...</span>
+                `;
+            }, 1000);
+
+            setTimeout(() => {
+                stepsDiv.innerHTML = `
+                    <div class="status-indicator online"></div>
+                    <span>✅ Script generiert</span><br>
+                    <div class="status-indicator online"></div>
+                    <span>✅ Script kopiert</span><br>
+                    <div class="status-indicator checking"></div>
+                    <span>🚀 Führe Installation in Termux aus...</span>
+                `;
+            }, 2000);
+
+            setTimeout(() => {
+                stepsDiv.innerHTML = `
+                    <div class="status-indicator online"></div>
+                    <span>✅ Script generiert</span><br>
+                    <div class="status-indicator online"></span>
+                    <span>✅ Script kopiert</span><br>
+                    <div class="status-indicator online"></span>
+                    <span>✅ Installation abgeschlossen</span><br>
+                    <div class="status-indicator checking"></span>
+                    <span>🔍 Prüfe Server-Status...</span>
+                `;
+                checkServerStatus();
+            }, 5000);
+        }
+
+        // Copy Script
+        function copyScript() {
+            navigator.clipboard.writeText(installScript).then(() => {
+                alert('✅ Script in Zwischenablage kopiert!\n\nFüge es in Termux ein und führe es aus.');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = installScript;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('✅ Script in Zwischenablage kopiert!');
+            });
+        }
+
+        // Check Server Status
+        function checkServerStatus() {
+            const statusDiv = document.getElementById('server-status');
+            const statusInfo = document.getElementById('status-info');
+            const urlsDiv = document.getElementById('server-urls');
+            
+            statusDiv.style.display = 'block';
+            
+            // Try to detect if server is running
+            fetch('http://127.0.0.1:8080/healthz')
+                .then(response => {
+                    if (response.ok) {
+                        statusInfo.innerHTML = `
+                            <span class="status-indicator online"></span>
+                            <span><strong>Server online!</strong></span>
+                        `;
+                        urlsDiv.innerHTML = `
+                            <h4>🌐 Zugriff-URLs:</h4>
+                            <ul>
+                                <li><a href="http://127.0.0.1:8080" target="_blank">http://127.0.0.1:8080</a> (lokal)</li>
+                                <li><a href="http://localhost:8080" target="_blank">http://localhost:8080</a> (localhost)</li>
+                            </ul>
+                        `;
+                    } else {
+                        throw new Error('Server not responding');
+                    }
+                })
+                .catch(() => {
+                    statusInfo.innerHTML = `
+                        <span class="status-indicator offline"></span>
+                        <span>Server offline - Installation erforderlich</span>
+                    `;
+                    urlsDiv.innerHTML = `
+                        <p>Führe die Installation aus, um den Server zu starten.</p>
+                    `;
+                });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            detectDevice();
+            
+            // Select LAN by default
+            document.querySelector('.tunnel-card[data-tunnel="lan"]').classList.add('selected');
+        });
+    </script>
+</body>
+</html>

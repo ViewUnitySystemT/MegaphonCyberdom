@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator</title>
+    <link rel="stylesheet" href="../styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <style>
+        body { 
+            font-family: var(--font-family); 
+            background-color: var(--background); 
+            color: var(--on-background); 
+            padding: 20px; 
+        }
+        .qr-container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: var(--surface); 
+            border-radius: var(--radius-lg); 
+            box-shadow: var(--shadow-md); 
+            padding: 30px; 
+        }
+        h1 { 
+            color: var(--primary); 
+            text-align: center; 
+            margin-bottom: 30px; 
+        }
+        .qr-section { 
+            margin-bottom: 30px; 
+            padding: 20px; 
+            background: var(--surface-variant); 
+            border-radius: var(--radius-md); 
+        }
+        .qr-section h3 { 
+            color: var(--on-surface); 
+            margin-bottom: 15px; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+        .input-group { 
+            margin-bottom: 15px; 
+        }
+        .input-group label { 
+            display: block; 
+            margin-bottom: 5px; 
+            font-weight: 500; 
+            color: var(--on-surface); 
+        }
+        .input-group input, .input-group textarea, .input-group select { 
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid var(--outline); 
+            border-radius: var(--radius-sm); 
+            background: var(--surface); 
+            color: var(--on-surface); 
+            font-size: 1rem; 
+        }
+        .input-group textarea { 
+            resize: vertical; 
+            min-height: 80px; 
+        }
+        .qr-display { 
+            text-align: center; 
+            margin: 20px 0; 
+            padding: 20px; 
+            background: white; 
+            border-radius: var(--radius-md); 
+        }
+        .qr-display canvas { 
+            max-width: 100%; 
+            height: auto; 
+        }
+        .qr-info { 
+            margin-top: 10px; 
+            font-size: 0.9rem; 
+            color: var(--on-surface-variant); 
+        }
+        .button-group { 
+            display: flex; 
+            gap: 10px; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            margin-top: 20px; 
+        }
+        .btn { 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: var(--radius-sm); 
+            cursor: pointer; 
+            font-size: 1rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            transition: all 0.3s ease; 
+        }
+        .btn-primary { 
+            background-color: var(--primary); 
+            color: var(--on-primary); 
+        }
+        .btn-secondary { 
+            background-color: var(--secondary); 
+            color: var(--on-secondary); 
+        }
+        .btn-success { 
+            background-color: var(--success); 
+            color: var(--on-success); 
+        }
+        .btn:hover { 
+            opacity: 0.9; 
+            transform: translateY(-2px); 
+        }
+        .preset-buttons { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 10px; 
+            margin-bottom: 20px; 
+        }
+        .preset-btn { 
+            padding: 15px; 
+            background: var(--surface); 
+            border: 2px solid var(--outline); 
+            border-radius: var(--radius-md); 
+            cursor: pointer; 
+            text-align: center; 
+            transition: all 0.3s ease; 
+        }
+        .preset-btn:hover { 
+            border-color: var(--primary); 
+            background: var(--primary-container); 
+        }
+        .preset-btn.active { 
+            border-color: var(--primary); 
+            background: var(--primary-container); 
+        }
+        .connection-types { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 15px; 
+            margin-top: 20px; 
+        }
+        .connection-type { 
+            padding: 15px; 
+            background: var(--surface); 
+            border-radius: var(--radius-md); 
+            border: 1px solid var(--outline); 
+        }
+        .connection-type h4 { 
+            margin-bottom: 10px; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+        }
+        .connection-type p { 
+            font-size: 0.9rem; 
+            color: var(--on-surface-variant); 
+            margin-bottom: 10px; 
+        }
+        .status-indicator { 
+            display: inline-block; 
+            width: 8px; 
+            height: 8px; 
+            border-radius: 50%; 
+            margin-right: 5px; 
+        }
+        .status-online { 
+            background-color: var(--success); 
+        }
+        .status-offline { 
+            background-color: var(--error); 
+        }
+        .status-unknown { 
+            background-color: var(--warning); 
+        }
+    </style>
+
+        <style>
+            .navigation-buttons {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                display: flex;
+                gap: 10px;
+                z-index: 1000;
+            }
+            
+            .nav-btn {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                border: none;
+                background: var(--primary, #007bff);
+                color: white;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                transition: all 0.3s ease;
+            }
+            
+            .nav-btn:hover {
+                transform: scale(1.1);
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            }
+            
+            .nav-btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+                transform: none;
+            }
+            
+            .nav-btn svg {
+                width: 20px;
+                height: 20px;
+            }
+        </style>
+
+    </head>
+<body>
+    
+        <header class="top-app-bar">
+            <div class="top-app-bar-content">
+                <button class="icon-button" onclick="window.history.back()" title="Zurück" title="Action Button">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </button>
+                <h1 class="top-app-bar-title">Navigation</h1>
+                <div class="top-app-bar-actions"><button class="icon-button" onclick="window.history.forward()" title="Vorwärts" title="Action Button">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M4 11v2h12.17l-5.59 5.59L12 20l8-8-8-8-1.41 1.41L16.17 11H4z"/></svg>
+                    </button>
+                    
+                    <button class="icon-button" onclick="window.history.forward()" title="Vorwärts" title="Action Button">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M4 11v2h12.17l-5.59 5.59L12 20l8-8-8-8-1.41 1.41L16.17 11H4z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+        <main class="main-content">
+
+    <div class="qr-container">
+        <h1>🔗 QR Code Generator & Sharing</h1>
+        
+        <!-- Connection Types Overview -->
+        <div class="qr-section">
+            <h3>📡 Verfügbare Verbindungsarten</h3>
+            <div class="connection-types">
+                <div class="connection-type">
+                    <h4><span class="status-indicator status-online"></span>📱 App-Sharing</h4>
+                    <p>Teile die TELCO Hub App über QR-Code</p>
+                </div>
+                <div class="connection-type">
+                    <h4><span class="status-indicator status-online"></span>🌐 WebRTC-Verbindung</h4>
+                    <p>Direkte Peer-to-Peer-Verbindung</p>
+                </div>
+                <div class="connection-type">
+                    <h4><span class="status-indicator status-online"></span>📶 WiFi Direct</h4>
+                    <p>Direkte WiFi-Verbindung zwischen Geräten</p>
+                </div>
+                <div class="connection-type">
+                    <h4><span class="status-indicator status-online"></span>🔵 Bluetooth</h4>
+                    <p>Bluetooth-Verbindung für Dateien und Calls</p>
+                </div>
+                <div class="connection-type">
+                    <h4><span class="status-indicator status-online"></span>📡 NFC</h4>
+                    <p>Near Field Communication für schnelle Verbindung</p>
+                </div>
+                <div class="connection-type">
+                    <h4><span class="status-indicator status-online"></span>🔗 Matrix-Room</h4>
+                    <p>Matrix-Room für erweiterte Kommunikation</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Preset Buttons -->
+        <div class="qr-section">
+            <h3>⚡ Schnell-Auswahl</h3>
+            <div class="preset-buttons">
+                <div class="preset-btn" data-type="app">
+                    <h4>📱 App teilen</h4>
+                    <p>Lade andere zur App ein</p>
+                </div>
+                <div class="preset-btn" data-type="webrtc">
+                    <h4>🎥 Video-Call</h4>
+                    <p>Starte einen WebRTC-Call</p>
+                </div>
+                <div class="preset-btn" data-type="screenshare">
+                    <h4>🖥️ Screen-Share</h4>
+                    <p>Bildschirm teilen</p>
+                </div>
+                <div class="preset-btn" data-type="matrix">
+                    <h4>🔗 Matrix-Room</h4>
+                    <p>Erweiterten Chat-Raum</p>
+                </div>
+                <div class="preset-btn" data-type="wifi">
+                    <h4>📶 WiFi Direct</h4>
+                    <p>Direkte WiFi-Verbindung</p>
+                </div>
+                <div class="preset-btn" data-type="bluetooth">
+                    <h4>🔵 Bluetooth</h4>
+                    <p>Bluetooth-Verbindung</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- QR Code Generator -->
+        <div class="qr-section">
+            <h3>🎯 QR Code Generator</h3>
+            
+            <div class="input-group">
+                <label for="qrType">Verbindungstyp:</label>
+                <select id="qrType">
+                    <option value="app">📱 App-Sharing</option>
+                    <option value="webrtc">🎥 WebRTC-Verbindung</option>
+                    <option value="screenshare">🖥️ Screen-Share</option>
+                    <option value="matrix">🔗 Matrix-Room</option>
+                    <option value="wifi">📶 WiFi Direct</option>
+                    <option value="bluetooth">🔵 Bluetooth</option>
+                    <option value="nfc">📡 NFC-Verbindung</option>
+                    <option value="custom">⚙️ Benutzerdefiniert</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="qrContent">Inhalt/URL:</label>
+                <textarea id="qrContent" placeholder="Gib hier den Inhalt für den QR-Code ein..."></textarea>
+            </div>
+
+            <div class="input-group">
+                <label for="qrSize">QR-Code Größe:</label>
+                <select id="qrSize">
+                    <option value="128">Klein (128px)</option>
+                    <option value="256" selected>Mittel (256px)</option>
+                    <option value="512">Groß (512px)</option>
+                    <option value="1024">Extra Groß (1024px)</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="qrErrorLevel">Fehlerkorrektur:</label>
+                <select id="qrErrorLevel">
+                    <option value="L">Niedrig (L)</option>
+                    <option value="M" selected>Mittel (M)</option>
+                    <option value="Q">Hoch (Q)</option>
+                    <option value="H">Höchst (H)</option>
+                </select>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="generateQR()" title="Action Button">
+                    🔗 QR-Code generieren
+                </button>
+                <button class="btn btn-secondary" onclick="downloadQR()" title="Action Button">
+                    💾 Herunterladen
+                </button>
+                <button class="btn btn-success" onclick="shareQR()" title="Action Button">
+                    📤 Teilen
+                </button>
+            </div>
+
+            <div id="qrDisplay" class="qr-display" style="display: block;">
+                <canvas id="qrCanvas"></canvas>
+                <div class="qr-info" id="qrInfo"></div>
+            </div>
+        </div>
+
+        <!-- Sharing Methods -->
+        <div class="qr-section">
+            <h3>📤 Teilen über alle verfügbaren Methoden</h3>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="shareViaWebShare()" title="Action Button">
+                    📱 Web Share API
+                </button>
+                <button class="btn btn-secondary" onclick="shareViaClipboard()" title="Action Button">
+                    📋 Zwischenablage
+                </button>
+                <button class="btn btn-success" onclick="shareViaEmail()" title="Action Button">
+                    📧 E-Mail
+                </button>
+                <button class="btn btn-primary" onclick="shareViaSMS()" title="Action Button">
+                    💬 SMS
+                </button>
+                <button class="btn btn-secondary" onclick="shareViaBluetooth()" title="Action Button">
+                    🔵 Bluetooth
+                </button>
+                <button class="btn btn-success" onclick="shareViaNFC()" title="Action Button">
+                    📡 NFC
+                </button>
+                <button class="btn btn-primary" onclick="shareViaWiFi()" title="Action Button">
+                    📶 WiFi Direct
+                </button>
+                <button class="btn btn-secondary" onclick="shareViaQR()" title="Action Button">
+                    🔗 QR-Code anzeigen
+                </button>
+            </div>
+        </div>
+
+        <!-- Device Capabilities -->
+        <div class="qr-section">
+            <h3>📱 Geräte-Features</h3>
+            <div id="deviceCapabilities"></div>
+        </div>
+    </div>
+
+    <script>
+        class QRCodeGenerator {
+            constructor() {
+                this.currentQRCode = null;
+                this.init();
+            }
+
+            init() {
+                this.setupPresetButtons();
+                this.setupTypeChange();
+                this.loadDeviceCapabilities();
+                this.generateDefaultQR();
+            }
+
+            setupPresetButtons() {
+                document.querySelectorAll('.preset-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        
+                        const type = btn.dataset.type;
+                        this.loadPreset(type);
+                    });
+                });
+            }
+
+            setupTypeChange() {
+                document.getElementById('qrType').addEventListener('change', () => {
+                    const type = document.getElementById('qrType').value;
+                    if (type !== 'custom') {
+                        this.loadPreset(type);
+                    }
+                });
+            }
+
+            loadPreset(type) {
+                const content = document.getElementById('qrContent');
+                const typeSelect = document.getElementById('qrType');
+                
+                switch(type) {
+                    case 'app':
+                        content.value = `${window.location.origin}/?invite=app&source=qr`;
+                        typeSelect.value = 'app';
+                        break;
+                    case 'webrtc':
+                        content.value = `${window.location.origin}/apps/peerlink-full.html?room=${this.generateRoomId()}`;
+                        typeSelect.value = 'webrtc';
+                        break;
+                    case 'screenshare':
+                        content.value = `${window.location.origin}/apps/conference-full.html?mode=screenshare&room=${this.generateRoomId()}`;
+                        typeSelect.value = 'screenshare';
+                        break;
+                    case 'matrix':
+                        content.value = `https://matrix.to/#/${this.generateMatrixRoomId()}`;
+                        typeSelect.value = 'matrix';
+                        break;
+                    case 'wifi':
+                        content.value = `telco://wifi-direct/${this.generateWifiId()}`;
+                        typeSelect.value = 'wifi';
+                        break;
+                    case 'bluetooth':
+                        content.value = `telco://bluetooth/${this.generateBluetoothId()}`;
+                        typeSelect.value = 'bluetooth';
+                        break;
+                }
+                
+                this.generateQR();
+            }
+
+            generateRoomId() {
+                return Math.random().toString(36).substr(2, 9);
+            }
+
+            generateMatrixRoomId() {
+                return `!${Math.random().toString(36).substr(2, 18)}:megaphoncyberdom.local`;
+            }
+
+            generateWifiId() {
+                return Math.random().toString(36).substr(2, 12);
+            }
+
+            generateBluetoothId() {
+                return Math.random().toString(36).substr(2, 12);
+            }
+
+            async generateQR() {
+                const content = document.getElementById('qrContent').value;
+                const size = parseInt(document.getElementById('qrSize').value);
+                const errorLevel = document.getElementById('qrErrorLevel').value;
+
+                if (!content.trim()) {
+                    alert('Bitte gib einen Inhalt für den QR-Code ein!');
+                    return;
+                }
+
+                try {
+                    const canvas = document.getElementById('qrCanvas');
+                    await QRCode.toCanvas(canvas, content, {
+                        width: size,
+                        margin: 2,
+                        color: {
+                            dark: '#000000',
+                            light: '#FFFFFF'
+                        },
+                        errorCorrectionLevel: errorLevel
+                    });
+
+                    document.getElementById('qrDisplay').style.display = 'block';
+                    document.getElementById('qrInfo').innerHTML = `
+                        <strong>QR-Code generiert!</strong><br>
+                        Inhalt: ${content}<br>
+                        Größe: ${size}x${size}px<br>
+                        Fehlerkorrektur: ${errorLevel}
+                    `;
+
+                    this.currentQRCode = content;
+                } catch (error) {
+                    console.error('QR-Code Generation Error:', error);
+                    alert('Fehler beim Generieren des QR-Codes: ' + error.message);
+                }
+            }
+
+            generateDefaultQR() {
+                document.getElementById('qrContent').value = `${window.location.origin}/?invite=app&source=qr`;
+                this.generateQR();
+            }
+
+            downloadQR() {
+                const canvas = document.getElementById('qrCanvas');
+                if (!canvas) {
+                    alert('Bitte generiere zuerst einen QR-Code!');
+                    return;
+                }
+
+                const link = document.createElement('a');
+                link.download = 'telco-hub-qr-code.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            }
+
+            async shareQR() {
+                const canvas = document.getElementById('qrCanvas');
+                if (!canvas) {
+                    alert('Bitte generiere zuerst einen QR-Code!');
+                    return;
+                }
+
+                if (navigator.share) {
+                    try {
+                        canvas.toBlob(async (blob) => {
+                            await navigator.share({
+                                title: 'TELCO Hub QR-Code',
+                                text: 'Verbindung über QR-Code',
+                                files: [new File([blob], 'qr-code.png', { type: 'image/png' })]
+                            });
+                        });
+                    } catch (error) {
+                        console.log('Web Share API nicht unterstützt:', error);
+                        this.fallbackShare();
+                    }
+                } else {
+                    this.fallbackShare();
+                }
+            }
+
+            fallbackShare() {
+                const canvas = document.getElementById('qrCanvas');
+                const link = document.createElement('a');
+                link.download = 'telco-hub-qr-code.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            }
+
+            // Sharing Methods
+            async shareViaWebShare() {
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: 'TELCO Hub',
+                            text: 'Verbinde dich über TELCO Hub!',
+                            url: this.currentQRCode || window.location.origin
+                        });
+                    } catch (error) {
+                        console.log('Web Share abgebrochen:', error);
+                    }
+                } else {
+                    alert('Web Share API wird nicht unterstützt');
+                }
+            }
+
+            async shareViaClipboard() {
+                try {
+                    await navigator.clipboard.writeText(this.currentQRCode || window.location.origin);
+                    alert('URL in Zwischenablage kopiert!');
+                } catch (error) {
+                    console.error('Clipboard Error:', error);
+                    alert('Fehler beim Kopieren in die Zwischenablage');
+                }
+            }
+
+            shareViaEmail() {
+                const subject = 'TELCO Hub Einladung';
+                const body = `Hallo!\n\nVerbinde dich über TELCO Hub:\n${this.currentQRCode || window.location.origin}\n\nViele Grüße!`;
+                window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            }
+
+            shareViaSMS() {
+                const text = `TELCO Hub Einladung: ${this.currentQRCode || window.location.origin}`;
+                window.location.href = `sms:?body=${encodeURIComponent(text)}`;
+            }
+
+            shareViaBluetooth() {
+                if (navigator.bluetooth) {
+                    // Bluetooth API implementieren
+                    alert('Bluetooth-Sharing wird implementiert...');
+                } else {
+                    alert('Bluetooth wird nicht unterstützt');
+                }
+            }
+
+            shareViaNFC() {
+                if ('NDEFReader' in window) {
+                    // NFC API implementieren
+                    alert('NFC-Sharing wird implementiert...');
+                } else {
+                    alert('NFC wird nicht unterstützt');
+                }
+            }
+
+            shareViaWiFi() {
+                alert('WiFi Direct-Sharing wird implementiert...');
+            }
+
+            shareViaQR() {
+                const canvas = document.getElementById('qrCanvas');
+                if (canvas) {
+                    const newWindow = window.open();
+                    newWindow.document.write(`
+                        <html>
+                            <head><title>QR-Code - TELCO Hub</title></head>
+                            <body style="text-align: center; padding: 20px;">
+                                <h1>🔗 TELCO Hub QR-Code</h1>
+                                <img  src="${canvas.toDataURL()}" alt="TELCO Hub Image" style="max-width: 100%; height: auto;">
+                                <p>Scanne diesen QR-Code mit deinem Gerät</p>
+                                    </main>
+    
+        <script>
+            // Browser Navigation Enhancement
+            document.addEventListener('DOMContentLoaded', function() {
+                // Navigation-Status anzeigen
+                updateNavigationStatus();
+                
+                // Popstate Event für Browser-Navigation
+                window.addEventListener('popstate', function(event) {
+                    console.log('Browser Navigation:', event.state);
+                    updateNavigationStatus();
+                });
+                
+                // Navigation-Status aktualisieren
+                function updateNavigationStatus() {
+                    const canGoBack = window.history.length > 1;
+                    const canGoForward = window.history.length > 1; // Vereinfacht
+                    
+                    // Back-Button aktivieren/deaktivieren
+                    const backButtons = document.querySelectorAll('button[onclick*="history.back"]');
+                    backButtons.forEach(btn => {
+                        btn.disabled = !canGoBack;
+                        btn.style.opacity = canGoBack ? '1' : '0.5';
+                    });
+                    
+                    // Forward-Button aktivieren/deaktivieren
+                    const forwardButtons = document.querySelectorAll('button[onclick*="history.forward"]');
+                    forwardButtons.forEach(btn => {
+                        btn.disabled = !canGoForward;
+                        btn.style.opacity = canGoForward ? '1' : '0.5';
+                    });
+                }
+                
+                // Globale Navigation-Funktionen
+                window.goBack = function() {
+                    if (window.history.length > 1) {
+                        window.history.back();
+                    }
+                };
+                
+                window.goForward = function() {
+                    window.history.forward();
+                };
+                
+                window.goHome = function() {
+                    window.location.href = '/';
+                };
+            });
+        </script>
+
+    </body>
+                        </html>
+                    `);
+                }
+            }
+
+            loadDeviceCapabilities() {
+                const capabilities = document.getElementById('deviceCapabilities');
+                const features = [];
+
+                // Web Share API
+                if (navigator.share) {
+                    features.push('<div class="connection-type"><h4>📱 Web Share API</h4><p>Unterstützt</p></div>');
+                }
+
+                // Clipboard API
+                if (navigator.clipboard) {
+                    features.push('<div class="connection-type"><h4>📋 Clipboard API</h4><p>Unterstützt</p></div>');
+                }
+
+                // Bluetooth
+                if (navigator.bluetooth) {
+                    features.push('<div class="connection-type"><h4>🔵 Bluetooth</h4><p>Unterstützt</p></div>');
+                }
+
+                // NFC
+                if ('NDEFReader' in window) {
+                    features.push('<div class="connection-type"><h4>📡 NFC</h4><p>Unterstützt</p></div>');
+                }
+
+                // Camera (for QR scanning)
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    features.push('<div class="connection-type"><h4>📷 Kamera</h4><p>Für QR-Scanner verfügbar</p></div>');
+                }
+
+                // WiFi Direct (experimental)
+                if ('wifiDirect' in navigator) {
+                    features.push('<div class="connection-type"><h4>📶 WiFi Direct</h4><p>Experimentell unterstützt</p></div>');
+                }
+
+                capabilities.innerHTML = features.join('');
+            }
+        }
+
+        // Global functions for buttons
+        function generateQR() {
+            window.qrGenerator.generateQR();
+        }
+
+        function downloadQR() {
+            window.qrGenerator.downloadQR();
+        }
+
+        function shareQR() {
+            window.qrGenerator.shareQR();
+        }
+
+        function shareViaWebShare() {
+            window.qrGenerator.shareViaWebShare();
+        }
+
+        function shareViaClipboard() {
+            window.qrGenerator.shareViaClipboard();
+        }
+
+        function shareViaEmail() {
+            window.qrGenerator.shareViaEmail();
+        }
+
+        function shareViaSMS() {
+            window.qrGenerator.shareViaSMS();
+        }
+
+        function shareViaBluetooth() {
+            window.qrGenerator.shareViaBluetooth();
+        }
+
+        function shareViaNFC() {
+            window.qrGenerator.shareViaNFC();
+        }
+
+        function shareViaWiFi() {
+            window.qrGenerator.shareViaWiFi();
+        }
+
+        function shareViaQR() {
+            window.qrGenerator.shareViaQR();
+        }
+
+        // Initialize when page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            window.qrGenerator = new QRCodeGenerator();
+        });
+    </script>
+</body>
+</html>
+
+
+

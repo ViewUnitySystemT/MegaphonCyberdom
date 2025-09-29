@@ -1,0 +1,43 @@
+{
+  "name": "ribw-serverfarm-backend",
+  "version": "1.0.0",
+  "description": "RIBW Serverfarm Portal - IP-basiertes System mit Domain Mapping",
+  "main": "ribw-serverfarm-backend.js",
+  "scripts": {
+    "start": "node ribw-serverfarm-backend.js",
+    "dev": "nodemon ribw-serverfarm-backend.js",
+    "test": "echo \"Tests für RIBW Serverfarm Backend\""
+  },
+  "keywords": [
+    "ribw",
+    "serverfarm",
+    "ip-based",
+    "domain-mapping",
+    "webrtc",
+    "ai",
+    "media",
+    "space-research"
+  ],
+  "author": "Raymond Demitrio Dr. Tel - MegaphonCyberdom",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/megaphoncyberdom/ribw-serverfarm"
+  },
+  "bugs": {
+    "url": "https://github.com/megaphoncyberdom/ribw-serverfarm/issues"
+  },
+  "homepage": "https://github.com/megaphoncyberdom/ribw-serverfarm#readme"
+}
+
+

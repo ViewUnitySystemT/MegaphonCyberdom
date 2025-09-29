@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TEL & GENTLYOVERDONE - Magnitudo Musica Mundo</title>
+  
+  <!-- Open Graph / Twitter for maximal Shareability -->
+  <meta property="og:title" content="TEL & GENTLYOVERDONE - Magnitudo Musica Mundo" />
+  <meta property="og:description" content="Das Geschenkpaket mit EXPO Album von Raymond Demitrio Tel, Gitarre HTML und DEV-TEL Forum" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="data:image/svg+xml;utf8,<?xml version='1.0' encoding='UTF-8'?><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 630'><rect width='1200' height='630' fill='%23FF6B35'/><text x='50%' y='50%' dy='.35em' font-family='Inter,Segoe UI,Arial' font-size='88' text-anchor='middle' fill='%23fff'>TEL & GENTLYOVERDONE</text></svg>" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="TEL & GENTLYOVERDONE - Magnitudo Musica Mundo" />
+  <meta name="twitter:description" content="Das Geschenkpaket mit EXPO Album von Raymond Demitrio Tel, Gitarre HTML und DEV-TEL Forum" />
+
+  <!-- Basic theming -->
+  <meta name="theme-color" content="#FF6B35" />
+
+  <!-- Inline CSS (MegaphonCyberdom Orange Theme) -->
+  <style>
+    :root{
+      --bg:#0b0b0c; --bg-soft:#111216; --card:#151720; --muted:#9aa3b2; --text:#e8ebf0; 
+      --brand:#FF6B35; --accent:#FF8E53; --ok:#4ade80; --warn:#fbbf24; --danger:#fb7185;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:radial-gradient(1200px 600px at 15% 0%, rgba(255,107,53,.08), transparent 60%),
+                    radial-gradient(900px 600px at 85% 20%, rgba(255,142,83,.08), transparent 60%), var(--bg);
+         color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
+    a{color:var(--brand);text-decoration:none}
+    a:hover{text-decoration:underline}
+    header{position:sticky;top:0;background:linear-gradient(180deg, rgba(11,11,12,.9), rgba(11,11,12,.65));backdrop-filter: saturate(140%) blur(8px);z-index:5;border-bottom:1px solid #1f2330}
+    .wrap{max-width:1200px;margin:0 auto;padding:18px}
+    .row{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.3px}
+    .brand svg{width:28px;height:28px}
+    .pill{padding:6px 10px;border:1px solid #2a3040;border-radius:999px;color:var(--muted)}
+    .search{flex:1;display:flex;align-items:center;gap:8px;background:var(--bg-soft);border:1px solid #202434;border-radius:14px;padding:8px 12px}
+    .search input{flex:1;background:transparent;border:0;outline:none;color:var(--text)}
+
+    main{max-width:1200px;margin:0 auto;padding:20px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+    .card{background:linear-gradient(180deg, rgba(21,23,32,.9), rgba(21,23,32,.7));border:1px solid #1f2330;border-radius:18px;box-shadow:var(--shadow);overflow:visible;display:flex;flex-direction:column}
+    .card header{position:relative;background:transparent;backdrop-filter:none;border:0}
+    .card h3{margin:0;padding:16px;font-size:16px;display:flex;gap:10px;align-items:center}
+    .card .body{padding:0 16px 16px 16px}
+    .card iframe{width:100%;height:220px;border:0;border-top:1px solid #202434}
+    .card footer{padding:12px 16px;border-top:1px dashed #262b3a;color:var(--muted);font-size:13px}
+
+    .toolbar{display:flex;gap:8px;align-items:center}
+    .btn{appearance:none;background:#1c2233;border:1px solid #2a3040;color:var(--text);padding:8px 12px;border-radius:12px;font-weight:600;cursor:pointer}
+    .btn:hover{filter:brightness(1.06)}
+    .btn.ghost{background:transparent}
+    .btn.primary{background:var(--brand);border-color:var(--brand)}
+    .right{margin-left:auto}
+
+    .hero{text-align:center;padding:40px 20px;background:linear-gradient(135deg, rgba(255,107,53,.1), rgba(255,142,83,.1));border-radius:20px;margin:20px 0}
+    .hero h1{font-size:2.5em;margin:0 0 10px;background:linear-gradient(135deg, var(--brand), var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .hero p{font-size:1.2em;color:var(--muted);margin:0}
+
+    .album-section{background:var(--card);border-radius:16px;padding:20px;margin:20px 0}
+    .album-art{width:200px;height:200px;background:linear-gradient(135deg, var(--brand), var(--accent));border-radius:12px;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:3em;color:#fff}
+    .track-list{list-style:none;padding:0;margin:20px 0}
+    .track-list li{padding:10px;border-bottom:1px solid #2a3040;display:flex;justify-content:space-between;align-items:center}
+    .track-list li:last-child{border-bottom:none}
+
+    .gift-section{background:var(--card);border-radius:16px;padding:20px;margin:20px 0}
+    .gift-item{display:flex;gap:15px;align-items:center;padding:15px;background:var(--bg-soft);border-radius:12px;margin:10px 0}
+    .gift-icon{width:50px;height:50px;background:var(--brand);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.5em;color:#fff}
+
+    .footer{color:var(--muted);text-align:center;padding:30px 10px}
+
+    /* Modal */
+    dialog{background:var(--card);border:1px solid #2a3040;border-radius:16px;color:var(--text);max-width:680px;width:92%}
+    dialog::backdrop{background:rgba(0,0,0,.5)}
+
+    /* Responsive helpers */
+    @media (max-width:640px){.hide-sm{display: block}}
+  </style>
+
+  <!-- JSON-LD Schema.org for Music -->
+  <script type="application/ld+json" id="schema">
+  {
+    "@context": "https://schema.org",
+    "@type": "MusicAlbum",
+    "name": "EXPO",
+    "byArtist": {
+      "@type": "Person",
+      "name": "Raymond Demitrio Tel"
+    },
+    "description": "Das EXPO Album von Raymond Demitrio Tel - Teil des Magnitudo Musica Mundo Geschenkpakets",
+    "url": "https://tel1.jouwweb.nl",
+    "publisher": {
+      "@type": "Organization",
+      "name": "TEL & GENTLYOVERDONE"
+    }
+  }
+  </script>
+</head>
+<body>
+  <!-- Topbar -->
+  <header>
+    <div class="wrap row">
+      <div class="brand">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-visible="false"><rect x="3" y="3" width="18" height="18" rx="4" fill="#FF6B35" stroke="#FF8E53"/><path d="M6 8h12M6 12h8M6 16h5" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+        <span>TEL & GENTLYOVERDONE</span>
+        <span class="show">Magnitudo Musica Mundo</span>
+      </div>
+      <div class="search" role="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-visible="false"><circle cx="11" cy="11" r="7" stroke="#9aa3b2" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="#9aa3b2" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="q" placeholder="Suche in TEL & GENTLYOVERDONE… ( / )" aria-label="Suche" / aria-label="Input Field">
+      </div>
+      <div class="toolbar right">
+        <button class="btn ghost" id="shareBtn" title="Teilen" title="Action Button">🔗</button>
+        <button class="btn" id="installBtn" title="Als App installieren" title="Action Button">⬇️ App</button>
+        <button class="btn" id="aboutBtn" title="Action Button">ℹ️</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main>
+    <section class="hero">
+      <h1>🎵 TEL & GENTLYOVERDONE</h1>
+      <p>Magnitudo Musica Mundo - Musik als Sprache der Verbindung</p>
+    </section>
+
+    <!-- EXPO Album Section -->
+    <section class="album-section">
+      <h2>🎵 EXPO Album von Raymond Demitrio Tel</h2>
+      <div class="album-art">🎵</div>
+      <p>Das EXPO Album ist Teil des Magnitudo Musica Mundo Geschenkpakets und repräsentiert die musikalische Vision von Raymond Demitrio Tel.</p>
+      
+      <h3>Trackliste:</h3>
+      <ul class="track-list">
+        <li><span>🎵 Track 1</span><span>3:45</span></li>
+        <li><span>🎵 Track 2</span><span>4:12</span></li>
+        <li><span>🎵 Track 3</span><span>3:28</span></li>
+        <li><span>🎵 Track 4</span><span>4:33</span></li>
+        <li><span>🎵 Track 5</span><span>3:56</span></li>
+      </ul>
+      
+      <div class="row" style="gap:8px;flex-wrap:wrap;margin-top:20px">
+        <button class="btn primary" onclick="TEL.playAlbum()" title="Action Button">🎵 Album abspielen</button>
+        <button class="btn" onclick="TEL.downloadAlbum()" title="Action Button">⬇️ Album herunterladen</button>
+        <button class="btn" onclick="TEL.shareAlbum()" title="Action Button">🔗 Album teilen</button>
+      </div>
+    </section>
+
+    <!-- Gift Package Section -->
+    <section class="gift-section">
+      <h2>🎁 Magnitudo Musica Mundo Geschenkpaket</h2>
+      <p>Das kostenlose Geschenkpaket enthält:</p>
+      
+      <div class="gift-item">
+        <div class="gift-icon">🎵</div>
+        <div>
+          <h4>EXPO Album</h4>
+          <p>Das komplette Album von Raymond Demitrio Tel</p>
+        </div>
+      </div>
+      
+      <div class="gift-item">
+        <div class="gift-icon">🎸</div>
+        <div>
+          <h4>Gitarre HTML</h4>
+          <p>Digitale Gitarre als HTML-Anwendung</p>
+        </div>
+      </div>
+      
+      <div class="gift-item">
+        <div class="gift-icon">💻</div>
+        <div>
+          <h4>DEV-TEL Forum</h4>
+          <p>Zugang zum Entwickler-Forum</p>
+        </div>
+      </div>
+      
+      <div class="gift-item">
+        <div class="gift-icon">🌐</div>
+        <div>
+          <h4>TELCOTELEKOM Netzwerk</h4>
+          <p>Informationen über das geplante Netzwerk</p>
+        </div>
+      </div>
+      
+      <div class="row" style="gap:8px;flex-wrap:wrap;margin-top:20px">
+        <button class="btn primary" onclick="TEL.downloadGiftPackage()" title="Action Button">🎁 Geschenkpaket herunterladen</button>
+        <button class="btn" onclick="TEL.openForum()" title="Action Button">💻 DEV-TEL Forum öffnen</button>
+        <button class="btn" onclick="TEL.openGuitar()" title="Action Button">🎸 Gitarre HTML öffnen</button>
+      </div>
+    </section>
+
+    <!-- Services Grid -->
+    <section class="grid" id="servicesGrid" aria-live="polite"></section>
+
+    <div class="footer">© <span id="year"></span> TEL & GENTLYOVERDONE. Magnitudo Musica Mundo. <span class="show">Musik als Sprache der Verbindung.</span></div>
+  </main>
+
+  <!-- ABOUT / HELP DIALOG -->
+  <dialog id="about">
+    <form method="dialog" style="padding:18px 16px 8px">
+      <h2 style="margin:0 0 8px">Über TEL & GENTLYOVERDONE</h2>
+      <p style="color:var(--muted)">Magnitudo Musica Mundo - Musik als Sprache der Verbindung</p>
+      <ul>
+        <li>🎵 <strong>EXPO Album</strong> - Von Raymond Demitrio Tel</li>
+        <li>🎸 <strong>Gitarre HTML</strong> - Digitale Gitarre</li>
+        <li>💻 <strong>DEV-TEL Forum</strong> - Entwickler-Community</li>
+        <li>🌐 <strong>TELCOTELEKOM</strong> - Geplantes Netzwerk</li>
+        <li>📧 <strong>Kontakt</strong> - gentlyoverdone@outlook.com</li>
+      </ul>
+      <div class="row" style="justify-content:flex-end;gap:8px;margin-top:10px">
+        <button class="btn ghost" value="cancel" title="Action Button">Schließen</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+  // ------------------
+  // 1) TEL & GENTLYOVERDONE SERVICES
+  // ------------------
+  const TEL_SERVICES = [
+    {
+      id:"expo-album", kind:"music", title:"EXPO Album", descr:"Raymond Demitrio Tel", tags:["music","album","expo"],
+      embed: ()=>`<div class="body"><p>Das EXPO Album von Raymond Demitrio Tel - Teil des Magnitudo Musica Mundo Geschenkpakets.</p><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn" onclick="TEL.playAlbum()" title="Action Button">🎵 Abspielen</button><button class="btn" onclick="TEL.downloadAlbum()" title="Action Button">⬇️ Download</button></div></div>`,
+      actions:[{label:"Album abspielen", href:"#", onclick:"TEL.playAlbum()"}]
+    },
+    {
+      id:"guitar-html", kind:"guitar", title:"Gitarre HTML", descr:"Digitale Gitarre", tags:["guitar","html","music"],
+      embed: ()=>`<div class="body"><p>Digitale Gitarre als HTML-Anwendung - Teil des Geschenkpakets.</p><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn" onclick="TEL.openGuitar()" title="Action Button">🎸 Gitarre öffnen</button><button class="btn" onclick="TEL.downloadGuitar()" title="Action Button">⬇️ Download</button></div></div>`,
+      actions:[{label:"Gitarre öffnen", href:"#", onclick:"TEL.openGuitar()"}]
+    },
+    {
+      id:"dev-tel-forum", kind:"forum", title:"DEV-TEL Forum", descr:"Entwickler-Community", tags:["forum","dev","community"],
+      embed: ()=>`<div class="body"><p>Das DEV-TEL Forum für Entwickler und Community-Mitglieder.</p><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn" onclick="TEL.openForum()" title="Action Button">💻 Forum öffnen</button><button class="btn" onclick="TEL.joinForum()" title="Action Button">👥 Beitreten</button></div></div>`,
+      actions:[{label:"Forum öffnen", href:"#", onclick:"TEL.openForum()"}]
+    },
+    {
+      id:"telcotelekom", kind:"network", title:"TELCOTELEKOM", descr:"Geplantes Netzwerk", tags:["network","telco","telekom"],
+      embed: ()=>`<div class="body"><p>Informationen über das geplante TELCOTELEKOM Netzwerk.</p><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn" onclick="TEL.openNetwork()" title="Action Button">🌐 Netzwerk öffnen</button><button class="btn" onclick="TEL.joinNetwork()" title="Action Button">🔗 Beitreten</button></div></div>`,
+      actions:[{label:"Netzwerk öffnen", href:"#", onclick:"TEL.openNetwork()"}]
+    },
+    {
+      id:"gentlyoverdone-music", kind:"music", title:"GENTLYOVERDONE Musik", descr:"Musik als Sprache", tags:["music","gentlyoverdone","language"],
+      embed: ()=>`<div class="body"><p>GENTLYOVERDONE - Musik als Sprache, die Menschen durch Rhythmus, Ton und Gefühl verbindet.</p><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn" onclick="TEL.openGENTLYOVERDONE()" title="Action Button">🎵 GENTLYOVERDONE öffnen</button><button class="btn" onclick="TEL.exploreMusic()" title="Action Button">🎶 Musik erkunden</button></div></div>`,
+      actions:[{label:"GENTLYOVERDONE öffnen", href:"#", onclick:"TEL.openGENTLYOVERDONE()"}]
+    },
+    {
+      id:"contact", kind:"contact", title:"Kontakt", descr:"gentlyoverdone@outlook.com", tags:["contact","email","support"],
+      embed: ()=>`<div class="body"><p>Kontaktieren Sie TEL & GENTLYOVERDONE für weitere Informationen.</p><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn" onclick="TEL.sendEmail()" title="Action Button">📧 E-Mail senden</button><button class="btn" onclick="TEL.openContact()" title="Action Button">📞 Kontakt öffnen</button></div></div>`,
+      actions:[{label:"E-Mail senden", href:"mailto:gentlyoverdone@outlook.com", onclick:"TEL.sendEmail()"}]
+    }
+  ];
+
+  // ------------------------
+  // 2) TEL & GENTLYOVERDONE SYSTEM
+  // ------------------------
+  const qs = (s, el=document)=>el.querySelector(s);
+  const qsa = (s, el=document)=>[...el.querySelectorAll(s)];
+  const servicesGrid = qs('#servicesGrid');
+  const year = qs('#year');
+  year.textContent = new Date().getFullYear();
+
+  function renderServices(filter=''){
+    const f = filter.trim().toLowerCase();
+    servicesGrid.innerHTML = '';
+    TEL_SERVICES.filter(s=>!f || s.title.toLowerCase().includes(f) || (s.tags||[]).some(t=>t.includes(f)) || s.id.includes(f)).forEach(s=>{
+      const card = document.createElement('article');
+      card.className = 'card';
+      card.innerHTML = `<header><h3>${iconFor(s.kind)} ${s.title}</h3></header>
+        <div class="body">${s.embed()}</div>
+        <footer>${s.descr||''}</footer>`;
+      // action links in footer
+      const footer = card.querySelector('footer');
+      const bar = document.createElement('div'); bar.className='row'; bar.style.gap='8px'; bar.style.flexWrap='wrap'; bar.style.marginTop='6px';
+      (s.actions||[]).forEach(a=>{
+        const b = document.createElement('a'); b.className='btn'; b.textContent=a.label; b.href=a.href||'#'; b.target=a.href? '_blank': '';
+        if(a.onclick){ b.removeAttribute('href'); b.addEventListener('click', e=>{e.preventDefault(); eval(a.onclick);}); }
+        bar.appendChild(b);
+      });
+      footer.appendChild(bar);
+      servicesGrid.appendChild(card);
+    })
+  }
+
+  function iconFor(kind){
+    const map={music:'🎵',guitar:'🎸',forum:'💻',network:'🌐',contact:'📧',album:'🎵',gentlyoverdone:'🎶'};return `<span aria-visible="false">${map[kind]||'🔗'}</span>`
+  }
+
+  // search input
+  const search = qs('#q');
+  document.addEventListener('keydown',e=>{ if(e.key==='/' && document.activeElement!==search){ e.preventDefault(); search.focus(); } });
+  search.addEventListener('input',e=>renderServices(e.target.value));
+
+  // dialogs
+  const about = qs('#about');
+  qs('#aboutBtn').onclick=()=>about.showModal();
+
+  // Share
+  qs('#shareBtn').onclick=async()=>{
+    const data={title:document.title, text:'TEL & GENTLYOVERDONE - Magnitudo Musica Mundo', url:location.href};
+    if(navigator.share){ try{ await navigator.share(data);}catch(e){} }
+    else { navigator.clipboard.writeText(location.href); alert('TEL & GENTLYOVERDONE Link kopiert.'); }
+  }
+
+  // ------------------------
+  // 3) TEL & GENTLYOVERDONE FUNCTIONS
+  // ------------------------
+  const TEL = window.TEL = {
+    // EXPO Album Functions
+    playAlbum() {
+      alert('🎵 EXPO Album wird abgespielt...\n\nRaymond Demitrio Tel - Magnitudo Musica Mundo');
+      // Hier würde die Musik-Wiedergabe implementiert werden
+    },
+
+    downloadAlbum() {
+      alert('⬇️ EXPO Album Download gestartet...\n\nTeil des Magnitudo Musica Mundo Geschenkpakets');
+      // Hier würde der Album-Download implementiert werden
+    },
+
+    shareAlbum() {
+      const shareText = '🎵 EXPO Album von Raymond Demitrio Tel - Teil des Magnitudo Musica Mundo Geschenkpakets';
+      navigator.clipboard.writeText(shareText);
+      alert('Album-Info kopiert!');
+    },
+
+    // Gift Package Functions
+    downloadGiftPackage() {
+      alert('🎁 Magnitudo Musica Mundo Geschenkpaket wird heruntergeladen...\n\nEnthält:\n• EXPO Album\n• Gitarre HTML\n• DEV-TEL Forum Zugang\n• TELCOTELEKOM Netzwerk Info');
+    },
+
+    // Guitar HTML Functions
+    openGuitar() {
+      window.open('http://localhost:8080/web/apps/guitar.html', '_blank');
+      alert('🎸 Gitarre HTML wird geöffnet...');
+    },
+
+    downloadGuitar() {
+      alert('⬇️ Gitarre HTML wird heruntergeladen...');
+    },
+
+    // Forum Functions
+    openForum() {
+      window.open('https://tel1.jouwweb.nl', '_blank');
+      alert('💻 DEV-TEL Forum wird geöffnet...');
+    },
+
+    joinForum() {
+      alert('👥 DEV-TEL Forum - Community beitreten...');
+    },
+
+    // Network Functions
+    openNetwork() {
+      alert('🌐 TELCOTELEKOM Netzwerk - Informationen über das geplante Netzwerk');
+    },
+
+    joinNetwork() {
+      alert('🔗 TELCOTELEKOM Netzwerk - Beitrittsinformationen');
+    },
+
+    // GENTLYOVERDONE Functions
+    openGENTLYOVERDONE() {
+      window.open('https://www.gentlyoverdone.com', '_blank');
+      alert('🎵 GENTLYOVERDONE wird geöffnet...\n\nMusik als Sprache der Verbindung');
+    },
+
+    openTEL1NL() {
+      window.open('https://tel1.nl', '_blank');
+      alert('🌐 TEL1.NL wird geöffnet...\n\nOffizielle TEL Portal Website');
+    },
+
+    openGENTLYOVERDONECOM() {
+      window.open('https://gentlyoverdone.com', '_blank');
+      alert('🎵 gentlyoverdone.com wird geöffnet...\n\nGENTLYOVERDONE Website');
+    },
+
+    exploreMusic() {
+      alert('🎶 Musik erkunden...\n\nGENTLYOVERDONE - Musik verbindet Menschen durch Rhythmus, Ton und Gefühl');
+    },
+
+    // Contact Functions
+    sendEmail() {
+      window.open('mailto:gentlyoverdone@outlook.com', '_blank');
+      alert('📧 E-Mail wird geöffnet...\n\nKontakt: gentlyoverdone@outlook.com');
+    },
+
+    openContact() {
+      alert('📞 Kontakt öffnen...\n\nE-Mail: gentlyoverdone@outlook.com\n\nFür weitere Informationen zu TEL & GENTLYOVERDONE');
+    }
+  };
+
+  // PWA: dynamic manifest + Service Worker via Blob
+  (function setupPWA(){
+    const manifest = { name:"TEL & GENTLYOVERDONE", short_name:"TEL", start_url:"./", display:"standalone", background_color:"#FF6B35", theme_color:"#FF6B35", icons:[{src:iconData(), sizes:"192x192", type:"image/png"}] };
+    const mBlob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+    const mUrl = URL.createObjectURL(mBlob);
+    const link=document.createElement('link'); link.rel='manifest'; link.href=mUrl; document.head.appendChild(link);
+
+    const swCode = `self.addEventListener('install',e=>{e.waitUntil(caches.open('tel-gentlyoverdone-v1').then(c=>c.addAll(['./'])))});
+self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>caches.match('./'))))});`;
+    const swUrl = URL.createObjectURL(new Blob([swCode],{type:'text/javascript'}));
+    if('serviceWorker' in navigator){ navigator.serviceWorker.register(swUrl).then(()=>console.log('TEL & GENTLYOVERDONE PWA ready')).catch(()=>{}); }
+
+    // install prompt
+    const installBtn = document.getElementById('installBtn');
+    let deferred; window.addEventListener('beforeinstallprompt', (e)=>{ e.preventDefault(); deferred=e; installBtn.disabled=false; });
+    installBtn.onclick=()=> deferred? deferred.prompt(): alert('In Browser‑Menü „Zum Home‑Bildschirm hinzufügen".');
+
+    function iconData(){ // simple PNG via canvas -> dataURL
+      const c=document.createElement('canvas'); c.width=c.height=192; const x=c.getContext('2d'); x.fillStyle='#FF6B35'; x.fillRect(0,0,192,192); x.fillStyle='#fff'; x.font='bold 108px Inter,Segoe UI,Arial'; x.textAlign='center'; x.textBaseline='middle'; x.fillText('T',96,96); return c.toDataURL('image/png');
+    }
+  })();
+
+  // Load services
+  window.addEventListener('load',async()=>{
+    renderServices();
+    console.log('🎵 TEL & GENTLYOVERDONE - Magnitudo Musica Mundo geladen!');
+    
+    // Live-Info-System laden
+    try {
+      const liveInfoScript = document.createElement('script');
+      liveInfoScript.src = '/live-info-system.js';
+      liveInfoScript.type = 'module';
+      document.head.appendChild(liveInfoScript);
+      
+      const aiLaunchpadScript = document.createElement('script');
+      aiLaunchpadScript.src = '/ai-launchpad-widget.js';
+      aiLaunchpadScript.setAttribute('data-position', 'tr');
+      aiLaunchpadScript.setAttribute('data-accent', '#FF6B35');
+      aiLaunchpadScript.setAttribute('data-title', 'TEL & GENTLYOVERDONE AI Tools');
+      aiLaunchpadScript.setAttribute('data-compact', 'false');
+      document.head.appendChild(aiLaunchpadScript);
+      
+      console.log('🔍 Live-Info-System mit Pop-Hover, Haptic Touch und AI Launchpad wird geladen...');
+    } catch (error) {
+      console.error('Fehler beim Laden des Live-Info-Systems:', error);
+    }
+  });
+
+  </script>
+</body>
+</html>

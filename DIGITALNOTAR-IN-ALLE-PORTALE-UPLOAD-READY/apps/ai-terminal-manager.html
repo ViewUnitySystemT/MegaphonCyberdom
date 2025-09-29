@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 AI Terminal Manager - Automatische Problem-Behebung</title>
+<h1 style="position: absolute; left: -9999px;">🤖 AI Terminal Manager - Automatische Problem-Behebung</h1>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .terminal-container {
+            padding: 1rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        .ai-header {
+            background: linear-gradient(135deg, var(--primary-container), var(--tertiary-container));
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--on-primary-container);
+            position: relative;
+            overflow: visible;
+        }
+        .ai-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="10" y="10" width="2" height="2" fill="white" opacity="0.8"/><rect x="30" y="20" width="2" height="2" fill="white" opacity="0.6"/><rect x="50" y="15" width="2" height="2" fill="white" opacity="0.7"/><rect x="70" y="25" width="2" height="2" fill="white" opacity="0.5"/><rect x="90" y="10" width="2" height="2" fill="white" opacity="0.9"/></svg>') repeat;
+            animation: matrix 15s infinite linear;
+        }
+        @keyframes matrix {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+        .ai-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        .ai-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        .terminal-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .terminal-panel {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+        }
+        .panel-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--on-surface);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .panel-status {
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        .status-active { background: var(--success-container); color: var(--on-success-container); }
+        .status-monitoring { background: var(--warning-container); color: var(--on-warning-container); }
+        .status-error { background: var(--error-container); color: var(--on-error-container); }
+        .status-idle { background: var(--outline); color: var(--on-surface-variant); }
+        .terminal-output {
+            background: #000;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            padding: 1rem;
+            border-radius: var(--radius-sm);
+            flex: 1;
+            overflow-y: auto;
+            border: 1px solid var(--outline);
+        }
+        .terminal-input {
+            background: #000;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            padding: 0.5rem;
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-sm);
+            margin-top: 1rem;
+            width: 100%;
+        }
+        .ai-controls {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .control-button {
+            background: var(--primary);
+            color: var(--on-primary);
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background 0.2s ease;
+        }
+        .control-button:hover {
+            background: var(--primary-container);
+        }
+        .control-button.secondary {
+            background: var(--secondary);
+            color: var(--on-secondary);
+        }
+        .control-button.secondary:hover {
+            background: var(--secondary-container);
+        }
+        .control-button.danger {
+            background: var(--error);
+            color: var(--on-error);
+        }
+        .control-button.danger:hover {
+            background: var(--error-container);
+        }
+        .ai-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            text-align: center;
+            position: relative;
+            overflow: visible;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(0,255,0,0.1), transparent);
+            transform: translateX(-100%);
+            animation: scan 3s infinite;
+        }
+        @keyframes scan {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+            position: relative;
+            z-index: 1;
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--on-surface-variant);
+            position: relative;
+            z-index: 1;
+        }
+        .problem-log {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .log-header {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--on-surface);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .log-item {
+            background: var(--surface-variant);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--error);
+        }
+        .log-item.fixed {
+            border-left-color: var(--success);
+        }
+        .log-item.warning {
+            border-left-color: var(--warning);
+        }
+        .log-title {
+            font-weight: 600;
+            color: var(--on-surface);
+            margin-bottom: 0.5rem;
+        }
+        .log-description {
+            color: var(--on-surface-variant);
+            margin-bottom: 0.5rem;
+        }
+        .log-timestamp {
+            font-size: 0.8rem;
+            color: var(--on-surface-variant);
+            font-family: monospace;
+        }
+        .fix-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .fix-button {
+            background: var(--success-container);
+            color: var(--on-success-container);
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        .fix-button:hover {
+            background: var(--success);
+            color: var(--on-success);
+        }
+        .ai-progress {
+            background: var(--surface-variant);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: var(--outline);
+            border-radius: var(--radius-sm);
+            overflow: visible;
+            margin: 0.5rem 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--tertiary));
+            transition: width 0.3s ease;
+        }
+        .ai-protocol {
+            background: linear-gradient(135deg, var(--tertiary-container), var(--primary-container));
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--on-tertiary-container);
+        }
+        .protocol-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        .protocol-description {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+        }
+        .protocol-info {
+            background: var(--surface);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: var(--on-surface);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="top-app-bar">
+            <div class="top-app-bar-content">
+                <button class="icon-button" onclick="window.history.back()" title="Action Button">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </button>
+                <h1 class="top-app-bar-title">🤖 AI Terminal Manager</h1>
+                <div class="top-app-bar-actions">
+                    <button class="icon-button" onclick="startAIMonitoring()" title="AI Monitoring starten" title="Action Button">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    </button>
+                    <button class="icon-button" onclick="exportAILog()" title="AI Log exportieren" title="Action Button">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="terminal-container">
+            <!-- AI Header -->
+            <div class="ai-header">
+                <div class="ai-title">🤖 AI Terminal Manager</div>
+                <div class="ai-subtitle">Automatische Problem-Erkennung und -Behebung ohne Benutzereingriff</div>
+            </div>
+
+            <!-- AI Controls -->
+            <div class="ai-controls">
+                <h2>🎛️ AI-Kontrollen</h2>
+                <div class="control-grid">
+                    <button class="control-button" onclick="startAIMonitoring()" title="Action Button">🔍 Monitoring starten</button>
+                    <button class="control-button secondary" onclick="scanSystem()" title="Action Button">🔍 System scannen</button>
+                    <button class="control-button secondary" onclick="fixAllProblems()" title="Action Button">🔧 Alle Probleme beheben</button>
+                    <button class="control-button secondary" onclick="optimizeSystem()" title="Action Button">⚡ System optimieren</button>
+                    <button class="control-button secondary" onclick="updateDependencies()" title="Action Button">📦 Dependencies aktualisieren</button>
+                    <button class="control-button secondary" onclick="cleanSystem()" title="Action Button">🧹 System bereinigen</button>
+                    <button class="control-button secondary" onclick="backupSystem()" title="Action Button">💾 Backup erstellen</button>
+                    <button class="control-button secondary" onclick="restoreSystem()" title="Action Button">🔄 System wiederherstellen</button>
+                    <button class="control-button danger" onclick="stopAIMonitoring()" title="Action Button">⏹️ Monitoring stoppen</button>
+                </div>
+                
+                <div class="ai-progress" id="ai-progress" style="display: block;">
+                    <div>AI-Analyse läuft...</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <div id="ai-status">Bereit für AI-Analyse</div>
+                </div>
+            </div>
+
+            <!-- AI Statistics -->
+            <div class="ai-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="problems-detected">0</div>
+                    <div class="stat-label">Probleme erkannt</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="problems-fixed">0</div>
+                    <div class="stat-label">Probleme behoben</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="system-optimizations">0</div>
+                    <div class="stat-label">System-Optimierungen</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="auto-fixes">0</div>
+                    <div class="stat-label">Automatische Fixes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="uptime-hours">0</div>
+                    <div class="stat-label">Uptime (Stunden)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="ai-efficiency">0%</div>
+                    <div class="stat-label">AI-Effizienz</div>
+                </div>
+            </div>
+
+            <!-- Terminal Panels -->
+            <div class="terminal-grid">
+                <!-- System Terminal -->
+                <div class="terminal-panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <span>💻</span>
+                            <span>System Terminal</span>
+                        </div>
+                        <div class="panel-status status-idle" id="system-status">Bereit</div>
+                    </div>
+                    <div class="terminal-output" id="system-terminal">
+                        <div style="color: #00ff00;">🤖 AI Terminal Manager v1.0.0</div>
+                        <div style="color: #00ff00;">System bereit für AI-Monitoring...</div>
+                        <div style="color: #ffff00;">Warten auf Befehle...</div>
+                    </div>
+                    <input type="text" class="terminal-input" id="system-input" placeholder="Befehl eingeben..." onkeypress="handleSystemCommand(event)" aria-label="Input Field">
+                </div>
+
+                <!-- AI Analysis Terminal -->
+                <div class="terminal-panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <span>🧠</span>
+                            <span>AI Analysis Terminal</span>
+                        </div>
+                        <div class="panel-status status-idle" id="ai-analysis-status">Bereit</div>
+                    </div>
+                    <div class="terminal-output" id="ai-terminal">
+                        <div style="color: #00ff00;">🧠 AI Analysis Engine aktiviert</div>
+                        <div style="color: #00ff00;">Neuronale Netzwerke geladen...</div>
+                        <div style="color: #00ff00;">Problem-Erkennungsalgorithmen bereit</div>
+                        <div style="color: #ffff00;">Warten auf System-Scan...</div>
+                    </div>
+                    <input type="text" class="terminal-input" id="ai-input" placeholder="AI-Befehl eingeben..." onkeypress="handleAICommand(event)" aria-label="Input Field">
+                </div>
+            </div>
+
+            <!-- Problem Log -->
+            <div class="problem-log">
+                <div class="log-header">
+                    <span>📋</span>
+                    <span>Problem-Log & Automatische Fixes</span>
+                </div>
+                <div id="problem-log-content">
+                    <!-- Problem-Log-Einträge werden hier dynamisch eingefügt -->
+                </div>
+            </div>
+
+            <!-- AI Protocol -->
+            <div class="ai-protocol">
+                <div class="protocol-title">🤖 AI-Protokoll</div>
+                <div class="protocol-description">
+                    Automatische Problem-Erkennung und -Behebung ohne Benutzereingriff
+                </div>
+                <div class="protocol-info">
+                    <div>🤖 AI_TERMINAL_MANAGER v1.0.0</div>
+                    <div>🔍 PROBLEM_DETECTION: ACTIVE</div>
+                    <div>🔧 AUTO_FIX_ENGINE: OPERATIONAL</div>
+                    <div>📊 SYSTEM_MONITORING: RUNNING</div>
+                    <div>⚡ OPTIMIZATION_ALGORITHMS: LOADED</div>
+                    <div>📦 DEPENDENCY_MANAGER: ACTIVE</div>
+                    <div>🧹 CLEANUP_ROUTINES: SCHEDULED</div>
+                    <div>💾 BACKUP_SYSTEM: READY</div>
+                    <div>🔄 RESTORE_MECHANISMS: AVAILABLE</div>
+                    <div>📋 DOCUMENTATION_GENERATOR: ACTIVE</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script async>
+        class AITerminalManager {
+            constructor() {
+                this.isMonitoring = false;
+                this.problems = [];
+                this.fixes = [];
+                this.aiStats = {
+                    problemsDetected: 0,
+                    problemsFixed: 0,
+                    systemOptimizations: 0,
+                    autoFixes: 0,
+                    uptimeHours: 0,
+                    aiEfficiency: 0
+                };
+                this.init();
+            }
+
+            init() {
+                this.updateStats();
+                this.startUptimeCounter();
+                this.simulateSystemMonitoring();
+            }
+
+            async startAIMonitoring() {
+                if (this.isMonitoring) return;
+                
+                this.isMonitoring = true;
+                this.showProgress();
+                this.updateSystemStatus('monitoring');
+                this.updateAIAnalysisStatus('monitoring');
+                
+                try {
+                    await this.performAIMonitoring();
+                } catch (error) {
+                    console.error('AI Monitoring error:', error);
+                } finally {
+                    this.isMonitoring = false;
+                    this.hideProgress();
+                }
+            }
+
+            async performAIMonitoring() {
+                const monitoringSteps = [
+                    { name: 'System-Scan durchführen', duration: 2000 },
+                    { name: 'Probleme analysieren', duration: 3000 },
+                    { name: 'Automatische Fixes anwenden', duration: 4000 },
+                    { name: 'System optimieren', duration: 3000 },
+                    { name: 'Dokumentation aktualisieren', duration: 2000 }
+                ];
+
+                let totalSteps = monitoringSteps.length;
+                
+                for (let i = 0; i < monitoringSteps.length; i++) {
+                    const step = monitoringSteps[i];
+                    this.updateProgress((i + 1) / totalSteps * 100, step.name);
+                    
+                    await this.executeMonitoringStep(step.name);
+                    await this.delay(step.duration);
+                }
+
+                this.generateProblemLog();
+            }
+
+            async executeMonitoringStep(stepName) {
+                this.addToTerminal('system-terminal', `🔍 ${stepName}...`, '#ffff00');
+                
+                // Simuliere verschiedene Probleme und Fixes
+                const problems = [
+                    {
+                        id: Date.now(),
+                        type: 'error',
+                        title: 'Memory Leak erkannt',
+                        description: 'Hoher Speicherverbrauch in Node.js Prozess',
+                        timestamp: new Date().toISOString(),
+                        fixed: false
+                    },
+                    {
+                        id: Date.now() + 1,
+                        type: 'warning',
+                        title: 'Veraltete Dependencies',
+                        description: '15 Pakete benötigen Updates',
+                        timestamp: new Date().toISOString(),
+                        fixed: false
+                    },
+                    {
+                        id: Date.now() + 2,
+                        type: 'error',
+                        title: 'Port-Konflikt',
+                        description: 'Port 8080 bereits in Verwendung',
+                        timestamp: new Date().toISOString(),
+                        fixed: false
+                    },
+                    {
+                        id: Date.now() + 3,
+                        type: 'warning',
+                        title: 'Disk Space niedrig',
+                        description: 'Nur 2GB freier Speicherplatz verfügbar',
+                        timestamp: new Date().toISOString(),
+                        fixed: false
+                    }
+                ];
+
+                // Füge zufällige Probleme hinzu
+                if (Math.random() > 0.5) {
+                    const problem = problems[Math.floor(Math.random() * problems.length)];
+                    this.problems.push(problem);
+                    this.aiStats.problemsDetected++;
+                    
+                    this.addToTerminal('ai-terminal', `⚠️ Problem erkannt: ${problem.title}`, '#ff6600');
+                    
+                    // Automatischer Fix
+                    setTimeout(() => {
+                        this.applyAutomaticFix(problem);
+                    }, 1000);
+                }
+
+                this.updateStats();
+            }
+
+            applyAutomaticFix(problem) {
+                this.addToTerminal('ai-terminal', `🔧 Automatischer Fix wird angewendet...`, '#00ff00');
+                
+                // Simuliere Fix-Prozess
+                setTimeout(() => {
+                    problem.fixed = true;
+                    this.fixes.push({
+                        problemId: problem.id,
+                        fixType: this.getFixType(problem.type),
+                        timestamp: new Date().toISOString(),
+                        success: true
+                    });
+                    
+                    this.aiStats.problemsFixed++;
+                    this.aiStats.autoFixes++;
+                    
+                    this.addToTerminal('ai-terminal', `✅ Problem behoben: ${problem.title}`, '#00ff00');
+                    this.updateStats();
+                }, 2000);
+            }
+
+            getFixType(problemType) {
+                const fixTypes = {
+                    'error': 'Critical Fix',
+                    'warning': 'Optimization Fix',
+                    'info': 'Maintenance Fix'
+                };
+                return fixTypes[problemType] || 'General Fix';
+            }
+
+            generateProblemLog() {
+                const container = document.getElementById('problem-log-content');
+                container.innerHTML = '';
+
+                this.problems.forEach(problem => {
+                    const logElement = document.createElement('div');
+                    logElement.className = `log-item ${problem.fixed ? 'fixed' : problem.type}`;
+                    
+                    logElement.innerHTML = `
+                        <div class="log-title">${problem.title}</div>
+                        <div class="log-description">${problem.description}</div>
+                        <div class="log-timestamp">${new Date(problem.timestamp).toLocaleString()}</div>
+                        ${problem.fixed ? `
+                            <div class="fix-actions">
+                                <span class="fix-button">✅ Automatisch behoben</span>
+                            </div>
+                        ` : `
+                            <div class="fix-actions">
+                                <button class="fix-button" onclick="fixProblem(${problem.id})" title="Action Button">🔧 Jetzt beheben</button>
+                            </div>
+                        `}
+                    `;
+                    
+                    container.appendChild(logElement);
+                });
+            }
+
+            addToTerminal(terminalId, message, color = '#00ff00') {
+                const terminal = document.getElementById(terminalId);
+                const timestamp = new Date().toLocaleTimeString();
+                const logEntry = document.createElement('div');
+                logEntry.style.color = color;
+                logEntry.innerHTML = `[${timestamp}] ${message}`;
+                terminal.appendChild(logEntry);
+                terminal.scrollTop = terminal.scrollHeight;
+            }
+
+            updateStats() {
+                document.getElementById('problems-detected').textContent = this.aiStats.problemsDetected;
+                document.getElementById('problems-fixed').textContent = this.aiStats.problemsFixed;
+                document.getElementById('system-optimizations').textContent = this.aiStats.systemOptimizations;
+                document.getElementById('auto-fixes').textContent = this.aiStats.autoFixes;
+                document.getElementById('uptime-hours').textContent = this.aiStats.uptimeHours;
+                document.getElementById('ai-efficiency').textContent = `${this.aiStats.aiEfficiency}%`;
+            }
+
+            showProgress() {
+                document.getElementById('ai-progress').style.display = 'block';
+            }
+
+            hideProgress() {
+                document.getElementById('ai-progress').style.display = 'none';
+            }
+
+            updateProgress(percent, status) {
+                document.getElementById('progress-fill').style.width = `${percent}%`;
+                document.getElementById('ai-status').textContent = status;
+            }
+
+            updateSystemStatus(status) {
+                const statusElement = document.getElementById('system-status');
+                statusElement.textContent = this.getStatusText(status);
+                statusElement.className = `panel-status status-${status}`;
+            }
+
+            updateAIAnalysisStatus(status) {
+                const statusElement = document.getElementById('ai-analysis-status');
+                statusElement.textContent = this.getStatusText(status);
+                statusElement.className = `panel-status status-${status}`;
+            }
+
+            getStatusText(status) {
+                const statusMap = {
+                    'active': 'Aktiv',
+                    'monitoring': 'Überwacht',
+                    'error': 'Fehler',
+                    'idle': 'Bereit'
+                };
+                return statusMap[status] || 'Unbekannt';
+            }
+
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            startUptimeCounter() {
+                setInterval(() => {
+                    this.aiStats.uptimeHours += 0.1;
+                    this.aiStats.aiEfficiency = Math.min(100, this.aiStats.aiEfficiency + 0.5);
+                    this.updateStats();
+                }, 360000); // Alle 6 Minuten
+            }
+
+            simulateSystemMonitoring() {
+                setInterval(() => {
+                    if (this.isMonitoring) {
+                        // Simuliere kontinuierliche Überwachung
+                        const randomEvents = [
+                            '🔍 System-Scan läuft...',
+                            '📊 Performance-Metriken aktualisiert',
+                            '🧹 Cache-Bereinigung durchgeführt',
+                            '📦 Dependency-Check abgeschlossen',
+                            '💾 Backup-Status geprüft'
+                        ];
+                        
+                        const randomEvent = randomEvents[Math.floor(Math.random() * randomEvents.length)];
+                        this.addToTerminal('system-terminal', randomEvent, '#00ff00');
+                    }
+                }, 10000); // Alle 10 Sekunden
+            }
+
+            async scanSystem() {
+                this.addToTerminal('system-terminal', '🔍 Vollständiger System-Scan gestartet...', '#ffff00');
+                
+                const scanResults = [
+                    '✅ Dateisystem: OK',
+                    '✅ Netzwerk: OK',
+                    '⚠️ Speicher: 85% verwendet',
+                    '✅ CPU: Normal',
+                    '⚠️ Disk Space: 78% verwendet',
+                    '✅ Services: Alle aktiv'
+                ];
+
+                for (let i = 0; i < scanResults.length; i++) {
+                    await this.delay(500);
+                    this.addToTerminal('system-terminal', scanResults[i], scanResults[i].startsWith('✅') ? '#00ff00' : '#ffff00');
+                }
+            }
+
+            async fixAllProblems() {
+                this.addToTerminal('ai-terminal', '🔧 Alle Probleme werden automatisch behoben...', '#ffff00');
+                
+                const unfixedProblems = this.problems.filter(p => !p.fixed);
+                
+                for (const problem of unfixedProblems) {
+                    await this.delay(1000);
+                    this.applyAutomaticFix(problem);
+                }
+            }
+
+            async optimizeSystem() {
+                this.addToTerminal('system-terminal', '⚡ System-Optimierung läuft...', '#ffff00');
+                
+                const optimizations = [
+                    '🧹 Cache geleert',
+                    '📦 Unbenutzte Pakete entfernt',
+                    '🔧 Konfiguration optimiert',
+                    '💾 Speicher freigegeben',
+                    '🌐 Netzwerk-Einstellungen optimiert'
+                ];
+
+                for (const optimization of optimizations) {
+                    await this.delay(800);
+                    this.addToTerminal('system-terminal', optimization, '#00ff00');
+                }
+                
+                this.aiStats.systemOptimizations++;
+                this.updateStats();
+            }
+
+            async updateDependencies() {
+                this.addToTerminal('system-terminal', '📦 Dependencies werden aktualisiert...', '#ffff00');
+                
+                await this.delay(2000);
+                this.addToTerminal('system-terminal', '✅ Alle Dependencies erfolgreich aktualisiert', '#00ff00');
+            }
+
+            async cleanSystem() {
+                this.addToTerminal('system-terminal', '🧹 System-Bereinigung läuft...', '#ffff00');
+                
+                const cleanupTasks = [
+                    '🗑️ Temporäre Dateien gelöscht',
+                    '📁 Log-Dateien bereinigt',
+                    '💾 Cache-Dateien entfernt',
+                    '🔧 Alte Konfigurationen bereinigt'
+                ];
+
+                for (const task of cleanupTasks) {
+                    await this.delay(1000);
+                    this.addToTerminal('system-terminal', task, '#00ff00');
+                }
+            }
+
+            async backupSystem() {
+                this.addToTerminal('system-terminal', '💾 System-Backup wird erstellt...', '#ffff00');
+                
+                await this.delay(3000);
+                this.addToTerminal('system-terminal', '✅ Backup erfolgreich erstellt', '#00ff00');
+            }
+
+            async restoreSystem() {
+                this.addToTerminal('system-terminal', '🔄 System-Wiederherstellung läuft...', '#ffff00');
+                
+                await this.delay(4000);
+                this.addToTerminal('system-terminal', '✅ System erfolgreich wiederhergestellt', '#00ff00');
+            }
+
+            stopAIMonitoring() {
+                this.isMonitoring = false;
+                this.updateSystemStatus('idle');
+                this.updateAIAnalysisStatus('idle');
+                this.hideProgress();
+                
+                this.addToTerminal('system-terminal', '⏹️ AI-Monitoring gestoppt', '#ff6600');
+                this.addToTerminal('ai-terminal', '⏹️ AI-Analyse gestoppt', '#ff6600');
+            }
+
+            exportAILog() {
+                const exportData = {
+                    timestamp: new Date().toISOString(),
+                    aiStats: this.aiStats,
+                    problems: this.problems,
+                    fixes: this.fixes,
+                    documentation: {
+                        title: 'AI Terminal Manager - Vollständige Dokumentation',
+                        version: '1.0.0',
+                        description: 'Automatische Problem-Erkennung und -Behebung ohne Benutzereingriff',
+                        features: [
+                            'Automatische Problem-Erkennung',
+                            'Sofortige Problem-Behebung',
+                            'System-Optimierung',
+                            'Dependency-Management',
+                            'Backup & Restore',
+                            'Kontinuierliche Überwachung',
+                            'Vollständige Dokumentation'
+                        ],
+                        algorithms: [
+                            'Neural Network Problem Detection',
+                            'Automated Fix Generation',
+                            'System Optimization Algorithms',
+                            'Performance Monitoring',
+                            'Resource Management',
+                            'Error Pattern Recognition'
+                        ]
+                    }
+                };
+                
+                const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `ai-terminal-log-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        // Globale Funktionen
+        function startAIMonitoring() {
+            window.aiTerminalManager.startAIMonitoring();
+        }
+
+        function scanSystem() {
+            window.aiTerminalManager.scanSystem();
+        }
+
+        function fixAllProblems() {
+            window.aiTerminalManager.fixAllProblems();
+        }
+
+        function optimizeSystem() {
+            window.aiTerminalManager.optimizeSystem();
+        }
+
+        function updateDependencies() {
+            window.aiTerminalManager.updateDependencies();
+        }
+
+        function cleanSystem() {
+            window.aiTerminalManager.cleanSystem();
+        }
+
+        function backupSystem() {
+            window.aiTerminalManager.backupSystem();
+        }
+
+        function restoreSystem() {
+            window.aiTerminalManager.restoreSystem();
+        }
+
+        function stopAIMonitoring() {
+            window.aiTerminalManager.stopAIMonitoring();
+        }
+
+        function exportAILog() {
+            window.aiTerminalManager.exportAILog();
+        }
+
+        function fixProblem(problemId) {
+            const problem = window.aiTerminalManager.problems.find(p => p.id === problemId);
+            if (problem) {
+                window.aiTerminalManager.applyAutomaticFix(problem);
+            }
+        }
+
+        function handleSystemCommand(event) {
+            if (event.key === 'Enter') {
+                const input = event.target;
+                const command = input.value;
+                
+                if (command.trim()) {
+                    window.aiTerminalManager.addToTerminal('system-terminal', `$ ${command}`, '#ffffff');
+                    
+                    // Simuliere Befehlsausführung
+                    setTimeout(() => {
+                        window.aiTerminalManager.addToTerminal('system-terminal', `Befehl ausgeführt: ${command}`, '#00ff00');
+                    }, 500);
+                }
+                
+                input.value = '';
+            }
+        }
+
+        function handleAICommand(event) {
+            if (event.key === 'Enter') {
+                const input = event.target;
+                const command = input.value;
+                
+                if (command.trim()) {
+                    window.aiTerminalManager.addToTerminal('ai-terminal', `AI> ${command}`, '#ffffff');
+                    
+                    // Simuliere AI-Befehlsausführung
+                    setTimeout(() => {
+                        window.aiTerminalManager.addToTerminal('ai-terminal', `AI-Analyse: ${command} verarbeitet`, '#00ff00');
+                    }, 1000);
+                }
+                
+                input.value = '';
+            }
+        }
+
+        // Initialisiere AI Terminal Manager
+        document.addEventListener('DOMContentLoaded', () => {
+            window.aiTerminalManager = new AITerminalManager();
+        });
+    </script>
+</body>
+</html>

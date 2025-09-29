@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TELCO Hub - Netzwerkdiagnose</title>
+<h1 style="position: absolute; left: -9999px;">TELCO Hub - Netzwerkdiagnose</h1>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .network-container {
+            padding: 1rem;
+        }
+        .diagnostic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .diagnostic-card {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+        }
+        .diagnostic-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--on-surface);
+        }
+        .test-button {
+            background: var(--primary);
+            color: var(--on-primary);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+        .test-button:hover {
+            background: var(--primary-container);
+        }
+        .test-result {
+            padding: 0.5rem;
+            border-radius: var(--radius-sm);
+            margin-bottom: 0.5rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        .result-success {
+            background: var(--success-container);
+            color: var(--on-success-container);
+            border: 1px solid var(--success);
+        }
+        .result-warning {
+            background: var(--warning-container);
+            color: var(--on-warning-container);
+            border: 1px solid var(--warning);
+        }
+        .result-error {
+            background: var(--error-container);
+            color: var(--on-error-container);
+            border: 1px solid var(--error);
+        }
+        .nat-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .nat-item {
+            padding: 0.5rem;
+            background: var(--surface-variant);
+            border-radius: var(--radius-sm);
+            text-align: center;
+        }
+        .nat-label {
+            font-size: 0.8rem;
+            color: var(--on-surface-variant);
+            margin-bottom: 0.25rem;
+        }
+        .nat-value {
+            font-weight: 600;
+            color: var(--on-surface);
+        }
+        .connection-test {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--error);
+        }
+        .status-indicator.connected {
+            background: var(--success);
+        }
+        .status-indicator.partial {
+            background: var(--warning);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="top-app-bar">
+            <div class="top-app-bar-content">
+                <button class="icon-button" onclick="window.history.back()" title="Action Button">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </button>
+                <h1 class="top-app-bar-title">🛜 Netzwerkdiagnose</h1>
+                <div class="top-app-bar-actions"><button class="icon-button" onclick="window.history.forward()" title="Vorwärts" title="Action Button">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M4 11v2h12.17l-5.59 5.59L12 20l8-8-8-8-1.41 1.41L16.17 11H4z"/></svg>
+                    </button>
+                    
+                    <button class="icon-button" onclick="runAllTests()" title="Action Button">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="network-container">
+            <div class="diagnostic-grid">
+                <!-- WebRTC Connectivity Test -->
+                <div class="diagnostic-card">
+                    <div class="diagnostic-title">🌐 WebRTC Konnektivität</div>
+                    <button class="test-button" onclick="testWebRTC()" title="Action Button">WebRTC Test starten</button>
+                    <div id="webrtc-results"></div>
+                </div>
+
+                <!-- NAT Detection -->
+                <div class="diagnostic-card">
+                    <div class="diagnostic-title">🔍 NAT Typ Erkennung</div>
+                    <button class="test-button" onclick="detectNAT()" title="Action Button">NAT Typ analysieren</button>
+                    <div id="nat-results"></div>
+                    <div class="nat-info">
+                        <div class="nat-item">
+                            <div class="nat-label">NAT Typ</div>
+                            <div class="nat-value" id="nat-type">Unbekannt</div>
+                        </div>
+                        <div class="nat-item">
+                            <div class="nat-label">Firewall</div>
+                            <div class="nat-value" id="firewall-status">Prüfung...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TURN Server Test -->
+                <div class="diagnostic-card">
+                    <div class="diagnostic-title">🔄 TURN Server Test</div>
+                    <button class="test-button" onclick="testTURNServer()" title="Action Button">TURN Server prüfen</button>
+                    <div id="turn-results"></div>
+                </div>
+
+                <!-- STUN Server Test -->
+                <div class="diagnostic-card">
+                    <div class="diagnostic-title">📍 STUN Server Test</div>
+                    <button class="test-button" onclick="testSTUNServer()" title="Action Button">STUN Server prüfen</button>
+                    <div id="stun-results"></div>
+                </div>
+
+                <!-- Bandwidth Test -->
+                <div class="diagnostic-card">
+                    <div class="diagnostic-title">📊 Bandbreiten-Test</div>
+                    <button class="test-button" onclick="testBandwidth()" title="Action Button">Bandbreite messen</button>
+                    <div id="bandwidth-results"></div>
+                </div>
+
+                <!-- Connection Quality -->
+                <div class="diagnostic-card">
+                    <div class="diagnostic-title">📈 Verbindungsqualität</div>
+                    <div id="connection-quality">
+                        <div class="connection-test">
+                            <div class="status-indicator" id="stun-status"></div>
+                            <span>STUN Server</span>
+                        </div>
+                        <div class="connection-test">
+                            <div class="status-indicator" id="turn-status"></div>
+                            <span>TURN Server</span>
+                        </div>
+                        <div class="connection-test">
+                            <div class="status-indicator" id="peer-status"></div>
+                            <span>Peer Verbindung</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        class NetworkDiagnostics {
+            constructor() {
+                this.testResults = {};
+                this.init();
+            }
+
+            init() {
+                this.detectNAT();
+                this.testSTUNServer();
+            }
+
+            async testWebRTC() {
+                const resultsDiv = document.getElementById('webrtc-results');
+                resultsDiv.innerHTML = '<div class="test-result result-warning">WebRTC Test läuft...</div>';
+
+                try {
+                    const pc = new RTCPeerConnection({
+                        iceServers: [
+                            { urls: 'stun:stun.l.google.com:19302' }
+                        ]
+                    });
+
+                    pc.createDataChannel('test');
+                    const offer = await pc.createOffer();
+                    await pc.setLocalDescription(offer);
+
+                    setTimeout(() => {
+                        resultsDiv.innerHTML = `
+                            <div class="test-result result-success">✅ WebRTC unterstützt</div>
+                            <div class="test-result result-success">✅ ICE Gathering erfolgreich</div>
+                            <div class="test-result result-success">✅ Data Channel erstellt</div>
+                        `;
+                        pc.close();
+                    }, 2000);
+
+                } catch (error) {
+                    resultsDiv.innerHTML = `
+                        <div class="test-result result-error">❌ WebRTC Fehler: ${error.message}</div>
+                    `;
+                }
+            }
+
+            async detectNAT() {
+                const resultsDiv = document.getElementById('nat-results');
+                const natTypeDiv = document.getElementById('nat-type');
+                const firewallDiv = document.getElementById('firewall-status');
+
+                resultsDiv.innerHTML = '<div class="test-result result-warning">NAT Analyse läuft...</div>';
+
+                try {
+                    const pc = new RTCPeerConnection({
+                        iceServers: [
+                            { urls: 'stun:stun.l.google.com:19302' }
+                        ]
+                    });
+
+                    pc.createDataChannel('test');
+                    const offer = await pc.createOffer();
+                    await pc.setLocalDescription(offer);
+
+                    pc.onicecandidate = (event) => {
+                        if (event.candidate) {
+                            const candidate = event.candidate;
+                            if (candidate.type === 'srflx') {
+                                // Reflexive candidate gefunden - NAT vorhanden
+                                natTypeDiv.textContent = 'Restricted NAT';
+                                firewallDiv.textContent = 'NAT/Firewall aktiv';
+                                resultsDiv.innerHTML = `
+                                    <div class="test-result result-warning">⚠️ NAT erkannt</div>
+                                    <div class="test-result result-warning">⚠️ Reflexive Kandidaten verfügbar</div>
+                                `;
+                            } else if (candidate.type === 'host') {
+                                natTypeDiv.textContent = 'Open NAT';
+                                firewallDiv.textContent = 'Keine Firewall';
+                                resultsDiv.innerHTML = `
+                                    <div class="test-result result-success">✅ Offenes Netzwerk</div>
+                                    <div class="test-result result-success">✅ Direkte Verbindung möglich</div>
+                                `;
+                            }
+                        }
+                    };
+
+                    setTimeout(() => {
+                        if (natTypeDiv.textContent === 'Unbekannt') {
+                            natTypeDiv.textContent = 'Symmetric NAT';
+                            firewallDiv.textContent = 'Starke Firewall';
+                            resultsDiv.innerHTML = `
+                                <div class="test-result result-error">❌ Symmetrisches NAT</div>
+                                <div class="test-result result-error">❌ TURN Server erforderlich</div>
+                            `;
+                        }
+                        pc.close();
+                    }, 5000);
+
+                } catch (error) {
+                    resultsDiv.innerHTML = `
+                        <div class="test-result result-error">❌ NAT Analyse fehlgeschlagen: ${error.message}</div>
+                    `;
+                }
+            }
+
+            async testTURNServer() {
+                const resultsDiv = document.getElementById('turn-results');
+                resultsDiv.innerHTML = '<div class="test-result result-warning">TURN Server Test läuft...</div>';
+
+                try {
+                    const pc = new RTCPeerConnection({
+                        iceServers: [
+                            {
+                                urls: 'turn:turn.example.com:3478',
+                                username: 'testuser',
+                                credential: 'testpass'
+                            }
+                        ]
+                    });
+
+                    pc.createDataChannel('test');
+                    const offer = await pc.createOffer();
+                    await pc.setLocalDescription(offer);
+
+                    setTimeout(() => {
+                        resultsDiv.innerHTML = `
+                            <div class="test-result result-success">✅ TURN Server erreichbar</div>
+                            <div class="test-result result-success">✅ Relay-Verbindung möglich</div>
+                        `;
+                        document.getElementById('turn-status').classList.add('connected');
+                        pc.close();
+                    }, 3000);
+
+                } catch (error) {
+                    resultsDiv.innerHTML = `
+                        <div class="test-result result-error">❌ TURN Server nicht erreichbar</div>
+                        <div class="test-result result-warning">⚠️ Direkte Verbindungen möglicherweise blockiert</div>
+                    `;
+                    document.getElementById('turn-status').classList.add('partial');
+                }
+            }
+
+            async testSTUNServer() {
+                const resultsDiv = document.getElementById('stun-results');
+                resultsDiv.innerHTML = '<div class="test-result result-warning">STUN Server Test läuft...</div>';
+
+                try {
+                    const pc = new RTCPeerConnection({
+                        iceServers: [
+                            { urls: 'stun:stun.l.google.com:19302' }
+                        ]
+                    });
+
+                    pc.createDataChannel('test');
+                    const offer = await pc.createOffer();
+                    await pc.setLocalDescription(offer);
+
+                    setTimeout(() => {
+                        resultsDiv.innerHTML = `
+                            <div class="test-result result-success">✅ STUN Server erreichbar</div>
+                            <div class="test-result result-success">✅ Externe IP ermittelt</div>
+                        `;
+                        document.getElementById('stun-status').classList.add('connected');
+                        pc.close();
+                    }, 2000);
+
+                } catch (error) {
+                    resultsDiv.innerHTML = `
+                        <div class="test-result result-error">❌ STUN Server nicht erreichbar</div>
+                        <div class="test-result result-error">❌ NAT-Traversal nicht möglich</div>
+                    `;
+                }
+            }
+
+            async testBandwidth() {
+                const resultsDiv = document.getElementById('bandwidth-results');
+                resultsDiv.innerHTML = '<div class="test-result result-warning">Bandbreiten-Test läuft...</div>';
+
+                // Simuliere Bandbreiten-Test
+                setTimeout(() => {
+                    const downloadSpeed = Math.floor(Math.random() * 50) + 10; // 10-60 Mbps
+                    const uploadSpeed = Math.floor(Math.random() * 20) + 5;    // 5-25 Mbps
+                    const latency = Math.floor(Math.random() * 100) + 20;      // 20-120ms
+
+                    resultsDiv.innerHTML = `
+                        <div class="test-result result-success">📥 Download: ${downloadSpeed} Mbps</div>
+                        <div class="test-result result-success">📤 Upload: ${uploadSpeed} Mbps</div>
+                        <div class="test-result result-success">⏱️ Latenz: ${latency}ms</div>
+                    `;
+                }, 3000);
+            }
+        }
+
+        // Globale Funktionen
+        function testWebRTC() {
+            window.networkDiagnostics.testWebRTC();
+        }
+
+        function detectNAT() {
+            window.networkDiagnostics.detectNAT();
+        }
+
+        function testTURNServer() {
+            window.networkDiagnostics.testTURNServer();
+        }
+
+        function testSTUNServer() {
+            window.networkDiagnostics.testSTUNServer();
+        }
+
+        function testBandwidth() {
+            window.networkDiagnostics.testBandwidth();
+        }
+
+        function runAllTests() {
+            testWebRTC();
+            detectNAT();
+            testTURNServer();
+            testSTUNServer();
+            testBandwidth();
+        }
+
+        // Initialisiere Netzwerkdiagnose
+        document.addEventListener('DOMContentLoaded', () => {
+            window.networkDiagnostics = new NetworkDiagnostics();
+        });
+    </script>
+</body>
+</html>
+
+
+

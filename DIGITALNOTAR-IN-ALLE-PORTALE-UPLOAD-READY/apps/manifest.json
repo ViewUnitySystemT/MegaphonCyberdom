@@ -1,0 +1,177 @@
+{
+  "apps": [
+    {
+      "id": "telemetry",
+      "title": "📡 Telemetry Dashboard",
+      "icon": "📡",
+      "order": 7,
+      "tags": ["Metrics", "Monitoring"],
+      "desc": "System telemetry and performance metrics",
+      "url": "/monitoring.html"
+    },
+    {
+      "id": "support",
+      "title": "💬 Support Chat",
+      "icon": "💬",
+      "order": 8,
+      "tags": ["Support", "Chat"],
+      "desc": "Customer support and help system",
+      "route": "/support"
+    },
+    {
+      "id": "redis-viewer",
+      "title": "🧠 Redis Viewer",
+      "icon": "🧠",
+      "order": 31,
+      "tags": ["Redis", "Cache", "Session"],
+      "desc": "Session-Management und Cache-Status",
+      "url": "/web/apps/redis-viewer.html"
+    },
+    {
+      "id": "turn-status",
+      "title": "🔐 TURN Server",
+      "icon": "🔐",
+      "order": 32,
+      "tags": ["TURN", "Server", "WebRTC"],
+      "desc": "TURN-Server Status und Konfiguration",
+      "url": "/web/apps/turn-status.html"
+    },
+    {
+      "id": "backup-tool",
+      "title": "💾 Backup Tool",
+      "icon": "💾",
+      "order": 33,
+      "tags": ["Backup", "Data", "Security"],
+      "desc": "Automatische Datensicherung",
+      "url": "/web/apps/backup-tool.html"
+    },
+    {
+      "id": "session-analyzer",
+      "title": "🔍 Session Analyzer",
+      "icon": "🔍",
+      "order": 34,
+      "tags": ["Analysis", "Debugging", "Sessions"],
+      "desc": "Verbindungsanalyse und Debugging",
+      "url": "/web/apps/session-analyzer.html"
+    },
+    {
+      "id": "cloudflare-dashboard",
+      "title": "☁️ Cloudflare Edge",
+      "icon": "☁️",
+      "order": 35,
+      "tags": ["Cloudflare", "Edge", "Deployment"],
+      "desc": "Edge-Deployment und Worker-Status",
+      "url": "/web/apps/cloudflare-dashboard.html"
+    },
+    {
+      "id": "media-gallery",
+      "title": "📸 Media Gallery",
+      "icon": "📸",
+      "order": 36,
+      "tags": ["Media", "Gallery", "Photos"],
+      "desc": "Media gallery and photo management",
+      "url": "/web/apps/media-gallery.html"
+    },
+    {
+      "id": "android-microsite-server",
+      "title": "📱 Android Microsite Server",
+      "icon": "📱",
+      "order": 37,
+      "tags": ["Android", "Termux", "Caddy", "Server"],
+      "desc": "Macht dein Android-Gerät zum Webserver - Information & Installation",
+      "url": "/web/apps/android-server-info.html"
+    },
+    {
+      "id": "android-server-direct",
+      "title": "🚀 Android Server (Direkt)",
+      "icon": "🚀",
+      "order": 38,
+      "tags": ["Android", "Installation", "Quick"],
+      "desc": "Direkte Installation ohne weitere Informationen",
+      "url": "/web/apps/android-microsite-server.html"
+    },
+    {
+      "id": "tunnel-setup",
+      "title": "🌐 Tunnel Setup",
+      "icon": "🌐",
+      "order": 39,
+      "tags": ["Tunnel", "SSH", "Cloudflare", "Public"],
+      "desc": "Öffentlicher Zugriff für Android Server - SSH, Cloudflare, ngrok",
+      "url": "/web/apps/tunnel-setup.html"
+    },
+    {
+      "id": "server-discovery",
+      "title": "🔍 Server Discovery",
+      "icon": "🔍",
+      "order": 40,
+      "tags": ["Discovery", "Network", "Scan", "Connect"],
+      "desc": "Finde und verbinde dich mit TELCO Hub Servern im Netzwerk",
+      "url": "/web/apps/server-discovery.html"
+    },
+    {
+      "id": "domain-setup",
+      "title": "🌐 Domain Setup",
+      "icon": "🌐",
+      "order": 41,
+      "tags": ["Domain", "HTTPS", "Cloudflare", "VPS", "Router"],
+      "desc": "Echte Domain/URL für Android Server - Cloudflare, VPS, Router",
+      "url": "/web/apps/domain-setup.html"
+    },
+    {
+      "id": "caddy-config",
+      "title": "⚙️ Caddy Config Generator",
+      "icon": "⚙️",
+      "order": 42,
+      "tags": ["Caddy", "Config", "Generator", "Advanced"],
+      "desc": "Erweiterte Caddy-Konfiguration mit Features generieren",
+      "url": "/web/apps/caddy-config-generator.html"
+    },
+    {
+      "id": "stage-toolbox",
+      "title": "🎵 Stage Toolbox",
+      "icon": "🎵",
+      "order": 43,
+      "tags": ["Music", "Tuner", "Metronome", "Compass", "Visualizer"],
+      "desc": "Professionelle Musik-Toolbox mit Tuner, Metronom, Kompass und mehr",
+      "url": "/web/apps/stage-toolbox.html"
+    },
+    {
+      "id": "peer-cam-chat",
+      "title": "📹 PeerCam & Live Chat",
+      "icon": "📹",
+      "order": 44,
+      "tags": ["Video", "P2P", "Chat", "Screenshots", "Recording"],
+      "desc": "P2P Video-Chat mit Kamera, Screenshots und Live-Messaging",
+      "url": "/web/apps/peer-cam-chat.html"
+    },
+    {
+      "id": "media-sharing",
+      "title": "🎵 Media Sharing",
+      "icon": "🎵",
+      "order": 45,
+      "tags": ["Media", "TEL", "Gentlyoverdone", "Playlist", "Sharing"],
+      "desc": "TEL & Gentlyoverdone - Musik, Videos und Content-Sharing",
+      "url": "/web/apps/media-sharing.html"
+    },
+    {
+      "id": "pricing-support",
+      "title": "💰 Pricing & Support",
+      "icon": "💰",
+      "order": 46,
+      "tags": ["Pricing", "Support", "Magnitudo", "Enterprise", "FAQ"],
+      "desc": "Magnitudo Musica Mundo - Unterstütze die musikalische Zukunft!",
+      "url": "/web/apps/pricing-support.html"
+    },
+    {
+      "id": "system-test-runner",
+      "title": "🧪 System Test Runner",
+      "icon": "🧪",
+      "order": 47,
+      "tags": ["Testing", "Quality", "Stability", "Debug", "Comprehensive"],
+      "desc": "Umfassender System-Test für alle Anwendungen und Features",
+      "url": "/web/tests/system-test-runner.html"
+    }
+  ],
+  "version": "1.0.0",
+  "lastUpdated": "2025-01-13T00:00:00Z"
+}

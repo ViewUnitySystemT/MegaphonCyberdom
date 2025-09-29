@@ -1,0 +1,803 @@
+<!-- TODO: Replacement character detected () - verify source encoding -->
+<!DOCTYPE html>
+<html lang="de" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pricing & Support - TELCO Hub</title>
+<h1 style="position: absolute; left: -9999px;">Pricing & Support - TELCO Hub</h1>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .pricing-support {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .hero-section {
+            background: linear-gradient(135deg, #FF6B35, #F7931E);
+            color: white;
+            border-radius: 16px;
+            padding: 3rem;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .hero-title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .hero-subtitle {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+        .hero-cta {
+            background: white;
+            color: #333333;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .hero-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        .pricing-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .pricing-card:hover {
+            border-color: #333333;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .pricing-card.featured {
+            border-color: #333333;
+            background: linear-gradient(135deg, #fff, #f8f9fa);
+        }
+        .pricing-card.featured::before {
+            content: "⭐ Beliebt";
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #FF6B35;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: bold;
+        }
+        .pricing-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #333333;
+        }
+        .pricing-price {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #333333;
+            margin-bottom: 0.5rem;
+        }
+        .pricing-period {
+            color: #333333;
+            margin-bottom: 2rem;
+        }
+        .pricing-features {
+            list-style: none;
+            padding: 0;
+            margin: 2rem 0;
+        }
+        .pricing-features li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .pricing-features li::before {
+            content: "✅";
+            font-size: 1.2rem;
+        }
+        .pricing-button {
+            width: 100%;
+            background: #FF6B35;
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .pricing-button:hover {
+            background: #e55a2b;
+            transform: translateY(-2px);
+        }
+        .pricing-button.secondary {
+            background: #6c757d;
+        }
+        .pricing-button.secondary:hover {
+            background: #545b62;
+        }
+        .support-section {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 3rem;
+            margin: 3rem 0;
+        }
+        .support-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        .support-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .support-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        .support-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .support-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #333333;
+        }
+        .support-desc {
+            color: #333333;
+            margin-bottom: 1.5rem;
+        }
+        .support-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .support-button:hover {
+            background: #0056b3;
+        }
+        .faq-section {
+            margin: 3rem 0;
+        }
+        .faq-item {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: visible;
+        }
+        .faq-question {
+            padding: 1.5rem;
+            background: #f8f9fa;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+        .faq-question:hover {
+            background: #e9ecef;
+        }
+        .faq-answer {
+            padding: 1.5rem;
+            display: block;
+            color: #333333;
+            line-height: 1.6;
+        }
+        .faq-answer.active {
+            display: block;
+        }
+        .faq-icon {
+            transition: transform 0.3s ease;
+        }
+        .faq-icon.rotated {
+            transform: rotate(180deg);
+        }
+        .testimonials-section {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 16px;
+            padding: 3rem;
+            margin: 3rem 0;
+        }
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        .testimonial-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+        }
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        .testimonial-author {
+            font-weight: bold;
+            opacity: 0.9;
+        }
+        .contact-form {
+            background: white;
+            border-radius: 16px;
+            padding: 3rem;
+            margin: 3rem 0;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #333333;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #333333;
+            box-shadow: 0 0 0 3px rgba(255,107,53,0.1);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        .form-button {
+            background: #FF6B35;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .form-button:hover {
+            background: #e55a2b;
+            transform: translateY(-2px);
+        }
+        .stats-section {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 3rem;
+            margin: 3rem 0;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #333333;
+            margin-bottom: 0.5rem;
+        }
+        .stat-label {
+            color: #333333;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="pricing-support">
+        <header class="top-app-bar">
+            <div class="top-app-bar-content">
+                <button class="icon-button" onclick="window.history.back()" title="Action Button">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                    </svg>
+                </button>
+                <h1 class="app-title">💰 Pricing & Support</h1>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Hero Section -->
+            <div class="hero-section">
+                <h1 class="hero-title">🎵 Magnitudo Musica Mundo</h1>
+                <p class="hero-subtitle">Unterstütze die musikalische Zukunft mit TELCO Hub</p>
+                <button class="hero-cta" onclick="scrollToPricing()" title="Action Button">
+                    🚀 Jetzt unterstützen
+                </button>
+            </div>
+
+            <!-- Pricing Plans -->
+            <section id="pricing">
+                <h2 class="optimized-style">💎 Preispläne</h2>
+                <div class="pricing-grid">
+                    <!-- Free Plan -->
+                    <div class="pricing-card">
+                        <h3 class="pricing-title">🎵 Starter</h3>
+                        <div class="pricing-price">0€</div>
+                        <div class="pricing-period">Für immer kostenlos</div>
+                        <ul class="pricing-features">
+                            <li>Basis-Kommunikation</li>
+                            <li>Bis zu 4 Teilnehmer</li>
+                            <li>Standard-Audio/Video</li>
+                            <li>Community-Support</li>
+                            <li>Basis-Features</li>
+                        </ul>
+                        <button class="pricing-button secondary" onclick="selectPlan('starter')" title="Action Button">
+                            Kostenlos starten
+                        </button>
+                    </div>
+
+                    <!-- Pro Plan -->
+                    <div class="pricing-card featured">
+                        <h3 class="pricing-title">🎼 Professional</h3>
+                        <div class="pricing-price">19€</div>
+                        <div class="pricing-period">pro Monat</div>
+                        <ul class="pricing-features">
+                            <li>Unbegrenzte Teilnehmer</li>
+                            <li>HD-Audio/Video</li>
+                            <li>Screen-Sharing</li>
+                            <li>Recording-Funktionen</li>
+                            <li>Priority-Support</li>
+                            <li>Erweiterte Features</li>
+                            <li>Cloud-Speicher (10GB)</li>
+                        </ul>
+                        <button class="pricing-button" onclick="selectPlan('professional')" title="Action Button">
+                            Professional wählen
+                        </button>
+                    </div>
+
+                    <!-- Enterprise Plan -->
+                    <div class="pricing-card">
+                        <h3 class="pricing-title">🎺 Enterprise</h3>
+                        <div class="pricing-price">99€</div>
+                        <div class="pricing-period">pro Monat</div>
+                        <ul class="pricing-features">
+                            <li>Alles aus Professional</li>
+                            <li>Unbegrenzter Cloud-Speicher</li>
+                            <li>White-Label-Option</li>
+                            <li>API-Zugang</li>
+                            <li>24/7 Premium-Support</li>
+                            <li>Custom-Integrationen</li>
+                            <li>SLA-Garantie</li>
+                            <li>Dedicated Account Manager</li>
+                        </ul>
+                        <button class="pricing-button" onclick="selectPlan('enterprise')" title="Action Button">
+                            Enterprise kontaktieren
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Support Section -->
+            <div class="support-section">
+                <h2 class="optimized-style">🛠️ Support & Hilfe</h2>
+                <div class="support-grid">
+                    <div class="support-card">
+                        <div class="support-icon">📚</div>
+                        <h3 class="support-title">Dokumentation</h3>
+                        <p class="support-desc">Umfassende Anleitungen und Tutorials für alle Features</p>
+                        <button class="support-button" onclick="openDocumentation()" title="Action Button">
+                            Dokumentation öffnen
+                        </button>
+                    </div>
+
+                    <div class="support-card">
+                        <div class="support-icon">💬</div>
+                        <h3 class="support-title">Live Chat</h3>
+                        <p class="support-desc">Sofortige Hilfe von unserem Support-Team</p>
+                        <button class="support-button" id="startLiveChat" onclick="startLiveChat()" title="Action Button">
+                            Chat starten
+                        </button>
+                    </div>
+
+                    <div class="support-card">
+                        <div class="support-icon">📧</div>
+                        <h3 class="support-title">E-Mail Support</h3>
+                        <p class="support-desc">Detaillierte Anfragen per E-Mail</p>
+                        <button class="support-button" onclick="openEmailSupport()" title="Action Button">
+                            E-Mail senden
+                        </button>
+                    </div>
+
+                    <div class="support-card">
+                        <div class="support-icon">🎥</div>
+                        <h3 class="support-title">Video-Tutorials</h3>
+                        <p class="support-desc">Schritt-für-Schritt Video-Anleitungen</p>
+                        <button class="support-button" onclick="openVideoTutorials()" title="Action Button">
+                            Videos ansehen
+                        </button>
+                    </div>
+
+                    <div class="support-card">
+                        <div class="support-icon">🔧</div>
+                        <h3 class="support-title">Remote Support</h3>
+                        <p class="support-desc">Direkte Fernwartung für Enterprise-Kunden</p>
+                        <button class="support-button" onclick="requestRemoteSupport()" title="Action Button">
+                            Remote-Support anfordern
+                        </button>
+                    </div>
+
+                    <div class="support-card">
+                        <div class="support-icon">🏫</div>
+                        <h3 class="support-title">Schulungen</h3>
+                        <p class="support-desc">Professionelle Schulungen für Teams</p>
+                        <button class="support-button" onclick="requestTraining()" title="Action Button">
+                            Schulung anfragen
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ Section -->
+            <div class="faq-section">
+                <h2 class="optimized-style">❓ Häufige Fragen</h2>
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <span>Wie funktioniert die kostenlose Version?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        Die kostenlose Version bietet alle grundlegenden Kommunikationsfunktionen für bis zu 4 Teilnehmer. Sie können Audio- und Video-Calls führen, chatten und die Basis-Features nutzen. Für erweiterte Funktionen wie Screen-Sharing, Recording oder mehr Teilnehmer empfehlen wir den Professional-Plan.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <span>Kann ich jederzeit upgraden oder downgraden?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        Ja, Sie können jederzeit zwischen den Plänen wechseln. Upgrades werden sofort aktiviert, Downgrades zum Ende des aktuellen Abrechnungszeitraums. Alle Ihre Daten und Einstellungen bleiben erhalten.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <span>Welche Zahlungsmethoden werden akzeptiert?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        Wir akzeptieren alle gängigen Kreditkarten (Visa, Mastercard, American Express), PayPal, SEPA-Überweisungen und für Enterprise-Kunden auch Rechnungsstellung mit 30 Tagen Zahlungsziel.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <span>Gibt es eine Geld-zurück-Garantie?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        Ja, wir bieten eine 30-tägige Geld-zurück-Garantie für alle bezahlten Pläne. Wenn Sie nicht zufrieden sind, erstatten wir Ihnen den vollen Betrag zurück, ohne Fragen zu stellen.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <span>Wie sicher sind meine Daten?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        Sicherheit hat höchste Priorität. Alle Daten werden Ende-zu-Ende verschlüsselt übertragen und gespeichert. Wir verwenden moderne Verschlüsselungsstandards und sind DSGVO-konform. Regelmäßige Sicherheitsaudits stellen sicher, dass Ihre Daten geschützt sind.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <span>Kann ich TELCO Hub in meine bestehende Infrastruktur integrieren?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        Ja, TELCO Hub bietet umfangreiche API-Integrationen und Webhooks. Enterprise-Kunden erhalten zusätzlich White-Label-Optionen und Custom-Integrationen. Unser technisches Team unterstützt Sie bei der Integration in Ihre bestehenden Systeme.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Testimonials -->
+            <div class="testimonials-section">
+                <h2 class="optimized-style">💬 Was unsere Kunden sagen</h2>
+                <div class="testimonials-grid">
+                    <div class="testimonial-card">
+                        <p class="testimonial-text">
+                            "TELCO Hub hat unsere Team-Kommunikation revolutioniert. Die Audio-Qualität ist fantastisch und die Features sind genau das, was wir brauchten."
+                        </p>
+                        <p class="testimonial-author">- Sarah M., Musikproduzentin</p>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <p class="testimonial-text">
+                            "Als Musikschule nutzen wir TELCO Hub für Online-Unterricht. Die Bildschirmfreigabe und Recording-Funktionen sind perfekt für unsere Bedürfnisse."
+                        </p>
+                        <p class="testimonial-author">- Michael K., Musikschulleiter</p>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <p class="testimonial-text">
+                            "Die Enterprise-Lösung hat uns geholfen, unsere globalen Teams zu verbinden. Der Support ist erstklassig und die Integration war nahtlos."
+                        </p>
+                        <p class="testimonial-author">- Anna L., IT-Direktorin</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="contact-form">
+                <h2 class="optimized-style">📞 Kontakt aufnehmen</h2>
+                <form id="contact-form" onsubmit="submitContactForm(event)">
+                    <div class="form-group">
+                        <label for="contact-name">Name *</label>
+                        <input type="text" id="contact-name" required aria-label="Input Field">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contact-email">E-Mail *</label>
+                        <input type="email" id="contact-email" required aria-label="Input Field">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contact-company">Unternehmen</label>
+                        <input type="text" id="contact-company" aria-label="Input Field">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contact-subject">Betreff *</label>
+                        <select id="contact-subject" required>
+                            <option value="">Bitte wählen...</option>
+                            <option value="general">Allgemeine Anfrage</option>
+                            <option value="sales">Verkauf & Preise</option>
+                            <option value="support">Technischer Support</option>
+                            <option value="enterprise">Enterprise-Lösung</option>
+                            <option value="partnership">Partnerschaft</option>
+                            <option value="other">Sonstiges</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contact-message">Nachricht *</label>
+                        <textarea id="contact-message" required placeholder="Beschreiben Sie Ihr Anliegen..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="contact-privacy" required aria-label="Input Field">
+                            Ich stimme der Verarbeitung meiner Daten gemäß der Datenschutzerklärung zu. *
+                        </label>
+                    </div>
+
+                    <button type="submit" class="form-button" title="Action Button">
+                        📤 Nachricht senden
+                    </button>
+                </form>
+            </div>
+
+            <!-- Stats Section -->
+            <div class="stats-section">
+                <h2 class="optimized-style">📊 Unsere Erfolge</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">10K+</div>
+                        <div class="stat-label">Aktive Nutzer</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-number">99.9%</div>
+                        <div class="stat-label">Uptime</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">Support</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-number">50+</div>
+                        <div class="stat-label">Länder</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-number">4.9★</div>
+                        <div class="stat-label">Bewertung</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">DSGVO-konform</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script async>
+        // Plan selection
+        function selectPlan(plan) {
+            const plans = {
+                starter: {
+                    name: 'Starter',
+                    price: 0,
+                    features: ['Basis-Kommunikation', 'Bis zu 4 Teilnehmer', 'Standard-Audio/Video']
+                },
+                professional: {
+                    name: 'Professional',
+                    price: 19,
+                    features: ['Unbegrenzte Teilnehmer', 'HD-Audio/Video', 'Screen-Sharing', 'Recording']
+                },
+                enterprise: {
+                    name: 'Enterprise',
+                    price: 99,
+                    features: ['Alles aus Professional', 'White-Label', 'API-Zugang', '24/7 Support']
+                }
+            };
+
+            const selectedPlan = plans[plan];
+            
+            if (plan === 'starter') {
+                alert(`✅ ${selectedPlan.name} Plan ausgewählt!\n\nSie können sofort mit der kostenlosen Version beginnen.`);
+            } else if (plan === 'professional') {
+                alert(`💳 ${selectedPlan.name} Plan ausgewählt!\n\nPreis: ${selectedPlan.price}€/Monat\n\nSie werden zur Zahlungsseite weitergeleitet...`);
+                // In real app, redirect to payment
+            } else if (plan === 'enterprise') {
+                alert(`🏢 ${selectedPlan.name} Plan ausgewählt!\n\nPreis: ${selectedPlan.price}€/Monat\n\nUnser Sales-Team wird sich innerhalb von 24 Stunden bei Ihnen melden.`);
+                // In real app, redirect to enterprise contact form
+            }
+        }
+
+        // Support functions
+        function openDocumentation() {
+            window.open('/docs', '_blank');
+        }
+
+        function startLiveChat() {
+            // Use TELCO Enhancements if available
+            if (window.TELCOEnhancements) {
+                try {
+                    window.TELCOEnhancements.enablePricingLiveChat({
+                        signalingUrl: 'wss://localhost:8080/ws', // Will be configured per environment
+                        room: 'support',
+                        buttonSelector: '#startLiveChat'
+                    });
+                    
+                    // Show enhancement indicator
+                    const indicator = document.createElement('div');
+                    indicator.style.cssText = 'position: fixed; top: 10px; right: 10px; background: #28a745; color: white; padding: 8px 12px; border-radius: 6px; font-size: 12px; z-index: 1000;';
+                    indicator.textContent = '🚀 Enhanced Live Chat Active';
+                    document.body.appendChild(indicator);
+                    setTimeout(() => indicator.remove(), 5000);
+                    
+                    return;
+                } catch (error) {
+                    console.warn('Enhanced Live Chat not available:', error.message);
+                }
+            }
+            
+            // Fallback
+            alert('💬 Live Chat wird gestartet...\n\nIn einer echten Implementierung würde hier ein Chat-Widget geöffnet.');
+        }
+
+        function openEmailSupport() {
+            window.location.href = 'mailto:support@telco-hub.com?subject=Support-Anfrage';
+        }
+
+        function openVideoTutorials() {
+            window.open('/tutorials', '_blank');
+        }
+
+        function requestRemoteSupport() {
+            alert('🔧 Remote Support angefordert!\n\nEin Support-Techniker wird sich innerhalb von 2 Stunden bei Ihnen melden.');
+        }
+
+        function requestTraining() {
+            alert('🏫 Schulungsanfrage gesendet!\n\nUnser Training-Team wird sich mit Ihnen in Verbindung setzen, um einen Termin zu vereinbaren.');
+        }
+
+        // FAQ functionality
+        function toggleFAQ(element) {
+            const answer = element.nextElementSibling;
+            const icon = element.querySelector('.faq-icon');
+            
+            if (answer.classList.contains('active')) {
+                answer.classList.remove('active');
+                icon.classList.remove('rotated');
+            } else {
+                // Close all other FAQs
+                document.querySelectorAll('.faq-answer.active').forEach(item => {
+                    item.classList.remove('active');
+                });
+                document.querySelectorAll('.faq-icon.rotated').forEach(item => {
+                    item.classList.remove('rotated');
+                });
+                
+                // Open current FAQ
+                answer.classList.add('active');
+                icon.classList.add('rotated');
+            }
+        }
+
+        // Contact form
+        function submitContactForm(event) {
+            event.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('contact-name').value,
+                email: document.getElementById('contact-email').value,
+                company: document.getElementById('contact-company').value,
+                subject: document.getElementById('contact-subject').value,
+                message: document.getElementById('contact-message').value
+            };
+            
+            // Simulate form submission
+            alert(`📤 Nachricht gesendet!\n\nVielen Dank für Ihre Anfrage, ${formData.name}!\n\nWir werden uns innerhalb von 24 Stunden bei Ihnen melden.`);
+            
+            // Reset form
+            document.getElementById('contact-form').reset();
+        }
+
+        // Scroll to pricing
+        function scrollToPricing() {
+            document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add smooth scrolling to all internal links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

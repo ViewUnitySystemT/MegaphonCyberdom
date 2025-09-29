@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎵 TEL Producer Suite - Serverfarm</title>
+    <style>
+        body { background: #0f172a; color: white; padding: 2rem; font-family: system-ui; }
+        h1 { color: #F59E0B; font-size: 3rem; margin-bottom: 2rem; text-shadow: 0 0 20px rgba(245,158,11,0.5); }
+        .producer-module { background: rgba(245,158,11,0.1); border: 2px solid #F59E0B; border-radius: 15px; padding: 2rem; margin-bottom: 2rem; transition: all 0.3s ease; cursor: pointer; }
+        .producer-module:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(245,158,11,0.3); }
+        .back-nav { display: flex; gap: 1rem; justify-content: center; margin-top: 3rem; }
+        .nav-btn { background: #F59E0B; color: white; padding: 1rem 2rem; border: none; border-radius: 8px; text-decoration: none; font-weight: bold; transition: all 0.3s ease; }
+        .nav-btn:hover { background: #f97316; transform: scale(1.05); }
+    </style>
+</head>
+<body>
+    <h1>🎵 TEL Producer Suite</h1>
+    <p style="color: #FF6B35; font-size: 1.2rem; text-align: center;">✅ AKTIV REPARIERT - Raymond Demitrio Tel Medienproduktion</p>
+
+    <div class="producer-module" onclick="openProducerModule('audio')">
+        <h3 style="color: #F59E0B;">🎧 Audio Production</h3>
+        <p>Professionelle Audio-Produktion und Mastering für Raymond Demitrio Tel</p>
+    </div>
+    
+    <div class="producer-module" onclick="openProducerModule('video')">
+        <h3 style="color: #F59E0B;">🎬 Video Production</h3>
+        <p>Video-Editing, Motion Graphics und Content-Creation</p>
+    </div>
+    
+    <div class="producer-module" onclick="openProducerModule('distribution')">
+        <h3 style="color: #F59E0B;">📡 Content Distribution</h3>
+        <p>Multi-Platform Distribution und Content-Management</p>
+    </div>
+
+    <!-- BIDIREKTIONALE NAVIGATION -->
+    <div class="back-nav">
+        <button class="nav-btn" onclick="navigateBack()">🔙 Zurück</button>
+        <a href="../" class="nav-btn">🏗️ Serverfarm</a>
+        <a href="../kommunikation/" class="nav-btn">📞 Kommunikation</a>
+        <a href="../../PRODUCER/" class="nav-btn">🎵 Producer Medien</a>
+        <a href="../../" class="nav-btn">🌐 Hauptseite</a>
+    </div>
+
+    <script>
+        function openProducerModule(moduleType) {
+            console.log(`🎵 Öffne Producer-Modul: ${moduleType}`);
+            
+            const modules = {
+                'audio': () => {
+                    window.open('/PRODUCER/', '_blank');
+                },
+                'video': () => {
+                    window.open('/apps/media-gallery.html', '_blank');
+                },
+                'distribution': () => {
+                    alert('📡 Content Distribution\n\n✅ Multi-Platform Publishing\n✅ Social Media Integration\n✅ Analytics & Tracking\n✅ Automated Workflows\n\n🔄 Wird in schwebender UI geöffnet...');
+                }
+            };
+            
+            if (modules[moduleType]) {
+                modules[moduleType]();
+            }
+        }
+
+        function navigateBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = '../';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🎵 Producer Suite Serverfarm geladen - Raymond Demitrio Tel Integration');
+        });
+    </script>
+</body>
+</html>
+
+
+

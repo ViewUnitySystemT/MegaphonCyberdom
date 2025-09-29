@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MegaphonCyberdom TEL — Globales Multimedia-Museum</title>
+<h1 style="position: absolute; left: -9999px;">MegaphonCyberdom TEL — Globales Multimedia-Museum</h1>
+  
+  <!-- Open Graph / Twitter for maximal Shareability -->
+  <meta property="og:title" content="MegaphonCyberdom TEL — Globales Multimedia-Museum" />
+  <meta property="og:description" content="Ein universeller Launcher für Video, Audio, KI, Kunst & Politik – mit globalem Multimedia-Museum und User-Content-Sharing." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="data:image/svg+xml;utf8,<?xml version='1.0' encoding='UTF-8'?><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 630'><rect width='1200' height='630' fill='%23FF6B35'/><text x='50%' y='50%' dy='.35em' font-family='Inter,Segoe UI,Arial' font-size='88' text-anchor='middle' fill='%23fff'>MEGAPHON TEL</text></svg>" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="MegaphonCyberdom TEL — Globales Multimedia-Museum" />
+  <meta name="twitter:description" content="Ein universeller Launcher für Video, Audio, KI, Kunst & Politik – mit globalem Multimedia-Museum und User-Content-Sharing." />
+
+  <!-- Basic theming -->
+  <meta name="theme-color" content="#FF6B35" />
+
+  <!-- Inline CSS (MegaphonCyberdom Orange Theme) -->
+  <style>
+    :root{
+      --bg:#0b0b0c; --bg-soft:#111216; --card:#151720; --muted:#9aa3b2; --text:#e8ebf0; 
+      --brand:#FF6B35; --accent:#FF8E53; --ok:#4ade80; --warn:#fbbf24; --danger:#fb7185;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:radial-gradient(1200px 600px at 15% 0%, rgba(255,107,53,.08), transparent 60%),
+                    radial-gradient(900px 600px at 85% 20%, rgba(255,142,83,.08), transparent 60%), var(--bg);
+         color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
+    a{color:var(--brand);text-decoration:none}
+    a:hover{text-decoration:underline}
+    header{position:sticky;top:0;background:linear-gradient(180deg, rgba(11,11,12,.9), rgba(11,11,12,.65));backdrop-filter: saturate(140%) blur(8px);z-index:5;border-bottom:1px solid #1f2330}
+    .wrap{max-width:1200px;margin:0 auto;padding:18px}
+    .row{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.3px}
+    .brand svg{width:28px;height:28px}
+    .pill{padding:6px 10px;border:1px solid #2a3040;border-radius:999px;color:var(--muted)}
+    .search{flex:1;display:flex;align-items:center;gap:8px;background:var(--bg-soft);border:1px solid #202434;border-radius:14px;padding:8px 12px}
+    .search input{flex:1;background:transparent;border:0;outline:none;color:var(--text)}
+
+    main{max-width:1200px;margin:0 auto;padding:20px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+    .card{background:linear-gradient(180deg, rgba(21,23,32,.9), rgba(21,23,32,.7));border:1px solid #1f2330;border-radius:18px;box-shadow:var(--shadow);overflow:visible;display:flex;flex-direction:column}
+    .card header{position:relative;background:transparent;backdrop-filter:none;border:0}
+    .card h3{margin:0;padding:16px;font-size:16px;display:flex;gap:10px;align-items:center}
+    .card .body{padding:0 16px 16px 16px}
+    .card iframe{width:100%;height:220px;border:0;border-top:1px solid #202434}
+    .card footer{padding:12px 16px;border-top:1px dashed #262b3a;color:var(--muted);font-size:13px}
+
+    .toolbar{display:flex;gap:8px;align-items:center}
+    .btn{appearance:none;background:#1c2233;border:1px solid #2a3040;color:var(--text);padding:8px 12px;border-radius:12px;font-weight:600;cursor:pointer}
+    .btn:hover{filter:brightness(1.06)}
+    .btn.ghost{background:transparent}
+    .btn.primary{background:var(--brand);border-color:var(--brand)}
+    .right{margin-left:auto}
+
+    .lang-switch{gap:6px}
+    .lang-switch button{padding:6px 10px}
+
+    .footer{color:var(--muted);text-align:center;padding:30px 10px}
+
+    .kbd{font:12px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;background:#0d1117;border:1px solid #30363d;border-bottom-width:2px;border-radius:6px;padding:2px 6px}
+
+    /* Museum Gallery */
+    .museum-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin:20px 0}
+    .museum-item{background:var(--card);border:1px solid #1f2330;border-radius:12px;overflow:visible;cursor:pointer;transition:transform 0.2s}
+    .museum-item:hover{transform:scale(1.02)}
+    .museum-item img{width:100%;height:150px;object-fit:cover}
+    .museum-item .info{padding:8px;font-size:12px}
+    .museum-item .author{color:var(--brand);font-weight:600}
+
+    /* Upload Zone */
+    .upload-zone{border:2px dashed var(--brand);border-radius:12px;padding:20px;text-align:center;margin:20px 0;background:rgba(255,107,53,0.05)}
+    .upload-zone.dragover{border-color:var(--accent);background:rgba(255,142,83,0.1)}
+
+    /* Modal */
+    dialog{background:var(--card);border:1px solid #2a3040;border-radius:16px;color:var(--text);max-width:680px;width:92%}
+    dialog::backdrop{background:rgba(0,0,0,.5)}
+
+    /* Responsive helpers */
+    @media (max-width:640px){.hide-sm{display: block}}
+  </style>
+
+  <!-- JSON-LD Schema.org for News/Org + Site -->
+  <script type="application/ld+json" id="schema">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "MegaphonCyberdom TEL",
+    "url": "https://megaphoncyberdom.com/tel-global-museum.html",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://megaphoncyberdom.com/search?q={query}",
+      "query-input": "required name=query"
+    }
+  }
+  </script>
+</head>
+<body>
+  <!-- Topbar -->
+  <header>
+    <div class="wrap row">
+      <div class="brand">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-visible="false"><rect x="3" y="3" width="18" height="18" rx="4" fill="#FF6B35" stroke="#FF8E53"/><path d="M6 8h12M6 12h8M6 16h5" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+        <span>MegaphonCyberdom TEL</span>
+        <span class="show" id="status-pill">offline‑ready</span>
+      </div>
+      <div class="search" role="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-visible="false"><circle cx="11" cy="11" r="7" stroke="#9aa3b2" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="#9aa3b2" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="q" placeholder="Suche in TEL, z. B. YouTube, Spotify, Museum… ( / )" aria-label="Suche" / aria-label="Input Field">
+      </div>
+      <div class="toolbar right">
+        <button class="btn ghost" id="shareBtn" title="Teilen" title="Action Button">🔗</button>
+        <button class="btn primary" id="uploadBtn" title="Content hochladen" title="Action Button">📤 Upload</button>
+        <button class="btn" id="installBtn" title="Als App installieren" title="Action Button">⬇️ App</button>
+        <div class="row lang-switch">
+          <button class="btn ghost" data-lang="de" aria-pressed="true" title="Action Button">DE</button>
+          <button class="btn ghost" data-lang="en" title="Action Button">EN</button>
+        </div>
+        <button class="btn" id="aboutBtn" title="Action Button">ℹ️</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero / Intro -->
+  <main>
+    <section class="card" aria-label="Intro">
+      <header><h3>🌐 MegaphonCyberdom TEL — Globales Multimedia-Museum</h3></header>
+      <div class="body">
+        <p id="intro">Dies ist ein universeller Launcher mit globalem Multimedia-Museum: Videos, Musik, Karten, KI‑Chat, Newsletter, Pressekit & User-Content-Sharing – alles ohne Build‑Tooling und ohne externe Stylesheets.</p>
+        <div class="row" style="gap:10px;flex-wrap:wrap;margin:10px 0 6px">
+          <button class="btn" id="toggleTheme" title="Action Button">Dark/Light</button>
+          <button class="btn" id="openPressKit" title="Action Button">🗞️ Presskit</button>
+          <button class="btn" id="openMuseum" title="Action Button">🏛️ Museum</button>
+          <button class="btn" id="exportRSS" title="Action Button">RSS</button>
+          <button class="btn" id="exportSitemap" title="Action Button">Sitemap</button>
+        </div>
+      </div>
+      <footer>Pro‑Tip: Drücke <span class="kbd">/</span> zum Fokussieren der Suche. Alles ist client‑seitig und kann offline zwischengespeichert werden.</footer>
+    </section>
+
+    <!-- Global Museum Gallery -->
+    <section class="card" aria-label="Global Museum">
+      <header><h3>🏛️ Globales Multimedia-Museum</h3></header>
+      <div class="body">
+        <div class="upload-zone" id="uploadZone">
+          <p>📤 <strong>Content hochladen</strong></p>
+          <p>Ziehe Dateien hierher oder klicke zum Auswählen</p>
+          <input type="file" id="fileInput" multiple accept="image/*,video/*,audio/*,.pdf,.txt,.md" style="display: block" aria-label="Input Field">
+          <button class="btn primary" onclick="document.getElementById('fileInput').click()" title="Action Button">Dateien auswählen</button>
+        </div>
+        <div class="museum-gallery" id="museumGallery">
+          <!-- User content will be displayed here -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Dynamic modules grid -->
+    <section class="grid" id="grid" aria-live="polite"></section>
+
+    <div class="footer">© <span id="year"></span> MegaphonCyberdom TEL. Kunst • Kultur • Politik • KI • Globales Museum. <span class="show">Made mit einer simplen HTML‑Datei.</span></div>
+  </main>
+
+  <!-- ABOUT / HELP DIALOG -->
+  <dialog id="about">
+    <form method="dialog" style="padding:18px 16px 8px">
+      <h2 style="margin:0 0 8px">Über MegaphonCyberdom TEL</h2>
+      <p style="color:var(--muted)">TEL ist ein globales, modulbasiertes Portal mit integriertem Multimedia-Museum. Du kannst Dienste per JSON konfigurieren, Offline‑Caching aktivieren, Presskit exportieren und deine eigene OpenAI‑API‑Taste lokal speichern.</p>
+      <ul>
+        <li>🔌 <strong>Bring‑Your‑Own‑Key</strong> für KI (lokal gespeichert)</li>
+        <li>📣 <strong>Presskit</strong> mit Logos, Boilerplate & Pitch</li>
+        <li>📰 <strong>RSS</strong> & <strong>Sitemap</strong> Generator</li>
+        <li>📱 <strong>PWA</strong> (Installierbar, offline‑bereit)</li>
+        <li>🌍 <strong>I18N</strong> (Deutsch/Englisch erweiterbar)</li>
+        <li>🏛️ <strong>Globales Museum</strong> mit User-Content-Sharing</li>
+        <li>🔗 <strong>Matrix Integration</strong> für weltweite Vernetzung</li>
+      </ul>
+      <div class="row" style="justify-content:flex-end;gap:8px;margin-top:10px">
+        <button class="btn ghost" value="cancel" title="Action Button">Schließen</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- MUSEUM DIALOG -->
+  <dialog id="museum">
+    <form method="dialog" style="padding:18px 16px 12px">
+      <h2 style="margin:0 0 8px">🏛️ Globales Multimedia-Museum</h2>
+      <p class="muted">Teile deine Kunst, Musik, Videos und Texte mit der Welt.</p>
+      <details open>
+        <summary><strong>Museum Features</strong></summary>
+        <ul>
+          <li>📤 <strong>Content Upload</strong> - Bilder, Videos, Audio, PDFs</li>
+          <li>🌍 <strong>Weltweite Verteilung</strong> - Matrix Federation</li>
+          <li>🏷️ <strong>Tagging System</strong> - Kategorien und Schlagwörter</li>
+          <li>💬 <strong>Community Feedback</strong> - Likes, Kommentare, Shares</li>
+          <li>📊 <strong>Analytics</strong> - Views, Downloads, Engagement</li>
+        </ul>
+      </details>
+      <details>
+        <summary><strong>Content Guidelines</strong></summary>
+        <p>Das Museum akzeptiert:</p>
+        <ul>
+          <li>🎨 <strong>Kunst</strong> - Digitale Kunst, Fotografie, Illustrationen</li>
+          <li>🎵 <strong>Musik</strong> - Originale Kompositionen, Remixes, Podcasts</li>
+          <li>🎬 <strong>Video</strong> - Kurzfilme, Dokumentationen, Tutorials</li>
+          <li>📝 <strong>Texte</strong> - Gedichte, Essays, Geschichten</li>
+          <li>💻 <strong>Code</strong> - Open Source Projekte, Demos</li>
+        </ul>
+      </details>
+      <div class="row" style="justify-content:flex-end;gap:8px;margin-top:10px">
+        <button class="btn" value="cancel" title="Action Button">Schließen</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+  // ------------------
+  // 1) SERVICES CONFIG (Enhanced with Matrix Integration)
+  // ------------------
+  const SERVICES = [
+    {
+      id:"youtube", kind:"video", title:"YouTube", descr:"Channel Highlights", tags:["video","news"],
+      embed: (q)=>`<iframe loading="lazy" allow="accelerometer; clipboard-read; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen src="https://www.youtube.com/embed/${q||'dQw4w9WgXcQ'}"></iframe>`,
+      defaultQuery:"dQw4w9WgXcQ",
+      actions:[{label:"Öffnen", href:"https://youtube.com"}]
+    },
+    {
+      id:"spotify", kind:"audio", title:"Spotify", descr:"Playlist / Podcast", tags:["audio","music"],
+      embed: (pl)=>`<iframe style="height:220px" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" src="https://open.spotify.com/embed/playlist/${pl||'37i9dQZF1DXcBWIGoYBM5M'}"></iframe>`,
+      defaultQuery:"37i9dQZF1DXcBWIGoYBM5M",
+      actions:[{label:"Öffnen", href:"https://spotify.com"}]
+    },
+    {
+      id:"matrix", kind:"chat", title:"Matrix Chat", descr:"Weltweite Kommunikation", tags:["chat","matrix"],
+      embed: ()=>`<div class="body"><p>Verbinde dich mit dem globalen Matrix-Netzwerk für sichere Kommunikation.</p><div class="row" style="gap:8px;flex-wrap:wrap"><a class="btn" href="http://localhost:8080" target="_blank">TELCO Hub</a><a class="btn" href="#" onclick="TEL.openMatrix()">Matrix Web</a></div></div>`,
+      actions:[{label:"Matrix Web", href:"#", onclick:"TEL.openMatrix()"}]
+    },
+    {
+      id:"maps", kind:"map", title:"Karten", descr:"Google Maps Embed", tags:["map"],
+      embed: (place)=>`<iframe loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=${encodeURIComponent(place||'Berlin')}&&output=embed"></iframe>`,
+      defaultQuery:"Berlin",
+      actions:[{label:"Routen", href:"https://maps.google.com"}]
+    },
+    {
+      id:"newsletter", kind:"form", title:"Newsletter", descr:"E-Mail Anmeldungen sammeln", tags:["community"],
+      embed: ()=>`<div class="body"><p>Melde dich an. Wir versenden selten, aber substanziell.</p><form onsubmit="return TEL.newsletter(this)"><input name="email" type="email" placeholder="deine@adresse" required style="width:100%;padding:10px;border-radius:10px;border:1px solid #2a3040;background:#0d1117;color:#e8ebf0" aria-label="Input Field"><div style="height:8px"></div><button class='btn' title="Action Button">Anmelden</button></form><p style="color:var(--muted);font-size:13px">Datenschutzfreundlich, Double‑Opt‑In kompatibel (via mailto:).</p></div>`,
+      actions:[{label:"Export CSV", href:"#", onclick:"TEL.exportSubscribers()"}]
+    },
+    {
+      id:"openai", kind:"ai", title:"KI‑Chat (BYO‑Key)", descr:"Lokaler OpenAI Schlüssel", tags:["ai"],
+      embed: ()=>`<div class="body"><p>Gib deinen <strong>OpenAI‑API‑Key</strong> ein (lokal gespeichert). Dann stelle eine Frage.</p><input id="openaiKey" type="password" placeholder="sk‑..." style="width:100%;padding:10px;border-radius:10px;border:1px solid #2a3040;background:#0d1117;color:#e8ebf0" aria-label="Input Field"><div style="height:8px"></div><textarea id="prompt" rows="3" placeholder="Frage hier eingeben…" style="width:100%;padding:10px;border-radius:10px;border:1px solid #2a3040;background:#0d1117;color:#e8ebf0"></textarea><div style="height:8px"></div><button class='btn' onclick='TEL.ask()' title="Action Button">Fragen</button><pre id="aiOut" style="white-space:pre-wrap;background:#0d1117;border:1px solid #2a3040;border-radius:12px;padding:10px;margin-top:8px;max-height:220px;overflow:auto"></pre><p style="color:var(--muted);font-size:12px">Hinweis: Dein Key wird nur im Browser gespeichert (localStorage). Beachte die Nutzungsbedingungen von OpenAI.</p></div>`
+    },
+    {
+      id:"museum", kind:"gallery", title:"Museum", descr:"Globales Multimedia-Museum", tags:["museum","art"],
+      embed: ()=>`<div class="body"><p>Entdecke Kunst, Musik und Kreativität aus der ganzen Welt.</p><div class="museum-gallery" id="miniGallery"></div><div class="row" style="gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn" onclick="TEL.openMuseum()" title="Action Button">Vollständiges Museum</button><button class="btn" onclick="TEL.uploadContent()" title="Action Button">Content hochladen</button></div></div>`,
+      actions:[{label:"Museum öffnen", href:"#", onclick:"TEL.openMuseum()"}]
+    },
+    {
+      id:"gentlyoverdone", kind:"streaming", title:"GENTLYOVERDONE", descr:"Musik als Sprache der Verbindung", tags:["streaming","gentlyoverdone","music"],
+      embed: ()=>`<div class="body"><p>GENTLYOVERDONE - Musik als Sprache, die Menschen durch Rhythmus, Ton und Gefühl verbindet. EXPO Album von Raymond Demitrio Tel.</p><div class="row" style="gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn" onclick="TEL.openGENTLYOVERDONE()" title="Action Button">GENTLYOVERDONE.com</button><button class="btn" onclick="TEL.openGENTLYOVERDONECOM()" title="Action Button">gentlyoverdone.com</button><button class="btn" onclick="TEL.openEXPOAlbum()" title="Action Button">EXPO Album</button><button class="btn" onclick="TEL.openMagnitudoMusica()" title="Action Button">Magnitudo Musica Mundo</button></div></div>`,
+      actions:[{label:"GENTLYOVERDONE öffnen", href:"#", onclick:"TEL.openGENTLYOVERDONE()"}]
+    },
+    {
+      id:"tel1nl", kind:"website", title:"TEL1.NL", descr:"TEL Portal Website", tags:["website","tel","portal"],
+      embed: ()=>`<div class="body"><p>TEL1.NL - Die offizielle TEL Portal Website mit Magnitudo Musica Mundo Geschenkpaket.</p><div class="row" style="gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn" onclick="TEL.openTEL1NL()" title="Action Button">TEL1.NL öffnen</button><button class="btn" onclick="TEL.openEXPOAlbum()" title="Action Button">EXPO Album</button><button class="btn" onclick="TEL.openMagnitudoMusica()" title="Action Button">Geschenkpaket</button></div></div>`,
+      actions:[{label:"TEL1.NL öffnen", href:"#", onclick:"TEL.openTEL1NL()"}]
+    },
+    {
+      id:"donate", kind:"pay", title:"Unterstützen", descr:"Stripe / PayPal", tags:["support"],
+      embed: ()=>`<div class='body'><p>Unterstütze MegaphonCyberdom TEL und ermögliche unabhängige Inhalte.</p><div class='row' style='gap:8px;flex-wrap:wrap'><a class='btn' href='https://donate.stripe.com' target='_blank' rel='noopener'>Stripe</a><a class='btn' href='https://paypal.me' target='_blank' rel='noopener'>PayPal</a><a class='btn' href='#' onclick='TEL.tip()' >Krypto</a></div></div>`
+    }
+  ];
+
+  // ---------------------------------
+  // 2) I18N minimal (DE/EN, erweiterbar)
+  // ---------------------------------
+  const I18N = {
+    de: {
+      intro: "Dies ist ein universeller Launcher mit globalem Multimedia-Museum: Videos, Musik, Karten, KI‑Chat, Newsletter, Pressekit & User-Content-Sharing – alles ohne Build‑Tooling und ohne externe Stylesheets.",
+      searchPh: "Suche in TEL, z. B. YouTube, Spotify, Museum… ( / )",
+      offline: "offline‑bereit"
+    },
+    en: {
+      intro: "A universal launcher with global multimedia museum: video, audio, maps, AI chat, newsletter, press kit & user content sharing – all in a single HTML file.",
+      searchPh: "Search TEL, e.g. YouTube, Spotify, museum… ( / )",
+      offline: "offline‑ready"
+    }
+  };
+
+  // ------------------------
+  // 3) GLOBAL MUSEUM SYSTEM
+  // ------------------------
+  const MUSEUM_CONTENT = JSON.parse(localStorage.getItem('MEGAPHON_MUSEUM') || '[]');
+
+  function saveMuseumContent() {
+    localStorage.setItem('MEGAPHON_MUSEUM', JSON.stringify(MUSEUM_CONTENT));
+  }
+
+  function addToMuseum(file, metadata) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const content = {
+        id: Date.now().toString(),
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        data: e.target.result,
+        metadata: metadata,
+        timestamp: new Date().toISOString(),
+        author: metadata.author || 'Anonymous',
+        tags: metadata.tags || [],
+        views: 0,
+        likes: 0
+      };
+      MUSEUM_CONTENT.unshift(content);
+      saveMuseumContent();
+      renderMuseumGallery();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function renderMuseumGallery() {
+    const gallery = document.getElementById('museumGallery');
+    if (!gallery) return;
+    
+    gallery.innerHTML = '';
+    MUSEUM_CONTENT.slice(0, 12).forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'museum-item';
+      div.onclick = () => TEL.viewMuseumItem(item);
+      
+      let preview = '';
+      if (item.type.startsWith('image/')) {
+        preview = `<img  src="${item.data}" alt="TELCO Hub Image" alt="${item.name}">`;
+      } else if (item.type.startsWith('video/')) {
+        preview = `<video src="${item.data}" style="width:100%;height:150px;object-fit:cover" controls></video>`;
+      } else if (item.type.startsWith('audio/')) {
+        preview = `<div style="height:150px;background:#1c2233;display:flex;align-items:center;justify-content:center;color:#FF6B35;font-size:24px">🎵</div>`;
+      } else {
+        preview = `<div style="height:150px;background:#1c2233;display:flex;align-items:center;justify-content:center;color:#FF6B35;font-size:24px">📄</div>`;
+      }
+      
+      div.innerHTML = `
+        ${preview}
+        <div class="info">
+          <div class="author">${item.author}</div>
+          <div>${item.name}</div>
+          <div style="color:var(--muted);font-size:10px">${item.views} views • ${item.likes} likes</div>
+        </div>
+      `;
+      gallery.appendChild(div);
+    });
+  }
+
+  // ------------------------
+  // 4) RENDER & INTERACTIONS
+  // ------------------------
+  const qs = (s, el=document)=>el.querySelector(s);
+  const qsa = (s, el=document)=>[...el.querySelectorAll(s)];
+  const grid = qs('#grid');
+  const year = qs('#year');
+  year.textContent = new Date().getFullYear();
+
+  function renderCards(filter=''){
+    const f = filter.trim().toLowerCase();
+    grid.innerHTML = '';
+    SERVICES.filter(s=>!f || s.title.toLowerCase().includes(f) || (s.tags||[]).some(t=>t.includes(f)) || s.id.includes(f)).forEach(s=>{
+      const card = document.createElement('article');
+      card.className = 'card';
+      card.innerHTML = `<header><h3>${iconFor(s.kind)} ${s.title}</h3></header>
+        <div class="body">${s.embed(s.defaultQuery||'')}</div>
+        <footer>${s.descr||''}</footer>`;
+      // action links in footer
+      const footer = card.querySelector('footer');
+      const bar = document.createElement('div'); bar.className='row'; bar.style.gap='8px'; bar.style.flexWrap='wrap'; bar.style.marginTop='6px';
+      (s.actions||[]).forEach(a=>{
+        const b = document.createElement('a'); b.className='btn'; b.textContent=a.label; b.href=a.href||'#'; b.target=a.href? '_blank': '';
+        if(a.onclick){ b.removeAttribute('href'); b.addEventListener('click', e=>{e.preventDefault(); eval(a.onclick);}); }
+        bar.appendChild(b);
+      });
+      footer.appendChild(bar);
+      grid.appendChild(card);
+    })
+  }
+
+  function iconFor(kind){
+    const map={video:'📺',audio:'🎧',map:'🗺️',form:'📬',ai:'🤖',social:'🌐',pay:'💳',chat:'💬',gallery:'🏛️',streaming:'🔴',gentlyoverdone:'🎵'};return `<span aria-visible="false">${map[kind]||'🔗'}</span>`
+  }
+
+  // search input
+  const search = qs('#q');
+  document.addEventListener('keydown',e=>{ if(e.key==='/' && document.activeElement!==search){ e.preventDefault(); search.focus(); } });
+  search.addEventListener('input',e=>renderCards(e.target.value));
+
+  // dialogs
+  const about = qs('#about');
+  const presskit = qs('#presskit');
+  const museum = qs('#museum');
+  qs('#aboutBtn').onclick=()=>about.showModal();
+  qs('#openPressKit').onclick=()=>presskit.showModal();
+  qs('#openMuseum').onclick=()=>museum.showModal();
+
+  // language switching
+  qsa('.lang-switch button').forEach(btn=>btn.addEventListener('click',()=>{
+    qsa('.lang-switch button').forEach(b=>b.setAttribute('aria-pressed','false'));
+    btn.setAttribute('aria-pressed','true');
+    const lang=btn.dataset.lang; localStorage.setItem('TEL_LANG',lang);
+    applyLang(lang);
+  }));
+
+  function applyLang(lang){
+    const t=I18N[lang]||I18N.de;
+    qs('#intro').textContent=t.intro;
+    qs('#q').placeholder=t.searchPh;
+    qs('#status-pill').textContent=t.offline;
+    document.documentElement.lang=lang;
+  }
+
+  // theme
+  qs('#toggleTheme').onclick=()=>{
+    const isLight=document.body.dataset.theme==='light';
+    document.body.dataset.theme=isLight?'dark':'light';
+    if(isLight){document.documentElement.style.colorScheme='dark'} else {document.documentElement.style.colorScheme='light'}
+  }
+
+  // Share
+  qs('#shareBtn').onclick=async()=>{
+    const data={title:document.title, text:'MegaphonCyberdom TEL — Globales Multimedia-Museum', url:location.href};
+    if(navigator.share){ try{ await navigator.share(data);}catch(e){} }
+    else { navigator.clipboard.writeText(location.href); alert('Link kopiert.'); }
+  }
+
+  // Upload functionality
+  const uploadZone = qs('#uploadZone');
+  const fileInput = qs('#fileInput');
+
+  uploadZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadZone.classList.add('dragover');
+  });
+
+  uploadZone.addEventListener('dragleave', () => {
+    uploadZone.classList.remove('dragover');
+  });
+
+  uploadZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadZone.classList.remove('dragover');
+    handleFiles(e.dataTransfer.files);
+  });
+
+  fileInput.addEventListener('change', (e) => {
+    handleFiles(e.target.files);
+  });
+
+  function handleFiles(files) {
+    Array.from(files).forEach(file => {
+      const metadata = {
+        author: prompt('Dein Name (optional):') || 'Anonymous',
+        tags: prompt('Tags (kommagetrennt):')?.split(',').map(t => t.trim()) || []
+      };
+      addToMuseum(file, metadata);
+    });
+  }
+
+  // Newsletter (privacy-friendly: local capture + mailto)
+  const SUBSCRIBERS=[];
+  const TEL = window.TEL={
+    newsletter: (form)=>{ const email=form.email.value.trim(); if(!/^[^@]+@[^@]+\.[^@]+$/.test(email)){ alert('Bitte gültige E‑Mail.'); return false; } SUBSCRIBERS.push({email, t:new Date().toISOString()});
+      location.href=`mailto:newsletter@megaphoncyberdom.com?subject=Subscribe&body=${encodeURIComponent(email)}`; form.reset(); return false; },
+    exportSubscribers: ()=>{ const csv='email,t\n'+SUBSCRIBERS.map(x=>`${x.email},${x.t}`).join('\n'); downloadFile('megaphon-subscribers.csv','text/csv',csv); },
+    tip: ()=>{ alert('BTC bc1qmegaphoncyberdom — Kopiert!'); navigator.clipboard.writeText('bc1qmegaphoncyberdom'); },
+    ask: async ()=>{
+      const key=qs('#openaiKey').value.trim(); const prompt=qs('#prompt').value.trim(); const out=qs('#aiOut');
+      if(!key){ alert('OpenAI‑Key fehlt.'); return; }
+      if(!prompt){ alert('Prompt fehlt.'); return; }
+      localStorage.setItem('TEL_OPENAI_KEY', key);
+      out.textContent='…';
+      try{
+        const resp = await fetch('https://api.openai.com/v1/chat/completions',{
+          method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
+          body: JSON.stringify({ model: 'gpt-4o-mini', messages:[{role:'user', content: prompt}] })
+        });
+        const j=await resp.json(); out.textContent=(j.choices?.[0]?.message?.content)||JSON.stringify(j,null,2);
+      }catch(err){ out.textContent='Fehler: '+err.message; }
+    },
+    openMatrix: ()=>{ window.open('http://localhost:8080', '_blank'); },
+    openMuseum: ()=>{ museum.showModal(); },
+    uploadContent: ()=>{ fileInput.click(); },
+    openGENTLYOVERDONE: ()=>{ window.open('https://www.gentlyoverdone.com', '_blank'); },
+    openTEL1NL: ()=>{ window.open('https://tel1.nl', '_blank'); },
+    openGENTLYOVERDONECOM: ()=>{ window.open('https://gentlyoverdone.com', '_blank'); },
+    openEXPOAlbum: ()=>{ 
+      window.open('http://localhost:8080/web/apps/tel-gentlyoverdone-real.html', '_blank');
+      TEL.addChatMessage('system', 'EXPO Album von Raymond Demitrio Tel geöffnet!');
+    },
+    openMagnitudoMusica: ()=>{ 
+      window.open('http://localhost:8080/web/apps/tel-gentlyoverdone-real.html', '_blank');
+      TEL.addChatMessage('system', 'Magnitudo Musica Mundo Geschenkpaket geöffnet!');
+    },
+    viewMuseumItem: (item)=>{ 
+      if(item.type.startsWith('image/') || item.type.startsWith('video/')) {
+        window.open(item.data, '_blank');
+      } else {
+        const blob = new Blob([item.data], {type: item.type});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = item.name;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+      item.views++;
+      saveMuseumContent();
+    }
+  };
+
+  // Export helpers
+  function downloadFile(name,type,content){ const blob=new Blob([content],{type}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000); }
+
+  // Logo/One‑Pager exports
+  qs('#downloadLogoSVG').onclick=(e)=>{ e.preventDefault(); const svg=`<svg xmlns='http://www.w3.org/2000/svg' width='1024' height='256'><rect width='100%' height='100%' fill='#FF6B35'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='Inter,Segoe UI,Arial' font-size='160' fill='#fff'>MEGAPHON TEL</text></svg>`; downloadFile('MegaphonCyberdom-TEL-logo.svg','image/svg+xml',svg); };
+  qs('#downloadLogoPNG').onclick=(e)=>{ e.preventDefault(); const c=document.createElement('canvas'); c.width=1024; c.height=256; const ctx=c.getContext('2d'); ctx.fillStyle='#FF6B35'; ctx.fillRect(0,0,c.width,c.height); ctx.fillStyle='#fff'; ctx.font='160px Inter,Segoe UI,Arial'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('MEGAPHON TEL', c.width/2, c.height/2); c.toBlob(b=>downloadFile('MegaphonCyberdom-TEL-logo.png','image/png',b)); };
+  qs('#downloadOnePager').onclick=(e)=>{ e.preventDefault(); const txt=`MegaphonCyberdom TEL — One‑Pager\n\nVision: Ein universelles, modulares Medien‑ und KI‑Portal mit globalem Multimedia-Museum in einer Datei.\nFeatures: Video, Audio, Karten, KI‑Chat (BYO‑Key), Newsletter, Presskit, PWA, I18N, Matrix Integration, Globales Museum.\nKontakt: hello@megaphoncyberdom.com`; downloadFile('MegaphonCyberdom-TEL-onepager.txt','text/plain',txt); };
+
+  // RSS & Sitemap minimal generator
+  qs('#exportRSS').onclick=()=>{
+    const iso=new Date().toUTCString();
+    const rss=`<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>MegaphonCyberdom TEL Feed</title><link>${location.href}</link><description>Aktuelle Module & Museum Content</description><lastBuildDate>${iso}</lastBuildDate>${SERVICES.map(s=>`<item><title>${s.title}</title><link>${location.href}#${s.id}</link><description>${s.descr||''}</description><guid>${s.id}</guid></item>`).join('')}${MUSEUM_CONTENT.slice(0,10).map(c=>`<item><title>${c.name}</title><link>${location.href}#museum-${c.id}</link><description>Content von ${c.author}</description><guid>${c.id}</guid></item>`).join('')}</channel></rss>`;
+    downloadFile('megaphon-tel.xml','application/rss+xml',rss);
+  };
+  qs('#exportSitemap').onclick=()=>{
+    const xml=`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${location.href}</loc><changefreq>daily</changefreq></url>${SERVICES.map(s=>`<url><loc>${location.href}#${s.id}</loc><changefreq>weekly</changefreq></url>`).join('')}${MUSEUM_CONTENT.map(c=>`<url><loc>${location.href}#museum-${c.id}</loc><changefreq>monthly</changefreq></url>`).join('')}</urlset>`;
+    downloadFile('megaphon-sitemap.xml','application/xml',xml);
+  };
+
+  // PWA: dynamic manifest + Service Worker via Blob
+  (function setupPWA(){
+    const manifest = { name:"MegaphonCyberdom TEL", short_name:"MEGAPHON TEL", start_url:"./", display:"standalone", background_color:"#FF6B35", theme_color:"#FF6B35", icons:[{src:iconData(), sizes:"192x192", type:"image/png"}] };
+    const mBlob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+    const mUrl = URL.createObjectURL(mBlob);
+    const link=document.createElement('link'); link.rel='manifest'; link.href=mUrl; document.head.appendChild(link);
+
+    const swCode = `self.addEventListener('install',e=>{e.waitUntil(caches.open('megaphon-tel-v1').then(c=>c.addAll(['./'])))});
+self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>caches.match('./'))))});`;
+    const swUrl = URL.createObjectURL(new Blob([swCode],{type:'text/javascript'}));
+    if('serviceWorker' in navigator){ navigator.serviceWorker.register(swUrl).then(()=>document.getElementById('status-pill').textContent='offline‑bereit').catch(()=>{}); }
+
+    // install prompt
+    const installBtn = document.getElementById('installBtn');
+    let deferred; window.addEventListener('beforeinstallprompt', (e)=>{ e.preventDefault(); deferred=e; installBtn.disabled=false; });
+    installBtn.onclick=()=> deferred? deferred.prompt(): alert('In Browser‑Menü „Zum Home‑Bildschirm hinzufügen".');
+
+    function iconData(){ // simple PNG via canvas -> dataURL
+      const c=document.createElement('canvas'); c.width=c.height=192; const x=c.getContext('2d'); x.fillStyle='#FF6B35'; x.fillRect(0,0,192,192); x.fillStyle='#fff'; x.font='bold 108px Inter,Segoe UI,Arial'; x.textAlign='center'; x.textBaseline='middle'; x.fillText('M',96,96); return c.toDataURL('image/png');
+    }
+  })();
+
+  // Load stored OpenAI key if present
+  window.addEventListener('load',async()=>{
+    renderCards();
+    renderMuseumGallery();
+    const lang=localStorage.getItem('TEL_LANG')|| (navigator.language||'de').slice(0,2);
+    applyLang(['de','en'].includes(lang)?lang:'de');
+    const k=localStorage.getItem('TEL_OPENAI_KEY'); if(k && qs('#openaiKey')) qs('#openaiKey').value=k;
+    
+    // Automatisches System laden
+    try {
+      const autoSystemScript = document.createElement('script');
+      autoSystemScript.src = '/tel-gentlyoverdone-auto-system.js';
+      autoSystemScript.type = 'module';
+      document.head.appendChild(autoSystemScript);
+      
+      const globalMediaScript = document.createElement('script');
+      globalMediaScript.src = '/global-media-monitor.js';
+      globalMediaScript.type = 'module';
+      document.head.appendChild(globalMediaScript);
+      
+      const liveInfoScript = document.createElement('script');
+      liveInfoScript.src = '/live-info-system.js';
+      liveInfoScript.type = 'module';
+      document.head.appendChild(liveInfoScript);
+      
+      const aiLaunchpadScript = document.createElement('script');
+      aiLaunchpadScript.src = '/ai-launchpad-widget.js';
+      aiLaunchpadScript.setAttribute('data-position', 'br');
+      aiLaunchpadScript.setAttribute('data-accent', '#FF6B35');
+      aiLaunchpadScript.setAttribute('data-title', 'TEL AI Tools');
+      aiLaunchpadScript.setAttribute('data-compact', 'false');
+      document.head.appendChild(aiLaunchpadScript);
+      
+      TEL.addChatMessage('system', 'Automatisches TEL & GENTLYOVERDONE System mit globaler Medien-Überwachung, Live-Info-System und AI Launchpad wird geladen...');
+    } catch (error) {
+      console.error('Fehler beim Laden des automatischen Systems:', error);
+    }
+  });
+
+  </script>
+</body>
+</html>

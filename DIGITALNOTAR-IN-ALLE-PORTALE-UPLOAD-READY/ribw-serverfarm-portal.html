@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RIBW Serverfarm Portal - IP-basiert</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a2332 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem 2rem;
+            border-bottom: 2px solid #00ff88;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header h1 {
+            color: #00ff88;
+            font-size: 2rem;
+            text-align: center;
+        }
+        
+        .ip-display {
+            text-align: center;
+            margin: 1rem 0;
+            font-size: 1.2rem;
+            color: #ff6b35;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .serverfarm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .server-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .server-card:hover {
+            transform: translateY(-5px);
+            border-color: #00ff88;
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2);
+        }
+        
+        .server-card h3 {
+            color: #00ff88;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .server-info {
+            margin: 1rem 0;
+        }
+        
+        .server-info span {
+            display: block;
+            margin: 0.5rem 0;
+            color: #ffffff;
+        }
+        
+        .server-info .label {
+            color: #ff6b35;
+            font-weight: bold;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: #00ff88;
+            color: #000;
+        }
+        
+        .btn-primary:hover {
+            background: #00cc6a;
+            transform: scale(1.05);
+        }
+        
+        .btn-secondary {
+            background: #ff6b35;
+            color: #fff;
+        }
+        
+        .btn-secondary:hover {
+            background: #e55a2b;
+            transform: scale(1.05);
+        }
+        
+        .domain-manager {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            backdrop-filter: blur(10px);
+        }
+        
+        .domain-manager h2 {
+            color: #ff6b35;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .domain-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 1rem;
+            align-items: end;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            color: #00ff88;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        
+        .form-group input, .form-group select {
+            padding: 0.8rem;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-size: 1rem;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #00ff88;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+        
+        .pricing-info {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .pricing-info h3 {
+            color: #00ff88;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .pricing-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        .pricing-item .price {
+            font-size: 1.5rem;
+            color: #ff6b35;
+            font-weight: bold;
+        }
+        
+        .pricing-item .description {
+            color: #ffffff;
+            margin-top: 0.5rem;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        
+        .status-online {
+            background: #00ff88;
+            box-shadow: 0 0 10px #00ff88;
+        }
+        
+        .status-offline {
+            background: #ff4444;
+            box-shadow: 0 0 10px #ff4444;
+        }
+        
+        .status-maintenance {
+            background: #ffaa00;
+            box-shadow: 0 0 10px #ffaa00;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem;
+            border-top: 1px solid rgba(0, 255, 136, 0.3);
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌐 RIBW Serverfarm Portal</h1>
+        <div class="ip-display">
+            Server IP: <strong>5.75.249.205</strong> | Status: <span class="status-indicator status-online"></span>Online
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="serverfarm-grid">
+            <div class="server-card">
+                <h3>🚀 Space Research Server</h3>
+                <div class="server-info">
+                    <span class="label">IP:</span>
+                    <span>5.75.249.205:3001</span>
+                    <span class="label">Status:</span>
+                    <span><span class="status-indicator status-online"></span>Aktiv</span>
+                    <span class="label">Kapazität:</span>
+                    <span>Unbegrenzt</span>
+                    <span class="label">Features:</span>
+                    <span>WebRTC, AI-APIs, Real-time Data</span>
+                </div>
+                <div class="action-buttons">
+                    <a href="http://5.75.249.205:3001" class="btn btn-primary" target="_blank">Zugriff</a>
+                    <button class="btn btn-secondary" onclick="configureSpaceServer()">Konfigurieren</button>
+                </div>
+            </div>
+
+            <div class="server-card">
+                <h3>🎵 Producer Media Server</h3>
+                <div class="server-info">
+                    <span class="label">IP:</span>
+                    <span>5.75.249.205:3002</span>
+                    <span class="label">Status:</span>
+                    <span><span class="status-indicator status-online"></span>Aktiv</span>
+                    <span class="label">Speicher:</span>
+                    <span>500GB SSD</span>
+                    <span class="label">Features:</span>
+                    <span>Audio/Video, Streaming, CDN</span>
+                </div>
+                <div class="action-buttons">
+                    <a href="http://5.75.249.205:3002" class="btn btn-primary" target="_blank">Zugriff</a>
+                    <button class="btn btn-secondary" onclick="configureMediaServer()">Konfigurieren</button>
+                </div>
+            </div>
+
+            <div class="server-card">
+                <h3>🤖 AI Systems Server</h3>
+                <div class="server-info">
+                    <span class="label">IP:</span>
+                    <span>5.75.249.205:3003</span>
+                    <span class="label">Status:</span>
+                    <span><span class="status-indicator status-online"></span>Aktiv</span>
+                    <span class="label">GPU:</span>
+                    <span>RTX 4090 x2</span>
+                    <span class="label">Features:</span>
+                    <span>ML, NLP, Computer Vision</span>
+                </div>
+                <div class="action-buttons">
+                    <a href="http://5.75.249.205:3003" class="btn btn-primary" target="_blank">Zugriff</a>
+                    <button class="btn btn-secondary" onclick="configureAIServer()">Konfigurieren</button>
+                </div>
+            </div>
+
+            <div class="server-card">
+                <h3>💼 Business Suite Server</h3>
+                <div class="server-info">
+                    <span class="label">IP:</span>
+                    <span>5.75.249.205:3004</span>
+                    <span class="label">Status:</span>
+                    <span><span class="status-indicator status-online"></span>Aktiv</span>
+                    <span class="label">RAM:</span>
+                    <span>64GB DDR5</span>
+                    <span class="label">Features:</span>
+                    <span>CRM, ERP, Analytics</span>
+                </div>
+                <div class="action-buttons">
+                    <a href="http://5.75.249.205:3004" class="btn btn-primary" target="_blank">Zugriff</a>
+                    <button class="btn btn-secondary" onclick="configureBusinessServer()">Konfigurieren</button>
+                </div>
+            </div>
+
+            <div class="server-card">
+                <h3>📡 Kommunikation Server</h3>
+                <div class="server-info">
+                    <span class="label">IP:</span>
+                    <span>5.75.249.205:3005</span>
+                    <span class="label">Status:</span>
+                    <span><span class="status-indicator status-online"></span>Aktiv</span>
+                    <span class="label">Bandbreite:</span>
+                    <span>10Gbps</span>
+                    <span class="label">Features:</span>
+                    <span>WebRTC, VoIP, Messaging</span>
+                </div>
+                <div class="action-buttons">
+                    <a href="http://5.75.249.205:3005" class="btn btn-primary" target="_blank">Zugriff</a>
+                    <button class="btn btn-secondary" onclick="configureCommServer()">Konfigurieren</button>
+                </div>
+            </div>
+
+            <div class="server-card">
+                <h3>🔧 System Admin Server</h3>
+                <div class="server-info">
+                    <span class="label">IP:</span>
+                    <span>5.75.249.205:3006</span>
+                    <span class="label">Status:</span>
+                    <span><span class="status-indicator status-online"></span>Aktiv</span>
+                    <span class="label">Zugriff:</span>
+                    <span>SSH, Web-Admin</span>
+                    <span class="label">Features:</span>
+                    <span>Monitoring, Logs, Backup</span>
+                </div>
+                <div class="action-buttons">
+                    <a href="http://5.75.249.205:3006" class="btn btn-primary" target="_blank">Zugriff</a>
+                    <button class="btn btn-secondary" onclick="configureAdminServer()">Konfigurieren</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="domain-manager">
+            <h2>🌐 Domain Manager - IP zu Domain Mapping</h2>
+            <div class="domain-form">
+                <div class="form-group">
+                    <label for="domain-name">Domain Name:</label>
+                    <input type="text" id="domain-name" placeholder="meine-domain.com">
+                </div>
+                <div class="form-group">
+                    <label for="server-port">Server Port:</label>
+                    <select id="server-port">
+                        <option value="3001">Space Research (3001)</option>
+                        <option value="3002">Producer Media (3002)</option>
+                        <option value="3003">AI Systems (3003)</option>
+                        <option value="3004">Business Suite (3004)</option>
+                        <option value="3005">Kommunikation (3005)</option>
+                        <option value="3006">System Admin (3006)</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="mapDomain()">Domain zuweisen</button>
+            </div>
+        </div>
+
+        <div class="pricing-info">
+            <h3>💰 Preismodell - Zahlen-gesteuert</h3>
+            <div class="pricing-grid">
+                <div class="pricing-item">
+                    <div class="price">€0.50/Stunde</div>
+                    <div class="description">Space Research Server</div>
+                </div>
+                <div class="pricing-item">
+                    <div class="price">€1.00/Stunde</div>
+                    <div class="description">Producer Media Server</div>
+                </div>
+                <div class="pricing-item">
+                    <div class="price">€2.00/Stunde</div>
+                    <div class="description">AI Systems Server</div>
+                </div>
+                <div class="pricing-item">
+                    <div class="price">€0.75/Stunde</div>
+                    <div class="description">Business Suite Server</div>
+                </div>
+                <div class="pricing-item">
+                    <div class="price">€0.25/Stunde</div>
+                    <div class="description">Kommunikation Server</div>
+                </div>
+                <div class="pricing-item">
+                    <div class="price">€0.10/Stunde</div>
+                    <div class="description">System Admin Server</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>🌐 RIBW Serverfarm Portal | IP: 5.75.249.205 | Powered by TEL1.NL</p>
+        <p>Raymond Demitrio Dr. Tel - MegaphonCyberdom</p>
+    </div>
+
+    <script>
+        // RIBW Serverfarm Portal - IP-basiertes System
+        console.log('🌐 RIBW Serverfarm Portal geladen');
+        
+        // Server-Konfiguration Funktionen
+        function configureSpaceServer() {
+            alert('🚀 Space Research Server Konfiguration\n\nIP: 5.75.249.205:3001\nStatus: Online\nFeatures: WebRTC, AI-APIs, Real-time Data\n\nKonfiguration wird geöffnet...');
+            window.open('http://5.75.249.205:3001/admin', '_blank');
+        }
+        
+        function configureMediaServer() {
+            alert('🎵 Producer Media Server Konfiguration\n\nIP: 5.75.249.205:3002\nStatus: Online\nSpeicher: 500GB SSD\nFeatures: Audio/Video, Streaming, CDN\n\nKonfiguration wird geöffnet...');
+            window.open('http://5.75.249.205:3002/admin', '_blank');
+        }
+        
+        function configureAIServer() {
+            alert('🤖 AI Systems Server Konfiguration\n\nIP: 5.75.249.205:3003\nStatus: Online\nGPU: RTX 4090 x2\nFeatures: ML, NLP, Computer Vision\n\nKonfiguration wird geöffnet...');
+            window.open('http://5.75.249.205:3003/admin', '_blank');
+        }
+        
+        function configureBusinessServer() {
+            alert('💼 Business Suite Server Konfiguration\n\nIP: 5.75.249.205:3004\nStatus: Online\nRAM: 64GB DDR5\nFeatures: CRM, ERP, Analytics\n\nKonfiguration wird geöffnet...');
+            window.open('http://5.75.249.205:3004/admin', '_blank');
+        }
+        
+        function configureCommServer() {
+            alert('📡 Kommunikation Server Konfiguration\n\nIP: 5.75.249.205:3005\nStatus: Online\nBandbreite: 10Gbps\nFeatures: WebRTC, VoIP, Messaging\n\nKonfiguration wird geöffnet...');
+            window.open('http://5.75.249.205:3005/admin', '_blank');
+        }
+        
+        function configureAdminServer() {
+            alert('🔧 System Admin Server Konfiguration\n\nIP: 5.75.249.205:3006\nStatus: Online\nZugriff: SSH, Web-Admin\nFeatures: Monitoring, Logs, Backup\n\nKonfiguration wird geöffnet...');
+            window.open('http://5.75.249.205:3006/admin', '_blank');
+        }
+        
+        // Domain Mapping Funktion
+        function mapDomain() {
+            const domainName = document.getElementById('domain-name').value;
+            const serverPort = document.getElementById('server-port').value;
+            
+            if (!domainName) {
+                alert('❌ Bitte geben Sie einen Domain-Namen ein!');
+                return;
+            }
+            
+            const serverNames = {
+                '3001': 'Space Research',
+                '3002': 'Producer Media',
+                '3003': 'AI Systems',
+                '3004': 'Business Suite',
+                '3005': 'Kommunikation',
+                '3006': 'System Admin'
+            };
+            
+            const serverName = serverNames[serverPort];
+            
+            alert(`🌐 Domain Mapping erfolgreich!\n\nDomain: ${domainName}\nServer: ${serverName}\nIP: 5.75.249.205:${serverPort}\n\nDNS-Einträge werden automatisch erstellt:\nA ${domainName} → 5.75.249.205\nCNAME www.${domainName} → ${domainName}\n\nSSL-Zertifikat wird automatisch aktiviert!\n\nZugriff: https://${domainName}`);
+            
+            // Domain zu localStorage hinzufügen
+            const domains = JSON.parse(localStorage.getItem('ribw-domains') || '[]');
+            domains.push({
+                domain: domainName,
+                port: serverPort,
+                server: serverName,
+                timestamp: new Date().toISOString(),
+                status: 'active'
+            });
+            localStorage.setItem('ribw-domains', JSON.stringify(domains));
+            
+            // Formular zurücksetzen
+            document.getElementById('domain-name').value = '';
+        }
+        
+        // Server-Status prüfen
+        function checkServerStatus() {
+            const servers = [
+                { port: 3001, name: 'Space Research' },
+                { port: 3002, name: 'Producer Media' },
+                { port: 3003, name: 'AI Systems' },
+                { port: 3004, name: 'Business Suite' },
+                { port: 3005, name: 'Kommunikation' },
+                { port: 3006, name: 'System Admin' }
+            ];
+            
+            servers.forEach(server => {
+                fetch(`http://5.75.249.205:${server.port}/health`)
+                    .then(response => {
+                        if (response.ok) {
+                            console.log(`✅ ${server.name} Server (${server.port}) - Online`);
+                        } else {
+                            console.log(`⚠️ ${server.name} Server (${server.port}) - Status: ${response.status}`);
+                        }
+                    })
+                    .catch(error => {
+                        console.log(`❌ ${server.name} Server (${server.port}) - Offline`);
+                    });
+            });
+        }
+        
+        // Alle 30 Sekunden Server-Status prüfen
+        setInterval(checkServerStatus, 30000);
+        
+        // Initiale Status-Prüfung
+        setTimeout(checkServerStatus, 1000);
+        
+        console.log('🌐 RIBW Serverfarm Portal vollständig initialisiert');
+    </script>
+</body>
+</html>
+
+

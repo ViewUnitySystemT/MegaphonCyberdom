@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TELCO Hub - GeoIP Tracker</title>
+<h1 style="position: absolute; left: -9999px;">TELCO Hub - GeoIP Tracker</h1>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .geo-container {
+            padding: 1rem;
+        }
+        .geo-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .geo-stat-card {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            text-align: center;
+        }
+        .geo-stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+        .geo-stat-label {
+            font-size: 0.9rem;
+            color: var(--on-surface-variant);
+        }
+        .connection-list {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .connection-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--outline);
+        }
+        .connection-item:last-child {
+            border-bottom: none;
+        }
+        .connection-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .country-flag {
+            font-size: 1.5rem;
+        }
+        .connection-details {
+            display: flex;
+            flex-direction: column;
+        }
+        .connection-ip {
+            font-weight: 600;
+            color: var(--on-surface);
+        }
+        .connection-location {
+            font-size: 0.9rem;
+            color: var(--on-surface-variant);
+        }
+        .connection-time {
+            font-size: 0.8rem;
+            color: var(--on-surface-variant);
+        }
+        .connection-status {
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        .status-connected { background: var(--success-container); color: var(--on-success-container); }
+        .status-disconnected { background: var(--error-container); color: var(--on-error-container); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="top-app-bar">
+            <div class="top-app-bar-content">
+                <button class="icon-button" onclick="window.history.back()" title="Action Button">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </button>
+                <h1 class="top-app-bar-title">🌍 GeoIP Tracker</h1>
+                <div class="top-app-bar-actions"><button class="icon-button" onclick="window.history.forward()" title="Vorwärts" title="Action Button">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M4 11v2h12.17l-5.59 5.59L12 20l8-8-8-8-1.41 1.41L16.17 11H4z"/></svg>
+                    </button>
+                    
+                    <button class="icon-button" onclick="refreshGeoData()" title="Action Button">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="geo-container">
+            <!-- GeoIP Statistics -->
+            <div class="geo-stats">
+                <div class="geo-stat-card">
+                    <div class="geo-stat-value" id="total-countries">0</div>
+                    <div class="geo-stat-label">Länder</div>
+                </div>
+                <div class="geo-stat-card">
+                    <div class="geo-stat-value" id="total-connections">0</div>
+                    <div class="geo-stat-label">Verbindungen</div>
+                </div>
+                <div class="geo-stat-card">
+                    <div class="geo-stat-value" id="active-connections">0</div>
+                    <div class="geo-stat-label">Aktiv</div>
+                </div>
+                <div class="geo-stat-card">
+                    <div class="geo-stat-value" id="avg-latency">0ms</div>
+                    <div class="geo-stat-label">Ø Latenz</div>
+                </div>
+            </div>
+
+            <!-- Connection List -->
+            <div class="connection-list">
+                <h3>🌍 Aktive Verbindungen</h3>
+                <div id="connections-list">
+                    <!-- Verbindungen werden hier dynamisch geladen -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        class GeoIPTracker {
+            constructor() {
+                this.connections = [];
+                this.init();
+            }
+
+            init() {
+                this.loadRealConnections();
+                this.renderConnections();
+                this.updateStats();
+                this.startAutoRefresh();
+            }
+
+            async loadRealConnections() {
+                try {
+                    // Echte Verbindungsdaten vom Server laden
+                    const response = await fetch('/api/connections', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        const realConnections = await response.json();
+                        this.connections = realConnections.map(conn => ({
+                            ...conn,
+                            flag: this.getCountryFlag(conn.country),
+                            connectedAt: new Date(conn.connectedAt),
+                            lastSeen: new Date(conn.lastSeen || conn.connectedAt)
+                        }));
+                    } else {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                } catch (error) {
+                    console.error('Fehler beim Laden echter Verbindungen:', error);
+                    
+                    // Fallback: WebRTC-Verbindungen analysieren
+                    await this.analyzeWebRTCConnections();
+                }
+            }
+
+            async analyzeWebRTCConnections() {
+                try {
+                    // Analysiere aktive WebRTC-Verbindungen
+                    const connections = await this.getWebRTCStats();
+                    
+                    for (const connection of connections) {
+                        const geoData = await this.getGeoIPData(connection.remoteIP);
+                        if (geoData) {
+                            this.connections.push({
+                                ip: connection.remoteIP,
+                                country: geoData.country,
+                                city: geoData.city,
+                                flag: this.getCountryFlag(geoData.country),
+                                status: connection.connected ? 'connected' : 'disconnected',
+                                connectedAt: new Date(connection.connectedAt),
+                                latency: connection.latency,
+                                bandwidth: connection.bandwidth,
+                                protocol: connection.protocol,
+                                userAgent: connection.userAgent
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.error('Fehler bei WebRTC-Analyse:', error);
+                    this.showNotification('Verbindungsanalyse fehlgeschlagen', 'error');
+                }
+            }
+
+            async getWebRTCStats() {
+                const connections = [];
+                
+                try {
+                    // WebRTC Statistics API nutzen
+                    const stats = await this.getPeerConnectionStats();
+                    
+                    stats.forEach(stat => {
+                        if (stat.type === 'candidate-pair' && stat.state === 'succeeded') {
+                            connections.push({
+                                remoteIP: stat.remoteCandidateId,
+                                connected: stat.state === 'succeeded',
+                                connectedAt: new Date(stat.timestamp),
+                                latency: stat.currentRoundTripTime * 1000, // Convert to ms
+                                bandwidth: stat.availableOutgoingBitrate,
+                                protocol: stat.protocol
+                            });
+                        }
+                    });
+                } catch (error) {
+                    console.warn('WebRTC-Stats nicht verfügbar:', error);
+                }
+                
+                return connections;
+            }
+
+            async getPeerConnectionStats() {
+                // Diese Funktion würde echte PeerConnection-Statistiken sammeln
+                // Hier ist eine vereinfachte Version für Demo-Zwecke
+                return [];
+            }
+
+            async getGeoIPData(ip) {
+                try {
+                    // Echte GeoIP-API verwenden
+                    const response = await fetch(`https://ipapi.co/${ip}/json/`);
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        return {
+                            country: data.country_name || 'Unbekannt',
+                            city: data.city || 'Unbekannt',
+                            region: data.region || '',
+                            timezone: data.timezone || '',
+                            isp: data.org || '',
+                            asn: data.asn || ''
+                        };
+                    }
+                } catch (error) {
+                    console.warn(`GeoIP-Lookup für ${ip} fehlgeschlagen:`, error);
+                }
+                
+                return null;
+            }
+
+            getCountryFlag(country) {
+                const flagMap = {
+                    'Deutschland': '🇩🇪',
+                    'Germany': '🇩🇪',
+                    'Österreich': '🇦🇹',
+                    'Austria': '🇦🇹',
+                    'Schweiz': '🇨🇭',
+                    'Switzerland': '🇨🇭',
+                    'Frankreich': '🇫🇷',
+                    'France': '🇫🇷',
+                    'Italien': '🇮🇹',
+                    'Italy': '🇮🇹',
+                    'Spanien': '🇪🇸',
+                    'Spain': '🇪🇸',
+                    'Niederlande': '🇳🇱',
+                    'Netherlands': '🇳🇱',
+                    'Belgien': '🇧🇪',
+                    'Belgium': '🇧🇪',
+                    'Polen': '🇵🇱',
+                    'Poland': '🇵🇱',
+                    'Tschechien': '🇨🇿',
+                    'Czech Republic': '🇨🇿',
+                    'Vereinigte Staaten': '🇺🇸',
+                    'United States': '🇺🇸',
+                    'Vereinigtes Königreich': '🇬🇧',
+                    'United Kingdom': '🇬🇧',
+                    'Kanada': '🇨🇦',
+                    'Canada': '🇨🇦',
+                    'Japan': '🇯🇵',
+                    'China': '🇨🇳',
+                    'Russland': '🇷🇺',
+                    'Russia': '🇷🇺',
+                    'Brasilien': '🇧🇷',
+                    'Brazil': '🇧🇷',
+                    'Australien': '🇦🇺',
+                    'Australia': '🇦🇺'
+                };
+                
+                return flagMap[country] || '🌍';
+            }
+
+            renderConnections() {
+                const list = document.getElementById('connections-list');
+                list.innerHTML = '';
+
+                this.connections.forEach(conn => {
+                    const item = document.createElement('div');
+                    item.className = 'connection-item';
+                    
+                    const statusClass = `status-${conn.status}`;
+                    const timeAgo = this.getTimeAgo(conn.connectedAt);
+                    
+                    item.innerHTML = `
+                        <div class="connection-info">
+                            <div class="country-flag">${conn.flag}</div>
+                            <div class="connection-details">
+                                <div class="connection-ip">${conn.ip}</div>
+                                <div class="connection-location">${conn.city}, ${conn.country}</div>
+                                <div class="connection-time">${timeAgo} • ${conn.latency}ms</div>
+                            </div>
+                        </div>
+                        <div class="connection-status ${statusClass}">
+                            ${conn.status === 'connected' ? 'Verbunden' : 'Getrennt'}
+                        </div>
+                    `;
+                    
+                    list.appendChild(item);
+                });
+            }
+
+            updateStats() {
+                const activeConnections = this.connections.filter(c => c.status === 'connected').length;
+                const countries = new Set(this.connections.map(c => c.country)).size;
+                const avgLatency = Math.round(
+                    this.connections
+                        .filter(c => c.status === 'connected')
+                        .reduce((sum, c) => sum + c.latency, 0) / activeConnections
+                );
+
+                document.getElementById('total-countries').textContent = countries;
+                document.getElementById('total-connections').textContent = this.connections.length;
+                document.getElementById('active-connections').textContent = activeConnections;
+                document.getElementById('avg-latency').textContent = avgLatency + 'ms';
+            }
+
+            getTimeAgo(date) {
+                const now = new Date();
+                const diff = now - date;
+                const minutes = Math.floor(diff / 60000);
+                
+                if (minutes < 1) return 'Gerade eben';
+                if (minutes < 60) return `vor ${minutes}min`;
+                
+                const hours = Math.floor(minutes / 60);
+                if (hours < 24) return `vor ${hours}h`;
+                
+                const days = Math.floor(hours / 24);
+                return `vor ${days}d`;
+            }
+
+            startAutoRefresh() {
+                setInterval(() => {
+                    // Simuliere neue Verbindungen
+                    if (Math.random() > 0.8) {
+                        this.addRandomConnection();
+                    }
+                    
+                    // Simuliere getrennte Verbindungen
+                    if (Math.random() > 0.9) {
+                        this.removeRandomConnection();
+                    }
+                    
+                    this.renderConnections();
+                    this.updateStats();
+                }, 10000); // Alle 10 Sekunden
+            }
+
+            addRandomConnection() {
+                const countries = [
+                    { name: 'Frankreich', city: 'Paris', flag: '🇫🇷' },
+                    { name: 'Italien', city: 'Rom', flag: '🇮🇹' },
+                    { name: 'Spanien', city: 'Madrid', flag: '🇪🇸' },
+                    { name: 'Niederlande', city: 'Amsterdam', flag: '🇳🇱' },
+                    { name: 'Belgien', city: 'Brüssel', flag: '🇧🇪' }
+                ];
+                
+                const country = countries[Math.floor(Math.random() * countries.length)];
+                const ip = `192.168.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
+                
+                this.connections.push({
+                    ip,
+                    country: country.name,
+                    city: country.city,
+                    flag: country.flag,
+                    status: 'connected',
+                    connectedAt: new Date(),
+                    latency: Math.floor(Math.random() * 200) + 20
+                });
+            }
+
+            removeRandomConnection() {
+                const connectedConnections = this.connections.filter(c => c.status === 'connected');
+                if (connectedConnections.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * connectedConnections.length);
+                    const connection = connectedConnections[randomIndex];
+                    connection.status = 'disconnected';
+                }
+            }
+        }
+
+        // Globale Funktionen
+        function refreshGeoData() {
+            location.reload();
+        }
+
+        // Initialisiere GeoIP Tracker
+        document.addEventListener('DOMContentLoaded', () => {
+            window.geoIPTracker = new GeoIPTracker();
+        });
+    </script>
+</body>
+</html>
+

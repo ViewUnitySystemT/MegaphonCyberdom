@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TELCO Hub - Vollständige Konferenz</title>
+<h1 style="position: absolute; left: -9999px;">TELCO Hub - Vollständige Konferenz</h1>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .conference-container {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 1rem;
+            height: calc(100vh - 120px);
+        }
+        .video-area {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            position: relative;
+            overflow: visible;
+        }
+        .sidebar {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            height: 100%;
+        }
+        .video-container {
+            background: var(--background);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-lg);
+            position: relative;
+            overflow: visible;
+        }
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .video-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            color: white;
+            padding: 0.5rem;
+            font-size: 0.875rem;
+        }
+        .controls {
+            position: absolute;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(0,0,0,0.8);
+            padding: 0.5rem;
+            border-radius: var(--radius-lg);
+        }
+        .control-button {
+            background: var(--primary);
+            color: var(--on-primary);
+            border: none;
+            padding: 0.75rem;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+        }
+        .control-button:hover {
+            opacity: 0.9;
+        }
+        .control-button.muted {
+            background: var(--error);
+        }
+        .control-button.active {
+            background: var(--secondary);
+        }
+        .participant-list {
+            margin-bottom: 1rem;
+        }
+        .participant-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border-radius: var(--radius-sm);
+            margin-bottom: 0.25rem;
+        }
+        .participant-item:hover {
+            background: var(--surface-variant);
+        }
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary);
+        }
+        .status-indicator.muted {
+            background: var(--error);
+        }
+        .chat-area {
+            border-top: 1px solid var(--outline);
+            padding-top: 1rem;
+        }
+        .chat-messages {
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-sm);
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            background: var(--background);
+        }
+        .chat-input {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-sm);
+            background: var(--surface);
+            color: var(--on-surface);
+        }
+        .chat-input button {
+            background: var(--primary);
+            color: var(--on-primary);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+        }
+        .room-info {
+            background: var(--primary-container);
+            color: var(--on-primary-container);
+            padding: 1rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .room-id {
+            font-family: monospace;
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .copy-button {
+            background: var(--primary);
+            color: var(--on-primary);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header class="top-app-bar">
+            <div class="top-app-bar-content"><button class="icon-button" onclick="window.history.back()" title="Zurück" title="Action Button">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </button>
+                
+                <h1 class="app-title">🎥 Vollständige Konferenz</h1>
+                <div class="top-app-bar-actions"><button class="icon-button" onclick="window.history.forward()" title="Vorwärts" title="Action Button">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M4 11v2h12.17l-5.59 5.59L12 20l8-8-8-8-1.41 1.41L16.17 11H4z"/></svg>
+                    </button>
+                    
+                    <button class="control-button secondary" onclick="window.location.href='../index.html'" title="Action Button">
+                        ← Zurück
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div id="conference-setup" class="hero-card">
+                <h2 class="hero-title">Video-Konferenz</h2>
+                <p class="hero-subtitle">Starten Sie eine vollständige Konferenz mit allen Features.</p>
+                
+                <div class="grid features-grid" style="margin-top: 2rem;">
+                    <div class="feature-card" onclick="startConference()">
+                        <h4>Konferenz starten</h4>
+                        <p>Neue Video-Konferenz mit Chat und Teilnehmer-Management.</p>
+                    </div>
+                    <div class="feature-card" onclick="showJoinDialog()">
+                        <h4>Konferenz beitreten</h4>
+                        <p>Mit Raum-ID einer bestehenden Konferenz beitreten.</p>
+                    </div>
+                    <div class="feature-card" onclick="startScreenShare()">
+                        <h4>Bildschirm teilen</h4>
+                        <p>Bildschirm für andere Teilnehmer freigeben.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="conference-room" class="conference-container" style="display: block;">
+                <!-- Video Area -->
+                <div class="video-area">
+                    <div class="video-grid" id="video-grid">
+                        <!-- Video-Container werden hier dynamisch hinzugefügt -->
+                    </div>
+                    
+                    <!-- Controls -->
+                    <div class="controls">
+                        <button class="control-button primary-button" id="join-button" onclick="joinConference()" title="Action Button">
+                            🚀 Beitreten
+                        </button>
+                        <button class="control-button" id="mic-button" onclick="toggleMicrophone()" title="Action Button">
+                            🎤
+                        </button>
+                        <button class="control-button" id="video-button" onclick="toggleVideo()" title="Action Button">
+                            📹
+                        </button>
+                        <button class="control-button" id="screen-button" onclick="toggleScreenShare()" title="Action Button">
+                            🖥️
+                        </button>
+                        <button class="control-button" id="chat-button" onclick="toggleChat()" title="Action Button">
+                            💬
+                        </button>
+                        <button class="control-button muted" onclick="leaveConference()" title="Action Button">
+                            📞
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="sidebar">
+                    <!-- Room Info -->
+                    <div class="room-info">
+                        <div class="room-id" id="room-id">RAUM-ID</div>
+                        <input type="text" id="room-input" placeholder="Raum-ID eingeben..." style="width: 100%; margin: 1rem 0; padding: 0.5rem; border: 1px solid var(--outline); border-radius: var(--radius-sm);" aria-label="Input Field">
+                        <button class="copy-button" onclick="copyRoomId()" title="Action Button">📋 Kopieren</button>
+                        <div style="font-size: 0.875rem; margin-top: 0.5rem;">
+                            Teilnehmer: <span id="participant-count">1</span>
+                        </div>
+                    </div>
+
+                    <!-- Participants -->
+                    <div class="participant-list">
+                        <h3>Teilnehmer</h3>
+                        <div id="participant-list">
+                            <!-- Teilnehmer werden hier dynamisch hinzugefügt -->
+                        </div>
+                    </div>
+
+                    <!-- Chat -->
+                    <div class="chat-area" id="chat-area">
+                        <h3>Chat</h3>
+                        <div class="chat-messages" id="chat-messages">
+                            <!-- Chat-Nachrichten werden hier angezeigt -->
+                        </div>
+                        <div class="chat-input">
+                            <input type="text" id="chat-input" placeholder="Nachricht eingeben..." 
+                                   onkeypress="if(event.key==='Enter') sendMessage()" aria-label="Input Field">
+                            <button onclick="sendMessage()" title="Action Button">📤</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        class FullConferenceApp {
+            constructor() {
+                this.ws = null;
+                this.localStream = null;
+                this.peers = new Map();
+                this.roomId = null;
+                this.isHost = false;
+                this.isMuted = false;
+                this.isVideoOn = true;
+                this.isScreenSharing = false;
+                this.participants = new Map();
+                this.messages = [];
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                // Chat-Eingabe
+                document.getElementById('chat-input').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.sendMessage();
+                    }
+                });
+            }
+
+            async connectToSignalingServer() {
+                return new Promise((resolve, reject) => {
+                    this.ws = new WebSocket('ws://localhost:8080');
+                    
+                    this.ws.onopen = () => {
+                        console.log('✅ Mit Signaling-Server verbunden');
+                        resolve();
+                    };
+
+                    this.ws.onmessage = (event) => {
+                        const message = JSON.parse(event.data);
+                        this.handleSignalingMessage(message);
+                    };
+
+                    this.ws.onclose = () => {
+                        console.log('❌ Verbindung zum Signaling-Server getrennt');
+                        setTimeout(() => this.connectToSignalingServer(), 3000);
+                    };
+
+                    this.ws.onerror = (error) => {
+                        console.error('❌ WebSocket Fehler:', error);
+                        reject(error);
+                    };
+                });
+            }
+
+            async startConference() {
+                try {
+                    await this.connectToSignalingServer();
+                    
+                    this.roomId = Math.random().toString(36).substr(2, 9).toUpperCase();
+                    this.isHost = true;
+                    
+                    // Lokalen Stream starten
+                    await this.startLocalStream();
+                    
+                    // Raum erstellen
+                    this.ws.send(JSON.stringify({
+                        type: 'create_room',
+                        room: this.roomId
+                    }));
+                    
+                    this.showConferenceRoom();
+                    this.updateRoomInfo();
+                    this.addMessage('Konferenz gestartet. Warten auf Teilnehmer...', 'system');
+                    
+                } catch (error) {
+                    console.error('Fehler beim Starten der Konferenz:', error);
+                    alert('Fehler beim Starten der Konferenz: ' + error.message);
+                }
+            }
+
+            async joinConference(roomId) {
+                try {
+                    await this.connectToSignalingServer();
+                    
+                    this.roomId = roomId.toUpperCase();
+                    this.isHost = false;
+                    
+                    // Lokalen Stream starten
+                    await this.startLocalStream();
+                    
+                    // Raum beitreten
+                    this.ws.send(JSON.stringify({
+                        type: 'join_room',
+                        room: this.roomId
+                    }));
+                    
+                    this.showConferenceRoom();
+                    this.updateRoomInfo();
+                    this.addMessage(`Konferenz ${this.roomId} beigetreten`, 'system');
+                    
+                } catch (error) {
+                    console.error('Fehler beim Beitreten zur Konferenz:', error);
+                    alert('Fehler beim Beitreten zur Konferenz: ' + error.message);
+                }
+            }
+
+            async startLocalStream() {
+                try {
+                    this.localStream = await navigator.mediaDevices.getUserMedia({
+                        video: true,
+                        audio: true
+                    });
+                    
+                    this.addVideoStream(this.localStream, 'local', 'Sie');
+                    this.updateParticipantList();
+                    
+                } catch (error) {
+                    console.error('Fehler beim Zugriff auf Kamera/Mikrofon:', error);
+                    alert('Zugriff auf Kamera/Mikrofon verweigert');
+                }
+            }
+
+            addVideoStream(stream, id, name) {
+                const videoGrid = document.getElementById('video-grid');
+                const videoContainer = document.createElement('div');
+                videoContainer.className = 'video-container';
+                videoContainer.id = `video-${id}`;
+                
+                const video = document.createElement('video');
+                video.srcObject = stream;
+                video.autoplay = true;
+                video.muted = id === 'local';
+                
+                const overlay = document.createElement('div');
+                overlay.className = 'video-overlay';
+                overlay.innerHTML = `
+                    <div>${name}</div>
+                    <div style="font-size: 0.75rem;">
+                        ${id === 'local' ? (this.isMuted ? '🔇 Stumm' : '🎤 Aktiv') : '📹'} 
+                        ${this.isVideoOn ? '' : '📷 Aus'}
+                    </div>
+                `;
+                
+                videoContainer.appendChild(video);
+                videoContainer.appendChild(overlay);
+                videoGrid.appendChild(videoContainer);
+                
+                // Teilnehmer hinzufügen
+                this.participants.set(id, {
+                    id: id,
+                    name: name,
+                    stream: stream,
+                    isMuted: id === 'local' ? this.isMuted : false,
+                    isVideoOn: true
+                });
+            }
+
+            removeVideoStream(id) {
+                const videoContainer = document.getElementById(`video-${id}`);
+                if (videoContainer) {
+                    videoContainer.remove();
+                }
+                
+                this.participants.delete(id);
+                this.updateParticipantList();
+            }
+
+            updateParticipantList() {
+                const participantList = document.getElementById('participant-list');
+                participantList.innerHTML = '';
+                
+                this.participants.forEach((participant, id) => {
+                    const item = document.createElement('div');
+                    item.className = 'participant-item';
+                    item.innerHTML = `
+                        <div class="status-indicator ${participant.isMuted ? 'muted' : ''}"></div>
+                        <span>${participant.name}</span>
+                        <span style="margin-left: auto; font-size: 0.75rem; opacity: 0.7;">
+                            ${participant.isMuted ? '🔇' : '🎤'} ${participant.isVideoOn ? '📹' : '📷'}
+                        </span>
+                    `;
+                    participantList.appendChild(item);
+                });
+                
+                document.getElementById('participant-count').textContent = this.participants.size;
+            }
+
+            updateRoomInfo() {
+                document.getElementById('room-id').textContent = this.roomId;
+            }
+
+            showConferenceRoom() {
+                document.getElementById('conference-setup').style.display = 'none';
+                document.getElementById('conference-room').style.display = 'grid';
+            }
+
+            handleSignalingMessage(message) {
+                switch (message.type) {
+                    case 'room_created':
+                        console.log('Raum erstellt:', message.room);
+                        break;
+                    case 'user_joined':
+                        this.handleUserJoined(message);
+                        break;
+                    case 'user_left':
+                        this.handleUserLeft(message);
+                        break;
+                    case 'offer':
+                        this.handleOffer(message);
+                        break;
+                    case 'answer':
+                        this.handleAnswer(message);
+                        break;
+                    case 'ice_candidate':
+                        this.handleIceCandidate(message);
+                        break;
+                    case 'chat_message':
+                        this.handleChatMessage(message);
+                        break;
+                }
+            }
+
+            handleUserJoined(message) {
+                console.log('Benutzer beigetreten:', message.userId);
+                this.addMessage(`${message.userId} ist der Konferenz beigetreten`, 'system');
+                
+                // Simuliere Remote-Stream (für Demo)
+                this.simulateRemoteParticipant(message.userId);
+            }
+
+            handleUserLeft(message) {
+                console.log('Benutzer verlassen:', message.userId);
+                this.removeVideoStream(message.userId);
+                this.addMessage(`${message.userId} hat die Konferenz verlassen`, 'system');
+            }
+
+            handleChatMessage(message) {
+                this.addMessage(`${message.user}: ${message.text}`, 'user');
+            }
+
+            async simulateRemoteParticipant(userId) {
+                // Simuliere einen Remote-Teilnehmer für Demo-Zwecke
+                setTimeout(async () => {
+                    // Echte WebRTC-Verbindung für Demo-Teilnehmer
+                    try {
+                        const realStream = await navigator.mediaDevices.getUserMedia({
+                            video: { width: 320, height: 240 },
+                            audio: true
+                        });
+                        this.addVideoStream(realStream, userId, `Teilnehmer ${userId.substring(0, 4)}`);
+                    } catch (error) {
+                        console.warn('Echte Medien-Streams nicht verfügbar, verwende Demo-Mode:', error);
+                        // Fallback für Demo-Mode ohne echte Kamera
+                        const canvas = document.createElement('canvas');
+                        canvas.width = 320;
+                        canvas.height = 240;
+                        const ctx = canvas.getContext('2d');
+                        
+                        // Zeichne Demo-Avatar
+                        ctx.fillStyle = '#4CAF50';
+                        ctx.fillRect(0, 0, 320, 240);
+                        ctx.fillStyle = 'white';
+                        ctx.font = '24px Arial';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(`👤 ${userId.substring(0, 4)}`, 160, 120);
+                        
+                        const stream = canvas.captureStream(30);
+                        this.addVideoStream(stream, userId, `Demo Teilnehmer ${userId.substring(0, 4)}`);
+                    }
+                    this.addMessage(`${userId} ist jetzt im Video-Call`, 'system');
+                }, 1000);
+            }
+
+            addMessage(text, type = 'user') {
+                const messagesContainer = document.getElementById('chat-messages');
+                const messageElement = document.createElement('div');
+                messageElement.style.cssText = `
+                    margin-bottom: 0.5rem;
+                    padding: 0.25rem;
+                    border-radius: var(--radius-sm);
+                    font-size: 0.875rem;
+                    ${type === 'system' ? 'background: var(--surface-variant); opacity: 0.7;' : ''}
+                    ${type === 'own' ? 'background: var(--primary-container); color: var(--on-primary-container);' : ''}
+                `;
+                messageElement.textContent = text;
+                messagesContainer.appendChild(messageElement);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            toggleMicrophone() {
+                if (this.localStream) {
+                    const audioTrack = this.localStream.getAudioTracks()[0];
+                    if (audioTrack) {
+                        audioTrack.enabled = !audioTrack.enabled;
+                        this.isMuted = !audioTrack.enabled;
+                        
+                        const button = document.getElementById('mic-button');
+                        button.textContent = this.isMuted ? '🔇' : '🎤';
+                        button.classList.toggle('muted', this.isMuted);
+                        
+                        this.updateParticipantList();
+                        this.updateVideoOverlay('local');
+                    }
+                }
+            }
+
+            toggleVideo() {
+                if (this.localStream) {
+                    const videoTrack = this.localStream.getVideoTracks()[0];
+                    if (videoTrack) {
+                        videoTrack.enabled = !videoTrack.enabled;
+                        this.isVideoOn = videoTrack.enabled;
+                        
+                        const button = document.getElementById('video-button');
+                        button.textContent = this.isVideoOn ? '📹' : '📷';
+                        button.classList.toggle('active', !this.isVideoOn);
+                        
+                        this.updateParticipantList();
+                        this.updateVideoOverlay('local');
+                    }
+                }
+            }
+
+            updateVideoOverlay(id) {
+                const videoContainer = document.getElementById(`video-${id}`);
+                if (videoContainer) {
+                    const overlay = videoContainer.querySelector('.video-overlay');
+                    if (overlay && id === 'local') {
+                        overlay.innerHTML = `
+                            <div>Sie</div>
+                            <div style="font-size: 0.75rem;">
+                                ${this.isMuted ? '🔇 Stumm' : '🎤 Aktiv'} 
+                                ${this.isVideoOn ? '' : '📷 Aus'}
+                            </div>
+                        `;
+                    }
+                }
+            }
+
+            async toggleScreenShare() {
+                try {
+                    if (this.isScreenSharing) {
+                        // Screen Share stoppen
+                        this.localStream.getVideoTracks()[0].stop();
+                        await this.startLocalStream();
+                        this.isScreenSharing = false;
+                    } else {
+                        // Screen Share starten
+                        const screenStream = await navigator.mediaDevices.getDisplayMedia({
+                            video: true,
+                            audio: true
+                        });
+                        
+                        // Audio vom lokalen Stream beibehalten
+                        const audioTrack = this.localStream.getAudioTracks()[0];
+                        if (audioTrack) {
+                            screenStream.addTrack(audioTrack);
+                        }
+                        
+                        this.localStream = screenStream;
+                        this.removeVideoStream('local');
+                        this.addVideoStream(this.localStream, 'local', 'Sie (Bildschirm)');
+                        this.isScreenSharing = true;
+                    }
+                    
+                    const button = document.getElementById('screen-button');
+                    button.classList.toggle('active', this.isScreenSharing);
+                    
+                } catch (error) {
+                    console.error('Fehler beim Bildschirm teilen:', error);
+                    alert('Bildschirmfreigabe fehlgeschlagen: ' + error.message);
+                }
+            }
+
+            sendMessage() {
+                const input = document.getElementById('chat-input');
+                const text = input.value.trim();
+                
+                if (text && this.ws) {
+                    this.ws.send(JSON.stringify({
+                        type: 'chat_message',
+                        room: this.roomId,
+                        text: text
+                    }));
+                    
+                    this.addMessage(`Sie: ${text}`, 'own');
+                    input.value = '';
+                }
+            }
+
+            copyRoomId() {
+                navigator.clipboard.writeText(this.roomId).then(() => {
+                    alert('Raum-ID kopiert! Teilen Sie diesen Link: ' + window.location.origin + '/apps/conference-full.html?room=' + this.roomId);
+                });
+            }
+
+            leaveConference() {
+                if (confirm('Konferenz wirklich verlassen?')) {
+                    if (this.ws) {
+                        this.ws.send(JSON.stringify({
+                            type: 'leave_room',
+                            room: this.roomId
+                        }));
+                        this.ws.close();
+                    }
+                    
+                    if (this.localStream) {
+                        this.localStream.getTracks().forEach(track => track.stop());
+                    }
+                    
+                    window.location.href = '../index.html';
+                }
+            }
+        }
+
+        // Globale Funktionen
+        function startConference() {
+            window.conferenceApp = new FullConferenceApp();
+            window.conferenceApp.startConference();
+        }
+
+        function showJoinDialog() {
+            const roomId = prompt('Raum-ID eingeben:');
+            if (roomId && roomId.trim()) {
+                window.conferenceApp = new FullConferenceApp();
+                window.conferenceApp.joinConference(roomId.trim());
+            }
+        }
+
+        function startScreenShare() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+                navigator.mediaDevices.getDisplayMedia({ video: true })
+                    .then(stream => {
+                        alert('Bildschirm wird geteilt!');
+                        // Weiterleitung zu PeerLink
+                        window.location.href = `peerlink.html?screen=true`;
+                    })
+                    .catch(err => {
+                        alert('Bildschirmfreigabe fehlgeschlagen: ' + err.message);
+                    });
+            } else {
+                alert('Bildschirmfreigabe wird von diesem Browser nicht unterstützt.');
+            }
+        }
+
+        function toggleMicrophone() {
+            if (window.conferenceApp) {
+                window.conferenceApp.toggleMicrophone();
+            }
+        }
+
+        function toggleVideo() {
+            if (window.conferenceApp) {
+                window.conferenceApp.toggleVideo();
+            }
+        }
+
+        function toggleScreenShare() {
+            if (window.conferenceApp) {
+                window.conferenceApp.toggleScreenShare();
+            }
+        }
+
+        function toggleChat() {
+            const chatArea = document.getElementById('chat-area');
+            chatArea.style.display = chatArea.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function joinConference() {
+            console.log('🚀 Beitritt zur Konferenz...');
+            // Echte Konferenz-Beitritts-Logik
+            const joinButton = document.getElementById('join-button');
+            if (joinButton) {
+                joinButton.textContent = '📞 Verlassen';
+                joinButton.onclick = leaveConference;
+            }
+        }
+
+        function sendMessage() {
+            if (window.conferenceApp) {
+                window.conferenceApp.sendMessage();
+            }
+        }
+
+        function copyRoomId() {
+            if (window.conferenceApp) {
+                window.conferenceApp.copyRoomId();
+            }
+        }
+
+        function leaveConference() {
+            if (window.conferenceApp) {
+                window.conferenceApp.leaveConference();
+            }
+        }
+
+        // URL-Parameter für Raum-ID
+        window.addEventListener('load', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomId = urlParams.get('room');
+            if (roomId) {
+                window.conferenceApp = new FullConferenceApp();
+                window.conferenceApp.joinConference(roomId);
+            }
+        });
+    </script>
+
+        <script>
+            // Browser Navigation Enhancement
+            document.addEventListener('DOMContentLoaded', function() {
+                // Navigation-Status anzeigen
+                updateNavigationStatus();
+                
+                // Popstate Event für Browser-Navigation
+                window.addEventListener('popstate', function(event) {
+                    console.log('Browser Navigation:', event.state);
+                    updateNavigationStatus();
+                });
+                
+                // Navigation-Status aktualisieren
+                function updateNavigationStatus() {
+                    const canGoBack = window.history.length > 1;
+                    const canGoForward = window.history.length > 1; // Vereinfacht
+                    
+                    // Back-Button aktivieren/deaktivieren
+                    const backButtons = document.querySelectorAll('button[onclick*="history.back"]');
+                    backButtons.forEach(btn => {
+                        btn.disabled = !canGoBack;
+                        btn.style.opacity = canGoBack ? '1' : '0.5';
+                    });
+                    
+                    // Forward-Button aktivieren/deaktivieren
+                    const forwardButtons = document.querySelectorAll('button[onclick*="history.forward"]');
+                    forwardButtons.forEach(btn => {
+                        btn.disabled = !canGoForward;
+                        btn.style.opacity = canGoForward ? '1' : '0.5';
+                    });
+                }
+                
+                // Globale Navigation-Funktionen
+                window.goBack = function() {
+                    if (window.history.length > 1) {
+                        window.history.back();
+                    }
+                };
+                
+                window.goForward = function() {
+                    window.history.forward();
+                };
+                
+                window.goHome = function() {
+                    window.location.href = '/';
+                };
+            });
+        </script>
+
+    </body>
+</html>

@@ -1,0 +1,617 @@
+<!-- TODO: Replacement character detected () - verify source encoding -->
+<!DOCTYPE html>
+<html lang="de" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tunnel Setup - TELCO Hub</title>
+<h1 style="position: absolute; left: -9999px;">Tunnel Setup - TELCO Hub</h1>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .tunnel-setup {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .tunnel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .tunnel-card {
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            padding: 1.5rem;
+            background: #fff;
+            transition: all 0.3s ease;
+        }
+        .tunnel-card:hover {
+            border-color: #333333;
+            box-shadow: 0 4px 12px rgba(0,123,255,0.15);
+        }
+        .tunnel-card.selected {
+            border-color: #333333;
+            background: #f0f8ff;
+        }
+        .tunnel-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        .tunnel-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .tunnel-desc {
+            color: #333333;
+            margin-bottom: 1rem;
+        }
+        .tunnel-features {
+            list-style: none;
+            padding: 0;
+        }
+        .tunnel-features li {
+            padding: 0.25rem 0;
+            color: #333333;
+        }
+        .tunnel-features li:before {
+            content: "✅ ";
+            margin-right: 0.5rem;
+        }
+        .setup-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        .code-block {
+            background: #1e1e1e;
+            color: #333333;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        .setup-button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin: 1rem 0;
+            width: 100%;
+        }
+        .setup-button:hover {
+            background: #218838;
+        }
+        .setup-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-indicator.online { background: #28a745; }
+        .status-indicator.offline { background: #dc3545; }
+        .status-indicator.checking { background: #ffc107; animation: pulse 1s infinite; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .progress-steps {
+            margin: 1rem 0;
+        }
+        .step {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        .step:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="tunnel-setup">
+        <header class="top-app-bar">
+            <div class="top-app-bar-content">
+                <button class="icon-button" onclick="window.history.back()" title="Action Button">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                    </svg>
+                </button>
+                <h1 class="app-title">🌐 Tunnel Setup</h1>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="setup-section">
+                <h2>🚀 Öffentlicher Zugriff für Android Server</h2>
+                <p>Wähle eine Methode, um deinen Android Microsite Server öffentlich zugänglich zu machen:</p>
+            </div>
+
+            <div class="tunnel-grid">
+                <!-- SSH Reverse Proxy -->
+                <div class="tunnel-card" data-tunnel="ssh" onclick="selectTunnel('ssh')">
+                    <div class="tunnel-icon">🔐</div>
+                    <div class="tunnel-title">SSH Reverse Proxy</div>
+                    <div class="tunnel-desc">Verwende deinen eigenen Server für öffentlichen Zugriff</div>
+                    <ul class="tunnel-features">
+                        <li>Vollständige Kontrolle</li>
+                        <li>Keine Drittanbieter-Abhängigkeit</li>
+                        <li>HTTPS mit eigenem Zertifikat</li>
+                        <li>Kostenlos (mit eigenem Server)</li>
+                    </ul>
+                </div>
+
+                <!-- Cloudflare Tunnel -->
+                <div class="tunnel-card" data-tunnel="cloudflare" onclick="selectTunnel('cloudflare')">
+                    <div class="tunnel-icon">☁️</div>
+                    <div class="tunnel-title">Cloudflare Tunnel</div>
+                    <div class="tunnel-desc">Einfacher HTTPS-Zugriff über Cloudflare</div>
+                    <ul class="tunnel-features">
+                        <li>Automatisches HTTPS</li>
+                        <li>HTTP/3 Support</li>
+                        <li>DDoS-Schutz</li>
+                        <li>Kostenloser Plan verfügbar</li>
+                    </ul>
+                </div>
+
+                <!-- ngrok Alternative -->
+                <div class="tunnel-card" data-tunnel="ngrok" onclick="selectTunnel('ngrok')">
+                    <div class="tunnel-icon">🔗</div>
+                    <div class="tunnel-title">ngrok Alternative</div>
+                    <div class="tunnel-desc">Schneller öffentlicher Zugriff ohne Setup</div>
+                    <ul class="tunnel-features">
+                        <li>Sofort einsatzbereit</li>
+                        <li>HTTPS inklusive</li>
+                        <li>Web-Interface</li>
+                        <li>Kostenloser Plan</li>
+                    </ul>
+                </div>
+
+                <!-- LAN Only -->
+                <div class="tunnel-card" data-tunnel="lan" onclick="selectTunnel('lan')">
+                    <div class="tunnel-icon">🏠</div>
+                    <div class="tunnel-title">LAN Only</div>
+                    <div class="tunnel-desc">Nur im lokalen Netzwerk verfügbar</div>
+                    <ul class="tunnel-features">
+                        <li>Maximale Sicherheit</li>
+                        <li>Keine externe Abhängigkeit</li>
+                        <li>Schnelle Verbindung</li>
+                        <li>Kostenlos</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Setup Instructions -->
+            <div class="setup-section" id="setup-instructions" class="optimized-style">
+                <h3 id="setup-title">Setup-Anleitung</h3>
+                <div id="setup-content"></div>
+                <button class="setup-button" id="setup-btn" onclick="startSetup()" title="Action Button">
+                    🚀 Setup starten
+                </button>
+            </div>
+
+            <!-- Progress -->
+            <div class="setup-section" id="setup-progress" class="optimized-style">
+                <h3>📋 Setup-Fortschritt</h3>
+                <div class="progress-steps" id="progress-steps"></div>
+            </div>
+
+            <!-- Server Status -->
+            <div class="setup-section" id="server-status" class="optimized-style">
+                <h3>📊 Server Status</h3>
+                <div id="status-info">
+                    <span class="status-indicator offline"></span>
+                    <span>Server offline</span>
+                </div>
+                <div id="server-urls"></div>
+            </div>
+        </main>
+    </div>
+
+    <script async>
+        let selectedTunnel = null;
+        let setupScript = '';
+
+        // Tunnel Selection
+        function selectTunnel(tunnelType) {
+            // Remove previous selection
+            document.querySelectorAll('.tunnel-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Select new tunnel
+            document.querySelector(`[data-tunnel="${tunnelType}"]`).classList.add('selected');
+            selectedTunnel = tunnelType;
+            
+            // Show setup instructions
+            showSetupInstructions(tunnelType);
+        }
+
+        // Show Setup Instructions
+        function showSetupInstructions(tunnelType) {
+            const instructionsDiv = document.getElementById('setup-instructions');
+            const titleDiv = document.getElementById('setup-title');
+            const contentDiv = document.getElementById('setup-content');
+            
+            instructionsDiv.style.display = 'block';
+            
+            switch(tunnelType) {
+                case 'ssh':
+                    titleDiv.textContent = '🔐 SSH Reverse Proxy Setup';
+                    contentDiv.innerHTML = `
+                        <h4>Voraussetzungen:</h4>
+                        <ul>
+                            <li>Eigener Linux-Server/VPS mit SSH-Zugang</li>
+                            <li>Domain oder IP-Adresse</li>
+                            <li>SSH-Schlüssel oder Passwort</li>
+                        </ul>
+                        
+                        <h4>Schritt 1: Server-Konfiguration</h4>
+                        <div class="code-block">
+# Auf deinem Server (Ubuntu/Debian):
+sudo apt update && sudo apt install nginx certbot python3-certbot-nginx
+
+# Nginx-Konfiguration erstellen
+sudo nano /etc/nginx/sites-available/android-server
+
+# Inhalt:
+server {
+    listen 80;
+    server_name deine-domain.com;
+    
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+# Site aktivieren
+sudo ln -s /etc/nginx/sites-available/android-server /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+
+# HTTPS-Zertifikat
+sudo certbot --nginx -d deine-domain.com
+                        </div>
+                        
+                        <h4>Schritt 2: Android-Setup</h4>
+                        <p>Das Android-Script wird automatisch mit SSH-Konfiguration generiert.</p>
+                    `;
+                    break;
+                    
+                case 'cloudflare':
+                    titleDiv.textContent = '☁️ Cloudflare Tunnel Setup';
+                    contentDiv.innerHTML = `
+                        <h4>Voraussetzungen:</h4>
+                        <ul>
+                            <li>Cloudflare-Account (kostenlos)</li>
+                            <li>Domain bei Cloudflare verwaltet</li>
+                        </ul>
+                        
+                        <h4>Schritt 1: Cloudflare Tunnel erstellen</h4>
+                        <div class="code-block">
+# 1. Gehe zu https://dash.cloudflare.com/
+# 2. Wähle "Zero Trust" → "Access" → "Tunnels"
+# 3. Klicke "Create a tunnel"
+# 4. Gib einen Namen ein (z.B. "android-server")
+# 5. Kopiere das Authentifizierungs-Token
+                        </div>
+                        
+                        <h4>Schritt 2: Android-Setup</h4>
+                        <div class="code-block">
+# Termux auf Android:
+pkg install -y cloudflared
+
+# Tunnel konfigurieren
+cloudflared tunnel login
+cloudflared tunnel create android-server
+
+# Konfiguration erstellen
+mkdir -p ~/.cloudflared
+cat > ~/.cloudflared/config.yml <<'YAML'
+tunnel: android-server
+credentials-file: /data/data/com.termux/files/home/.cloudflared/android-server.json
+ingress:
+  - hostname: android.deine-domain.com
+    service: http://localhost:8080
+  - service: http_status:404
+YAML
+
+# Tunnel starten
+cloudflared tunnel run android-server
+                        </div>
+                    `;
+                    break;
+                    
+                case 'ngrok':
+                    titleDiv.textContent = '🔗 ngrok Alternative Setup';
+                    contentDiv.innerHTML = `
+                        <h4>Optionen:</h4>
+                        <ul>
+                            <li><strong>ngrok:</strong> https://ngrok.com/ (kostenlos, 1 Verbindung)</li>
+                            <li><strong>localtunnel:</strong> https://localtunnel.github.io/www/ (kostenlos)</li>
+                            <li><strong>serveo:</strong> https://serveo.net/ (kostenlos, SSH-basiert)</li>
+                        </ul>
+                        
+                        <h4>ngrok Setup:</h4>
+                        <div class="code-block">
+# 1. Registriere dich bei https://ngrok.com/
+# 2. Lade dein Authtoken herunter
+# 3. Termux auf Android:
+pkg install -y ngrok
+
+# Authentifizierung
+ngrok config add-authtoken DEIN_AUTH_TOKEN
+
+# Tunnel starten
+ngrok http 8080
+                        </div>
+                        
+                        <h4>localtunnel Setup:</h4>
+                        <div class="code-block">
+# Termux auf Android:
+pkg install -y nodejs npm
+npm install -g localtunnel
+
+# Tunnel starten
+lt --port 8080 --subdomain dein-subdomain
+                        </div>
+                    `;
+                    break;
+                    
+                case 'lan':
+                    titleDiv.textContent = '🏠 LAN Only Setup';
+                    contentDiv.innerHTML = `
+                        <h4>LAN-Konfiguration:</h4>
+                        <p>Dein Android-Server ist nur im lokalen Netzwerk verfügbar.</p>
+                        
+                        <h4>Zugriff:</h4>
+                        <ul>
+                            <li><strong>Lokal:</strong> http://127.0.0.1:8080</li>
+                            <li><strong>LAN:</strong> http://[ANDROID-IP]:8080</li>
+                            <li><strong>mDNS:</strong> http://android.local:8080 (falls unterstützt)</li>
+                        </ul>
+                        
+                        <h4>IP-Adresse finden:</h4>
+                        <div class="code-block">
+# In Termux:
+termux-wifi-connectioninfo | grep ip_address
+                        </div>
+                        
+                        <h4>Statische IP (Router):</h4>
+                        <p>Konfiguriere eine statische IP für dein Android-Gerät im Router, damit die Adresse sich nicht ändert.</p>
+                    `;
+                    break;
+            }
+        }
+
+        // Start Setup
+        function startSetup() {
+            const progressDiv = document.getElementById('setup-progress');
+            const stepsDiv = document.getElementById('progress-steps');
+            
+            progressDiv.style.display = 'block';
+            
+            // Generate setup script based on selected tunnel
+            generateSetupScript();
+            
+            // Show progress steps
+            stepsDiv.innerHTML = `
+                <div class="step">
+                    <span class="status-indicator checking"></span>
+                    <span>Setup-Script wird generiert...</span>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                stepsDiv.innerHTML = `
+                    <div class="step">
+                        <span class="status-indicator online"></span>
+                        <span>✅ Setup-Script generiert</span>
+                    </div>
+                    <div class="step">
+                        <span class="status-indicator checking"></span>
+                        <span>📋 Kopiere das Script in Termux...</span>
+                    </div>
+                `;
+            }, 1000);
+            
+            setTimeout(() => {
+                stepsDiv.innerHTML = `
+                    <div class="step">
+                        <span class="status-indicator online"></span>
+                        <span>✅ Setup-Script generiert</span>
+                    </div>
+                    <div class="step">
+                        <span class="status-indicator online"></span>
+                        <span>✅ Script kopiert</span>
+                    </div>
+                    <div class="step">
+                        <span class="status-indicator checking"></span>
+                        <span>🚀 Führe Setup in Termux aus...</span>
+                    </div>
+                `;
+                
+                // Show copy button
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'setup-button';
+                copyBtn.textContent = '📋 Script kopieren';
+                copyBtn.onclick = copyScript;
+                progressDiv.appendChild(copyBtn);
+            }, 2000);
+        }
+
+        // Generate Setup Script
+        function generateSetupScript() {
+            switch(selectedTunnel) {
+                case 'ssh':
+                    setupScript = `#!/data/data/com.termux/files/usr/bin/bash
+# === SSH Reverse Proxy Setup ===
+echo "🔐 SSH Reverse Proxy Setup..."
+
+# Install autossh for stable connections
+pkg install -y autossh
+
+# Create SSH config
+mkdir -p ~/.ssh
+cat > ~/.ssh/config <<'SSH'
+Host android-server
+    HostName DEINE_SERVER_IP
+    User DEIN_USERNAME
+    Port 22
+    ServerAliveInterval 30
+    ServerAliveCountMax 3
+SSH
+
+# Create tunnel script
+cat > ~/start-tunnel.sh <<'TUNNEL'
+#!/data/data/com.termux/files/usr/bin/bash
+autossh -M 0 -N -f \\
+  -R 8080:localhost:8080 \\
+  android-server
+TUNNEL
+chmod +x ~/start-tunnel.sh
+
+# Add to autostart
+echo "~/start-tunnel.sh &" >> ~/.termux/boot/00_telco_services.sh
+
+echo "✅ SSH Reverse Proxy konfiguriert!"
+echo "📝 Bearbeite ~/.ssh/config mit deinen Server-Daten"
+echo "🚀 Starte Tunnel mit: ~/start-tunnel.sh"
+`;
+                    break;
+                    
+                case 'cloudflare':
+                    setupScript = `#!/data/data/com.termux/files/usr/bin/bash
+# === Cloudflare Tunnel Setup ===
+echo "☁️ Cloudflare Tunnel Setup..."
+
+# Install cloudflared
+pkg install -y cloudflared
+
+# Login to Cloudflare
+echo "🔐 Melde dich bei Cloudflare an..."
+cloudflared tunnel login
+
+# Create tunnel
+echo "🏗️ Erstelle Tunnel..."
+cloudflared tunnel create android-server
+
+# Create config
+mkdir -p ~/.cloudflared
+cat > ~/.cloudflared/config.yml <<'YAML'
+tunnel: android-server
+credentials-file: /data/data/com.termux/files/home/.cloudflared/android-server.json
+ingress:
+  - hostname: android.DEINE_DOMAIN.com
+    service: http://localhost:8080
+  - service: http_status:404
+YAML
+
+# Add to autostart
+echo "cloudflared tunnel run android-server &" >> ~/.termux/boot/00_telco_services.sh
+
+echo "✅ Cloudflare Tunnel konfiguriert!"
+echo "📝 Bearbeite ~/.cloudflared/config.yml mit deiner Domain"
+echo "🌐 Konfiguriere DNS in Cloudflare Dashboard"
+echo "🚀 Starte Tunnel mit: cloudflared tunnel run android-server"
+`;
+                    break;
+                    
+                case 'ngrok':
+                    setupScript = `#!/data/data/com.termux/files/usr/bin/bash
+# === ngrok Alternative Setup ===
+echo "🔗 ngrok Alternative Setup..."
+
+# Option 1: ngrok
+echo "📦 Installiere ngrok..."
+pkg install -y ngrok
+
+echo "🔐 Authentifizierung:"
+echo "1. Gehe zu https://ngrok.com/"
+echo "2. Registriere dich und hole dein Authtoken"
+echo "3. Führe aus: ngrok config add-authtoken DEIN_TOKEN"
+
+# Option 2: localtunnel
+echo "📦 Installiere localtunnel..."
+pkg install -y nodejs npm
+npm install -g localtunnel
+
+# Create tunnel scripts
+cat > ~/start-ngrok.sh <<'NGROK'
+#!/data/data/com.termux/files/usr/bin/bash
+ngrok http 8080
+NGROK
+
+cat > ~/start-localtunnel.sh <<'LT'
+#!/data/data/com.termux/files/usr/bin/bash
+lt --port 8080 --subdomain DEIN_SUBDOMAIN
+LT
+
+chmod +x ~/start-ngrok.sh ~/start-localtunnel.sh
+
+echo "✅ Tunnel-Alternativen installiert!"
+echo "🚀 ngrok: ~/start-ngrok.sh"
+echo "🚀 localtunnel: ~/start-localtunnel.sh"
+`;
+                    break;
+                    
+                case 'lan':
+                    setupScript = `#!/data/data/com.termux/files/usr/bin/bash
+# === LAN Only Setup ===
+echo "🏠 LAN Only Setup..."
+
+# Get IP address
+IP=$(termux-wifi-connectioninfo | grep ip_address | cut -d'"' -f4)
+
+echo "✅ LAN-Setup abgeschlossen!"
+echo "🌐 Server-URLs:"
+echo "   • Lokal: http://127.0.0.1:8080"
+echo "   • LAN: http://$IP:8080"
+echo ""
+echo "📱 Für statische IP:"
+echo "   1. Gehe zu Router-Einstellungen"
+echo "   2. DHCP-Reservierung für Android-Gerät"
+echo "   3. Reserviere IP: $IP"
+`;
+                    break;
+            }
+        }
+
+        // Copy Script
+        function copyScript() {
+            navigator.clipboard.writeText(setupScript).then(() => {
+                alert('✅ Setup-Script in Zwischenablage kopiert!\n\nFüge es in Termux ein und führe es aus.');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = setupScript;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('✅ Setup-Script in Zwischenablage kopiert!');
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Auto-select LAN by default
+            selectTunnel('lan');
+        });
+    </script>
+</body>
+</html>

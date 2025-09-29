@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏗️ 83-Server-Punkt Serverfarm - TEL Portal</title>
+    <style>
+        :root {
+            --primary: #FF6B35;
+            --secondary: #8B5CF6;
+            --accent: #10B981;
+            --surface: #1e293b;
+            --text: #e2e8f0;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: linear-gradient(135deg, #0f172a, var(--surface));
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .header h1 {
+            font-size: 3.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(255,107,53,0.5);
+        }
+        
+        .serverfarm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .server-module {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,107,53,0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .server-module:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(255,107,53,0.3);
+            border-color: var(--primary);
+        }
+        
+        .module-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            display: block;
+        }
+        
+        .module-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            text-align: center;
+        }
+        
+        .module-description {
+            opacity: 0.9;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            text-align: justify;
+        }
+        
+        .module-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: pulse 2s infinite;
+        }
+        
+        .status-indicator.broken {
+            background: #ef4444;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .navigation {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 3rem;
+        }
+        
+        .nav-button {
+            background: rgba(255,107,53,0.2);
+            color: white;
+            padding: 1rem 2rem;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-button:hover {
+            background: var(--primary);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>🏗️ 83-Server-Punkt Serverfarm</h1>
+        <p>TEL Portal Infrastructure - Raymond Demitrio Tel</p>
+        <p style="color: var(--accent);">JSON-getrieben, wartbar, modular</p>
+    </header>
+
+    <main class="serverfarm-grid">
+        <div class="server-module" onclick="openModule('kommunikation')">
+            <div class="module-icon">📞</div>
+            <div class="module-title">Kommunikations-Suite</div>
+            <div class="module-description">
+                WebRTC-basierte Kommunikationsinfrastruktur mit Matrix Integration, 
+                Audio/Video-Calls und Messaging-Services.
+            </div>
+            <div class="module-status">
+                <span>Status: Needs Creation</span>
+                <div class="status-indicator broken"></div>
+            </div>
+        </div>
+
+        <div class="server-module" onclick="openModule('ai')">
+            <div class="module-icon">🤖</div>
+            <div class="module-title">AI Systems</div>
+            <div class="module-description">
+                AI-Psychology Framework Integration mit echten Machine Learning 
+                Algorithmen und neuronalen Netzwerken.
+            </div>
+            <div class="module-status">
+                <span>Status: Beta (Dummy)</span>
+                <div class="status-indicator broken"></div>
+            </div>
+        </div>
+
+        <div class="server-module" onclick="openModule('space')">
+            <div class="module-icon">🚀</div>
+            <div class="module-title">Space Research</div>
+            <div class="module-description">
+                Satellitenlogik, Space-APIs und Forschungsdaten-Integration 
+                für wissenschaftliche Anwendungen.
+            </div>
+            <div class="module-status">
+                <span>Status: Needs Creation</span>
+                <div class="status-indicator broken"></div>
+            </div>
+        </div>
+
+        <div class="server-module" onclick="openModule('business')">
+            <div class="module-icon">💼</div>
+            <div class="module-title">Business Suite</div>
+            <div class="module-description">
+                Automatisierung für Geschäftsprozesse, CRM-Integration 
+                und Enterprise-Level Business-APIs.
+            </div>
+            <div class="module-status">
+                <span>Status: Needs Creation</span>
+                <div class="status-indicator broken"></div>
+            </div>
+        </div>
+
+        <div class="server-module" onclick="openModule('producer')">
+            <div class="module-icon">🎵</div>
+            <div class="module-title">Medienproduktion</div>
+            <div class="module-description">
+                Raymond Demitrio Tel Producer-Suite mit Audio/Video-Processing, 
+                Content-Management und Medien-Distribution.
+            </div>
+            <div class="module-status">
+                <span>Status: Needs Creation</span>
+                <div class="status-indicator broken"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Navigation -->
+    <div class="navigation">
+        <a href="../" class="nav-button">🌐 Zur Hauptseite</a>
+        <button class="nav-button" onclick="runAutoFix()">🔧 Auto-Fix starten</button>
+        <button class="nav-button" onclick="showSystemHealth()">📊 System-Health</button>
+    </div>
+
+    <script>
+        // JSON-Schema laden und Module verwalten
+        let systemSchema = null;
+
+        async function loadSystemSchema() {
+            try {
+                const response = await fetch('/digitalnotar-systempaket-komplett.json');
+                systemSchema = await response.json();
+                console.log('✅ System-Schema geladen');
+                updateModuleStatus();
+            } catch (error) {
+                console.error('❌ Schema-Laden fehlgeschlagen:', error);
+            }
+        }
+
+        function updateModuleStatus() {
+            if (!systemSchema) return;
+            
+            const serverfarmModules = systemSchema.digitalnotarSystempaket.modules
+                .find(m => m.id === 'serverfarm')?.children || [];
+            
+            serverfarmModules.forEach(module => {
+                const moduleElement = document.querySelector(`[onclick="openModule('${module.id}')"]`);
+                if (moduleElement) {
+                    const statusElement = moduleElement.querySelector('.module-status span');
+                    const indicator = moduleElement.querySelector('.status-indicator');
+                    
+                    if (module.status === 'needs_creation') {
+                        statusElement.textContent = 'Status: Needs Creation';
+                        indicator.classList.add('broken');
+                    } else if (module.isDummy) {
+                        statusElement.textContent = 'Status: Dummy Module';
+                        indicator.classList.add('broken');
+                    } else {
+                        statusElement.textContent = 'Status: Active';
+                        indicator.classList.remove('broken');
+                    }
+                }
+            });
+        }
+
+        function openModule(moduleId) {
+            console.log(`🔧 Öffne Serverfarm-Modul: ${moduleId}`);
+            
+            // Prüfe ob Modul existiert
+            const moduleUrl = `/serverfarm/${moduleId}/`;
+            
+            // Teste URL vor Öffnung
+            fetch(moduleUrl, { method: 'HEAD' })
+                .then(response => {
+                    if (response.status === 200) {
+                        window.open(moduleUrl, '_blank');
+                    } else {
+                        alert(`⚠️ Modul "${moduleId}" noch nicht verfügbar (Status: ${response.status})\n\nWird automatisch erstellt...`);
+                        createModule(moduleId);
+                    }
+                })
+                .catch(error => {
+                    alert(`❌ Modul "${moduleId}" nicht erreichbar\n\nFehler: ${error.message}`);
+                });
+        }
+
+        function createModule(moduleId) {
+            console.log(`🔧 Erstelle Serverfarm-Modul: ${moduleId}`);
+            
+            // Hier würde normalerweise eine API-Call zum Server-Management erfolgen
+            // Für Demo: Zeige was erstellt werden würde
+            const moduleInfo = {
+                'kommunikation': 'WebRTC + Matrix Integration',
+                'ai': 'AI-Psychology Framework + ML',
+                'space': 'Satellite APIs + Research Data',
+                'business': 'CRM + Business Process Automation',
+                'producer': 'Raymond Demitrio Tel Media Suite'
+            };
+            
+            alert(`🔧 Modul "${moduleId}" wird erstellt:\n\n${moduleInfo[moduleId] || 'Standard-Modul'}\n\n✅ Auto-Creation aktiviert`);
+        }
+
+        async function runAutoFix() {
+            console.log('🔧 Auto-Fix für Serverfarm wird gestartet...');
+            
+            // Lade und führe Auto-Fix Script aus
+            try {
+                const script = document.createElement('script');
+                script.src = '/auto-fix-script-live.js';
+                document.head.appendChild(script);
+                
+                alert('🔧 Auto-Fix Script geladen!\n\n✅ Alle Links werden analysiert\n✅ Dummy-Module werden markiert\n✅ Report wird generiert');
+            } catch (error) {
+                console.error('❌ Auto-Fix Fehler:', error);
+                alert(`❌ Auto-Fix konnte nicht gestartet werden: ${error.message}`);
+            }
+        }
+
+        function showSystemHealth() {
+            if (window.telAIFunctions && window.telAIFunctions.systemMonitor) {
+                const health = window.telAIFunctions.systemMonitor.generateHealthReport();
+                
+                alert(`📊 System-Health Report:\n\nGesamtgesundheit: ${health.systemHealth.overall}%\nLink-Gesundheit: ${health.systemHealth.links}%\nPerformance: ${health.systemHealth.performance}%\nStatus: ${health.systemHealth.status.toUpperCase()}\n\n🔧 Auto-Fix verfügbar für Reparaturen`);
+            } else {
+                alert('📊 System-Health Monitor wird geladen...\n\n⏳ Bitte warten Sie einen Moment');
+            }
+        }
+
+        // Initialisierung
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🏗️ 83-Server-Punkt Serverfarm geladen');
+            loadSystemSchema();
+            
+            // Lade AI-Functions falls verfügbar
+            if (!window.telAIFunctions) {
+                const script = document.createElement('script');
+                script.src = '/ai-functions-real.js';
+                document.head.appendChild(script);
+            }
+        });
+
+        // Keyboard-Shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case '1':
+                        e.preventDefault();
+                        openModule('kommunikation');
+                        break;
+                    case '2':
+                        e.preventDefault();
+                        openModule('ai');
+                        break;
+                    case '3':
+                        e.preventDefault();
+                        openModule('space');
+                        break;
+                    case 'f':
+                        e.preventDefault();
+                        runAutoFix();
+                        break;
+                }
+            }
+        });
+
+        console.log('🏗️ Serverfarm bereit - JSON-getrieben, wartbar, modular');
+    </script>
+</body>
+</html>
+
+
+

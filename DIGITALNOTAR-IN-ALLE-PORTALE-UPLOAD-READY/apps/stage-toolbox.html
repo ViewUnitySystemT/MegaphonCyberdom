@@ -1,0 +1,804 @@
+<!-- TODO: Replacement character detected () - verify source encoding -->
+<!DOCTYPE html>
+<html lang="de" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Stage Toolbox - TELCO Hub</title>
+<h1 style="position: absolute; left: -9999px;">Stage Toolbox - TELCO Hub</h1>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .stage-toolbox {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .toolbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .tool-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .tool-card:hover {
+            border-color: #333333;
+            box-shadow: 0 4px 12px rgba(0,123,255,0.15);
+        }
+        .tool-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .tool-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .tool-desc {
+            color: #333333;
+            margin-bottom: 1rem;
+        }
+        .tool-button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+        }
+        .tool-button:hover {
+            background: #218838;
+        }
+        .tool-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .tuner-display {
+            background: #1e1e1e;
+            color: #333333;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 1rem 0;
+            text-align: center;
+        }
+        .metronome-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .metronome-display {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333333;
+        }
+        .compass-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 1rem auto;
+        }
+        .compass-circle {
+            width: 100%;
+            height: 100%;
+            border: 3px solid #007bff;
+            border-radius: 50%;
+            position: relative;
+        }
+        .compass-needle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2px;
+            height: 80px;
+            background: #dc3545;
+            transform-origin: bottom center;
+            transform: translate(-50%, -100%);
+            transition: transform 0.1s ease;
+        }
+        .compass-directions {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .compass-direction {
+            position: absolute;
+            font-weight: bold;
+            color: #333333;
+        }
+        .compass-direction.north { top: 5px; left: 50%; transform: translateX(-50%); }
+        .compass-direction.south { bottom: 5px; left: 50%; transform: translateX(-50%); }
+        .compass-direction.east { right: 5px; top: 50%; transform: translateY(-50%); }
+        .compass-direction.west { left: 5px; top: 50%; transform: translateY(-50%); }
+        .audio-visualizer {
+            width: 100%;
+            height: 100px;
+            background: #1e1e1e;
+            border-radius: 8px;
+            margin: 1rem 0;
+            position: relative;
+            overflow: visible;
+        }
+        .visualizer-bar {
+            position: absolute;
+            bottom: 0;
+            background: linear-gradient(to top, #007bff, #00ff00);
+            width: 4px;
+            border-radius: 2px;
+            transition: height 0.1s ease;
+        }
+        .settings-panel {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .settings-group {
+            margin: 1rem 0;
+        }
+        .settings-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        .settings-group input, .settings-group select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="stage-toolbox">
+        <header class="top-app-bar">
+            <div class="top-app-bar-content">
+                <button class="icon-button" onclick="window.history.back()" title="Action Button">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                    </svg>
+                </button>
+                <h1 class="app-title">🎵 Stage Toolbox</h1>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="toolbox-grid">
+                <!-- Tuner -->
+                <div class="tool-card">
+                    <div class="tool-icon">🎸</div>
+                    <div class="tool-title">Gitarren-Tuner</div>
+                    <div class="tool-desc">Präziser Tuner für alle Instrumente</div>
+                    
+                    <div class="tuner-display" id="tuner-display">
+                        <div>Frequenz: <span id="frequency">440 Hz</span></div>
+                        <div>Note: <span id="note">A4</span></div>
+                        <div>Cents: <span id="cents">0</span></div>
+                    </div>
+                    
+                    <div class="settings-panel">
+                        <div class="settings-group">
+                            <label>Instrument:</label>
+                            <select id="instrument-select">
+                                <option value="guitar">Gitarre (Standard)</option>
+                                <option value="bass">Bass (Standard)</option>
+                                <option value="violin">Violine</option>
+                                <option value="piano">Klavier</option>
+                                <option value="custom">Benutzerdefiniert</option>
+                            </select>
+                        </div>
+                        <div class="settings-group">
+                            <label>Referenzton:</label>
+                            <input type="number" id="reference-tone" value="440" min="400" max="500" aria-label="Input Field">
+                        </div>
+                    </div>
+                    
+                    <button class="tool-button" id="tuner-btn" onclick="toggleTuner()" title="Action Button">
+                        🎵 Tuner starten
+                    </button>
+                </div>
+
+                <!-- Metronom -->
+                <div class="tool-card">
+                    <div class="tool-icon">🥁</div>
+                    <div class="tool-title">Metronom</div>
+                    <div class="tool-desc">Präzises Timing für Proben und Auftritte</div>
+                    
+                    <div class="metronome-display" id="metronome-display">120 BPM</div>
+                    
+                    <div class="metronome-controls">
+                        <button aria-label="-10" onclick="changeBPM(-10)" title="Action Button">-10</button>
+                        <button aria-label="-1" onclick="changeBPM(-1)" title="Action Button">-1</button>
+                        <button aria-label="+1" onclick="changeBPM(1)" title="Action Button">+1</button>
+                        <button aria-label="+10" onclick="changeBPM(10)" title="Action Button">+10</button>
+                    </div>
+                    
+                    <div class="settings-panel">
+                        <div class="settings-group">
+                            <label>BPM:</label>
+                            <input type="range" id="bpm-slider" min="40" max="200" value="120" onchange="setBPM(this.value)" aria-label="Input Field">
+                        </div>
+                        <div class="settings-group">
+                            <label>Zeitmaß:</label>
+                            <select id="time-signature">
+                                <option value="4/4">4/4</option>
+                                <option value="3/4">3/4</option>
+                                <option value="2/4">2/4</option>
+                                <option value="6/8">6/8</option>
+                            </select>
+                        </div>
+                        <div class="settings-group">
+                            <label>Sound:</label>
+                            <select id="metronome-sound">
+                                <option value="click">Click</option>
+                                <option value="beep">Beep</option>
+                                <option value="wood">Holz</option>
+                                <option value="electronic">Elektronisch</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button class="tool-button" id="metronome-btn" onclick="toggleMetronome()" title="Action Button">
+                        ▶️ Metronom starten
+                    </button>
+                </div>
+
+                <!-- Kompass -->
+                <div class="tool-card">
+                    <div class="tool-icon">🧭</div>
+                    <div class="tool-title">Digitaler Kompass</div>
+                    <div class="tool-desc">Präzise Richtungsanzeige für Bühnenaufbau</div>
+                    
+                    <div class="compass-container">
+                        <div class="compass-circle">
+                            <div class="compass-needle" id="compass-needle"></div>
+                            <div class="compass-directions">
+                                <div class="compass-direction north">N</div>
+                                <div class="compass-direction south">S</div>
+                                <div class="compass-direction east">O</div>
+                                <div class="compass-direction west">W</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tuner-display">
+                        <div>Richtung: <span id="direction">0°</span></div>
+                        <div>Himmelsrichtung: <span id="cardinal">N</span></div>
+                    </div>
+                    
+                    <div class="settings-panel">
+                        <div class="settings-group">
+                            <label>Kalibrierung:</label>
+                            <button aria-label="🧭 Kalibrieren" onclick="calibrateCompass()" title="Action Button">🧭 Kalibrieren</button>
+                        </div>
+                        <div class="settings-group">
+                            <label>Genauigkeit:</label>
+                            <select id="compass-accuracy">
+                                <option value="high">Hoch</option>
+                                <option value="medium">Mittel</option>
+                                <option value="low">Niedrig</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button class="tool-button" id="compass-btn" onclick="toggleCompass()" title="Action Button">
+                        🧭 Kompass starten
+                    </button>
+                </div>
+
+                <!-- Audio Visualizer -->
+                <div class="tool-card">
+                    <div class="tool-icon">📊</div>
+                    <div class="tool-title">Audio Visualizer</div>
+                    <div class="tool-desc">Echtzeit-Audio-Analyse für Soundcheck</div>
+                    
+                    <div class="audio-visualizer" id="audio-visualizer">
+                        <!-- Visualizer bars werden dynamisch erstellt -->
+                    </div>
+                    
+                    <div class="settings-panel">
+                        <div class="settings-group">
+                            <label>Visualisierung:</label>
+                            <select id="visualizer-type">
+                                <option value="bars">Balken</option>
+                                <option value="wave">Wellen</option>
+                                <option value="circular">Kreis</option>
+                                <option value="spectrum">Spektrum</option>
+                            </select>
+                        </div>
+                        <div class="settings-group">
+                            <label>Sensitivität:</label>
+                            <input type="range" id="sensitivity" min="0.1" max="2" step="0.1" value="1" aria-label="Input Field">
+                        </div>
+                        <div class="settings-group">
+                            <label>Frequenz-Bereich:</label>
+                            <select id="frequency-range">
+                                <option value="full">Vollspektrum</option>
+                                <option value="bass">Bass (20-250 Hz)</option>
+                                <option value="mid">Mitten (250-4000 Hz)</option>
+                                <option value="treble">Höhen (4000-20000 Hz)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button class="tool-button" id="visualizer-btn" onclick="toggleVisualizer()" title="Action Button">
+                        📊 Visualizer starten
+                    </button>
+                </div>
+
+                <!-- Setlist Manager -->
+                <div class="tool-card">
+                    <div class="tool-icon">📋</div>
+                    <div class="tool-title">Setlist Manager</div>
+                    <div class="tool-desc">Professionelle Setlist-Verwaltung</div>
+                    
+                    <div class="settings-panel">
+                        <div class="settings-group">
+                            <label>Setlist Name:</label>
+                            <input type="text" id="setlist-name" placeholder="Meine Setlist" aria-label="Input Field">
+                        </div>
+                        <div class="settings-group">
+                            <label>Song hinzufügen:</label>
+                            <input type="text" id="song-input" placeholder="Song-Titel" aria-label="Input Field">
+                            <button aria-label="➕ Hinzufügen" onclick="addSong()" title="Action Button">➕ Hinzufügen</button>
+                        </div>
+                    </div>
+                    
+                    <div id="setlist-display" class="optimized-style">
+                        <!-- Setlist wird hier angezeigt -->
+                    </div>
+                    
+                    <button class="tool-button" onclick="saveSetlist()" title="Action Button">
+                        💾 Setlist speichern
+                    </button>
+                </div>
+
+                <!-- Stage Monitor -->
+                <div class="tool-card">
+                    <div class="tool-icon">📺</div>
+                    <div class="tool-title">Stage Monitor</div>
+                    <div class="tool-desc">Bühnen-Monitoring und Kommunikation</div>
+                    
+                    <div class="settings-panel">
+                        <div class="settings-group">
+                            <label>Monitor-Kanal:</label>
+                            <select id="monitor-channel">
+                                <option value="main">Hauptmix</option>
+                                <option value="vocals">Gesang</option>
+                                <option value="instruments">Instrumente</option>
+                                <option value="click">Click-Track</option>
+                            </select>
+                        </div>
+                        <div class="settings-group">
+                            <label>Lautstärke:</label>
+                            <input type="range" id="monitor-volume" min="0" max="100" value="50" aria-label="Input Field">
+                        </div>
+                        <div class="settings-group">
+                            <label>EQ:</label>
+                            <select id="monitor-eq">
+                                <option value="flat">Flach</option>
+                                <option value="vocal">Gesang</option>
+                                <option value="instrument">Instrument</option>
+                                <option value="custom">Benutzerdefiniert</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button class="tool-button" onclick="connectMonitor()" title="Action Button">
+                        📺 Monitor verbinden
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script async>
+        // Global variables
+        let tunerActive = false;
+        let metronomeActive = false;
+        let compassActive = false;
+        let visualizerActive = false;
+        let audioContext = null;
+        let analyser = null;
+        let microphone = null;
+        let metronomeInterval = null;
+        let compassWatch = null;
+        let currentBPM = 120;
+        let setlist = [];
+
+        // Tuner functionality
+        async function toggleTuner() {
+            const btn = document.getElementById('tuner-btn');
+            
+            if (!tunerActive) {
+                try {
+                    await startTuner();
+                    btn.textContent = '⏹️ Tuner stoppen';
+                    btn.style.background = '#dc3545';
+                    tunerActive = true;
+                } catch (error) {
+                    alert('Mikrofon-Zugriff erforderlich für Tuner');
+                }
+            } else {
+                stopTuner();
+                btn.textContent = '🎵 Tuner starten';
+                btn.style.background = '#28a745';
+                tunerActive = false;
+            }
+        }
+
+        async function startTuner() {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            microphone = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const source = audioContext.createMediaStreamSource(microphone);
+            source.connect(analyser);
+            
+            analyser.fftSize = 2048;
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            
+            function analyzeFrequency() {
+                if (!tunerActive) return;
+                
+                analyser.getByteFrequencyData(dataArray);
+                
+                // Find peak frequency
+                let maxIndex = 0;
+                let maxValue = 0;
+                for (let i = 0; i < bufferLength; i++) {
+                    if (dataArray[i] > maxValue) {
+                        maxValue = dataArray[i];
+                        maxIndex = i;
+                    }
+                }
+                
+                const frequency = (maxIndex * audioContext.sampleRate) / analyser.fftSize;
+                updateTunerDisplay(frequency);
+                
+                requestAnimationFrame(analyzeFrequency);
+            }
+            
+            analyzeFrequency();
+        }
+
+        function stopTuner() {
+            if (microphone) {
+                microphone.getTracks().forEach(track => track.stop());
+            }
+            if (audioContext) {
+                audioContext.close();
+            }
+        }
+
+        function updateTunerDisplay(frequency) {
+            const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+            const referenceTone = parseFloat(document.getElementById('reference-tone').value);
+            
+            // Calculate note and cents
+            const noteNumber = 12 * Math.log2(frequency / referenceTone) + 69;
+            const noteIndex = Math.round(noteNumber) % 12;
+            const octave = Math.floor(noteNumber / 12) - 1;
+            const cents = Math.round((noteNumber - Math.round(noteNumber)) * 100);
+            
+            document.getElementById('frequency').textContent = frequency.toFixed(1) + ' Hz';
+            document.getElementById('note').textContent = notes[noteIndex] + octave;
+            document.getElementById('cents').textContent = cents + ' cents';
+        }
+
+        // Metronome functionality
+        function toggleMetronome() {
+            const btn = document.getElementById('metronome-btn');
+            
+            if (!metronomeActive) {
+                startMetronome();
+                btn.textContent = '⏹️ Metronom stoppen';
+                btn.style.background = '#dc3545';
+                metronomeActive = true;
+            } else {
+                stopMetronome();
+                btn.textContent = '▶️ Metronom starten';
+                btn.style.background = '#28a745';
+                metronomeActive = false;
+            }
+        }
+
+        function startMetronome() {
+            const interval = 60000 / currentBPM;
+            metronomeInterval = setInterval(() => {
+                playMetronomeClick();
+            }, interval);
+        }
+
+        function stopMetronome() {
+            if (metronomeInterval) {
+                clearInterval(metronomeInterval);
+                metronomeInterval = null;
+            }
+        }
+
+        function playMetronomeClick() {
+            const soundType = document.getElementById('metronome-sound').value;
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // Different sounds for different types
+            switch(soundType) {
+                case 'click':
+                    oscillator.frequency.setValueAtTime(1000, audioContext.currentTime);
+                    break;
+                case 'beep':
+                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                    break;
+                case 'wood':
+                    oscillator.frequency.setValueAtTime(500, audioContext.currentTime);
+                    break;
+                case 'electronic':
+                    oscillator.frequency.setValueAtTime(1200, audioContext.currentTime);
+                    break;
+            }
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.1);
+        }
+
+        function changeBPM(delta) {
+            currentBPM = Math.max(40, Math.min(200, currentBPM + delta));
+            document.getElementById('bpm-slider').value = currentBPM;
+            document.getElementById('metronome-display').textContent = currentBPM + ' BPM';
+            
+            if (metronomeActive) {
+                stopMetronome();
+                startMetronome();
+            }
+        }
+
+        function setBPM(bpm) {
+            currentBPM = parseInt(bpm);
+            document.getElementById('metronome-display').textContent = currentBPM + ' BPM';
+            
+            if (metronomeActive) {
+                stopMetronome();
+                startMetronome();
+            }
+        }
+
+        // Compass functionality
+        function toggleCompass() {
+            const btn = document.getElementById('compass-btn');
+            
+            if (!compassActive) {
+                startCompass();
+                btn.textContent = '⏹️ Kompass stoppen';
+                btn.style.background = '#dc3545';
+                compassActive = true;
+            } else {
+                stopCompass();
+                btn.textContent = '🧭 Kompass starten';
+                btn.style.background = '#28a745';
+                compassActive = false;
+            }
+        }
+
+        function startCompass() {
+            if (navigator.geolocation && navigator.compass) {
+                compassWatch = navigator.watchHeading(
+                    (heading) => {
+                        updateCompassDisplay(heading.magneticHeading);
+                    },
+                    (error) => {
+                        console.error('Compass error:', error);
+                        // Fallback to device orientation
+                        startDeviceOrientationCompass();
+                    }
+                );
+            } else {
+                startDeviceOrientationCompass();
+            }
+        }
+
+        function startDeviceOrientationCompass() {
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener('deviceorientation', handleOrientation);
+            } else {
+                alert('Kompass nicht verfügbar auf diesem Gerät');
+            }
+        }
+
+        function handleOrientation(event) {
+            if (event.alpha !== null) {
+                updateCompassDisplay(event.alpha);
+            }
+        }
+
+        function updateCompassDisplay(heading) {
+            const needle = document.getElementById('compass-needle');
+            const direction = document.getElementById('direction');
+            const cardinal = document.getElementById('cardinal');
+            
+            needle.style.transform = `translate(-50%, -100%) rotate(${heading}deg)`;
+            direction.textContent = Math.round(heading) + '°';
+            
+            // Calculate cardinal direction
+            const directions = ['N', 'NO', 'O', 'SO', 'S', 'SW', 'W', 'NW'];
+            const index = Math.round(heading / 45) % 8;
+            cardinal.textContent = directions[index];
+        }
+
+        function stopCompass() {
+            if (compassWatch) {
+                navigator.clearWatch(compassWatch);
+                compassWatch = null;
+            }
+            window.removeEventListener('deviceorientation', handleOrientation);
+        }
+
+        function calibrateCompass() {
+            alert('Bewege das Gerät in einer 8-Form für 10 Sekunden zur Kalibrierung');
+        }
+
+        // Audio Visualizer functionality
+        async function toggleVisualizer() {
+            const btn = document.getElementById('visualizer-btn');
+            
+            if (!visualizerActive) {
+                try {
+                    await startVisualizer();
+                    btn.textContent = '⏹️ Visualizer stoppen';
+                    btn.style.background = '#dc3545';
+                    visualizerActive = true;
+                } catch (error) {
+                    alert('Mikrofon-Zugriff erforderlich für Visualizer');
+                }
+            } else {
+                stopVisualizer();
+                btn.textContent = '📊 Visualizer starten';
+                btn.style.background = '#28a745';
+                visualizerActive = false;
+            }
+        }
+
+        async function startVisualizer() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                microphone = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const source = audioContext.createMediaStreamSource(microphone);
+                source.connect(analyser);
+            }
+            
+            analyser.fftSize = 256;
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            
+            // Create visualizer bars
+            const visualizer = document.getElementById('audio-visualizer');
+            visualizer.innerHTML = '';
+            const barCount = 32;
+            
+            for (let i = 0; i < barCount; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'visualizer-bar';
+                bar.style.left = (i * (100 / barCount)) + '%';
+                bar.style.height = '0px';
+                visualizer.appendChild(bar);
+            }
+            
+            function updateVisualizer() {
+                if (!visualizerActive) return;
+                
+                analyser.getByteFrequencyData(dataArray);
+                const bars = visualizer.querySelectorAll('.visualizer-bar');
+                
+                for (let i = 0; i < bars.length; i++) {
+                    const dataIndex = Math.floor(i * bufferLength / bars.length);
+                    const height = (dataArray[dataIndex] / 255) * 100;
+                    bars[i].style.height = height + 'px';
+                }
+                
+                requestAnimationFrame(updateVisualizer);
+            }
+            
+            updateVisualizer();
+        }
+
+        function stopVisualizer() {
+            if (microphone) {
+                microphone.getTracks().forEach(track => track.stop());
+            }
+            if (audioContext) {
+                audioContext.close();
+                audioContext = null;
+            }
+        }
+
+        // Setlist functionality
+        function addSong() {
+            const songInput = document.getElementById('song-input');
+            const songTitle = songInput.value.trim();
+            
+            if (songTitle) {
+                setlist.push({
+                    id: Date.now(),
+                    title: songTitle,
+                    duration: '0:00',
+                    key: 'C',
+                    tempo: 120
+                });
+                
+                songInput.value = '';
+                updateSetlistDisplay();
+            }
+        }
+
+        function updateSetlistDisplay() {
+            const display = document.getElementById('setlist-display');
+            display.innerHTML = '';
+            
+            setlist.forEach((song, index) => {
+                const songDiv = document.createElement('div');
+                songDiv.style.cssText = 'padding: 0.5rem; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;';
+                songDiv.innerHTML = `
+                    <span>${index + 1}. ${song.title}</span>
+                    <button aria-label="❌" onclick="removeSong(${song.id})" class="optimized-style" title="Action Button">❌</button>
+                `;
+                display.appendChild(songDiv);
+            });
+        }
+
+        function removeSong(songId) {
+            setlist = setlist.filter(song => song.id !== songId);
+            updateSetlistDisplay();
+        }
+
+        function saveSetlist() {
+            const setlistName = document.getElementById('setlist-name').value || 'Unbenannte Setlist';
+            const setlistData = {
+                name: setlistName,
+                songs: setlist,
+                created: new Date().toISOString()
+            };
+            
+            localStorage.setItem('stageToolbox_setlist_' + Date.now(), JSON.stringify(setlistData));
+            alert('Setlist gespeichert!');
+        }
+
+        // Stage Monitor functionality
+        function connectMonitor() {
+            alert('Stage Monitor Verbindung wird simuliert...\n\nIn einer echten Implementierung würde hier eine Verbindung zu einem Mischpult oder Audio-Interface hergestellt.');
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (tunerActive) stopTuner();
+            if (metronomeActive) stopMetronome();
+            if (compassActive) stopCompass();
+            if (visualizerActive) stopVisualizer();
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateSetlistDisplay();
+        });
+    </script>
+</body>
+</html>

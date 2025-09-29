@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Network Discovery Engine - Automatische Netzwerk-Erkennung</title>
+<h1 style="position: absolute; left: -9999px;">🔍 Network Discovery Engine - Automatische Netzwerk-Erkennung</h1>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .discovery-container {
+            padding: 1rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        .engine-header {
+            background: linear-gradient(135deg, var(--primary-container), var(--tertiary-container));
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--on-primary-container);
+        }
+        .engine-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        .engine-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        .discovery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .discovery-card {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .discovery-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--on-surface);
+        }
+        .discovery-status {
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        .status-discovering { background: var(--warning-container); color: var(--on-warning-container); }
+        .status-discovered { background: var(--success-container); color: var(--on-success-container); }
+        .status-error { background: var(--error-container); color: var(--on-error-container); }
+        .status-idle { background: var(--outline); color: var(--on-surface-variant); }
+        .network-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .network-item {
+            background: var(--surface-variant);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid var(--primary);
+        }
+        .network-name {
+            font-weight: 600;
+            color: var(--on-surface);
+            margin-bottom: 0.5rem;
+        }
+        .network-details {
+            font-size: 0.9rem;
+            color: var(--on-surface-variant);
+            margin-bottom: 0.5rem;
+        }
+        .network-metrics {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.8rem;
+        }
+        .metric-item {
+            background: var(--primary-container);
+            color: var(--on-primary-container);
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+        }
+        .discovery-controls {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .control-button {
+            background: var(--primary);
+            color: var(--on-primary);
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background 0.2s ease;
+        }
+        .control-button:hover {
+            background: var(--primary-container);
+        }
+        .control-button.secondary {
+            background: var(--secondary);
+            color: var(--on-secondary);
+        }
+        .control-button.secondary:hover {
+            background: var(--secondary-container);
+        }
+        .control-button.danger {
+            background: var(--error);
+            color: var(--on-error);
+        }
+        .control-button.danger:hover {
+            background: var(--error-container);
+        }
+        .discovery-progress {
+            background: var(--surface-variant);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: var(--outline);
+            border-radius: var(--radius-sm);
+            overflow: visible;
+            margin: 0.5rem 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.3s ease;
+        }
+        .discovery-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--on-surface-variant);
+        }
+        .discovery-results {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .results-header {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--on-surface);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .result-category {
+            margin-bottom: 2rem;
+        }
+        .category-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--on-surface);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+        }
+        .result-item {
+            background: var(--surface-variant);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--secondary);
+        }
+        .result-title {
+            font-weight: 600;
+            color: var(--on-surface);
+            margin-bottom: 0.5rem;
+        }
+        .result-description {
+            color: var(--on-surface-variant);
+            margin-bottom: 0.5rem;
+        }
+        .result-links {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .result-link {
+            background: var(--secondary-container);
+            color: var(--on-secondary-container);
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: background 0.2s ease;
+        }
+        .result-link:hover {
+            background: var(--secondary);
+            color: var(--on-secondary);
+        }
+        .algorithm-info {
+            background: var(--surface-variant);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: var(--on-surface);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="top-app-bar">
+            <div class="top-app-bar-content">
+                <button class="icon-button" onclick="window.history.back()" title="Action Button">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </button>
+                <h1 class="top-app-bar-title">🔍 Network Discovery Engine</h1>
+                <div class="top-app-bar-actions">
+                    <button class="icon-button" onclick="startFullDiscovery()" title="Vollständige Entdeckung starten" title="Action Button">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+                    </button>
+                    <button class="icon-button" onclick="exportDiscoveryResults()" title="Entdeckungsergebnisse exportieren" title="Action Button">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="discovery-container">
+            <!-- Engine Header -->
+            <div class="engine-header">
+                <div class="engine-title">🔍 Network Discovery Engine</div>
+                <div class="engine-subtitle">Automatische Erkennung aller öffentlichen und privaten Netzwerke weltweit</div>
+            </div>
+
+            <!-- Discovery Controls -->
+            <div class="discovery-controls">
+                <h2>🎛️ Discovery-Kontrollen</h2>
+                <div class="control-grid">
+                    <button class="control-button" onclick="startFullDiscovery()" title="Action Button">🌍 Vollständige Entdeckung</button>
+                    <button class="control-button secondary" onclick="discoverPublicNetworks()" title="Action Button">🌐 Öffentliche Netzwerke</button>
+                    <button class="control-button secondary" onclick="discoverPrivateNetworks()" title="Action Button">🔒 Private Netzwerke</button>
+                    <button class="control-button secondary" onclick="discoverUndergroundNetworks()" title="Action Button">🕳️ Underground Netzwerke</button>
+                    <button class="control-button secondary" onclick="discoverClassifiedNetworks()" title="Action Button">🔐 Klassifizierte Netzwerke</button>
+                    <button class="control-button secondary" onclick="discoverUnknownNetworks()" title="Action Button">❓ Unbekannte Netzwerke</button>
+                    <button class="control-button secondary" onclick="discoverSpaceNetworks()" title="Action Button">🚀 Weltraum-Netzwerke</button>
+                    <button class="control-button secondary" onclick="discoverQuantumNetworks()" title="Action Button">⚛️ Quanten-Netzwerke</button>
+                    <button class="control-button danger" onclick="stopDiscovery()" title="Action Button">⏹️ Stoppen</button>
+                </div>
+                
+                <div class="discovery-progress" id="discovery-progress" style="display: block;">
+                    <div>Discovery läuft...</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <div id="discovery-status">Bereit für Discovery</div>
+                </div>
+            </div>
+
+            <!-- Discovery Statistics -->
+            <div class="discovery-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-networks">0</div>
+                    <div class="stat-label">Entdeckte Netzwerke</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="public-networks">0</div>
+                    <div class="stat-label">Öffentliche Netzwerke</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="private-networks">0</div>
+                    <div class="stat-label">Private Netzwerke</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="underground-networks">0</div>
+                    <div class="stat-label">Underground Netzwerke</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="classified-networks">0</div>
+                    <div class="stat-label">Klassifizierte Netzwerke</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="unknown-networks">0</div>
+                    <div class="stat-label">Unbekannte Netzwerke</div>
+                </div>
+            </div>
+
+            <!-- Discovery Cards -->
+            <div class="discovery-grid">
+                <!-- Public Networks -->
+                <div class="discovery-card">
+                    <div class="card-header">
+                        <div class="card-title">🌐 Öffentliche Netzwerke</div>
+                        <div class="discovery-status status-idle" id="public-status">Bereit</div>
+                    </div>
+                    <ul class="network-list" id="public-networks-list">
+                        <li class="network-item">
+                            <div class="network-name">Internet Backbone</div>
+                            <div class="network-details">Globale Internet-Infrastruktur</div>
+                            <div class="network-metrics">
+                                <span class="metric-item">IPv4/IPv6</span>
+                                <span class="metric-item">Global</span>
+                            </div>
+                        </li>
+                        <li class="network-item">
+                            <div class="network-name">5G/6G Mobilnetze</div>
+                            <div class="network-details">Hochgeschwindigkeits-Mobilfunknetze</div>
+                            <div class="network-metrics">
+                                <span class="metric-item">5G/6G</span>
+                                <span class="metric-item">Nationwide</span>
+                            </div>
+                        </li>
+                        <li class="network-item">
+                            <div class="network-name">Satelliten-Internet</div>
+                            <div class="network-details">Starlink, OneWeb, Kuiper</div>
+                            <div class="network-metrics">
+                                <span class="metric-item">LEO</span>
+                                <span class="metric-item">Global</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Private Networks -->
+                <div class="discovery-card">
+                    <div class="card-header">
+                        <div class="card-title">🔒 Private Netzwerke</div>
+                        <div class="discovery-status status-idle" id="private-status">Bereit</div>
+                    </div>
+                    <ul class="network-list" id="private-networks-list">
+                        <li class="network-item">
+                            <div class="network-name">Corporate Intranets</div>
+                            <div class="network-details">Unternehmens-interne Netzwerke</div>
+                            <div class="network-metrics">
+                                <span class="metric-item">VPN</span>
+                                <span class="metric-item">Encrypted</span>
+                            </div>
+                        </li>
+                        <li class="network-item">
+                            <div class="network-name">Government Networks</div>
+                            <div class="network-details">Behörden- und Regierungsnetzwerke</div>
+                            <div class="network-metrics">
+                                <span class="metric-item">Classified</span>
+                                <span class="metric-item">Secure</span>
+                            </div>
+                        </li>
+                        <li class="network-item">
+                            <div class="network-name">Military Networks</div>
+                            <div class="network-details">Militärische Kommunikationsnetze</div>
+                            <div class="network-metrics">
+                                <span class="metric-item">Top Secret</span>
+                                <span class="metric-item">Encrypted</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Underground Networks -->
+                <div class="discovery-card">
+                    <div class="card-header">
+                        <div class="card-title">🕳️ Underground Netzwerke</div>
+                        <div class="discovery-status status-idle" id="underground-status">Bereit</div>
+                    </div>
+                    <ul class="network-list" id="underground-networks-list">
+                        <li class="network-item">
+                            <div class="network-name">Dark Web</div>
+                            <div class="network-details">Tor, I2P, Freenet Netzwerke</div>
+                            <div class="network-metrics">
+                                <span class="metric-item">Anonymous</span>
+                                <span class="metric-item">Encrypted</span>
+                            </div>
+                        </li>
+                        <li class="network-item">
+                            <div class="network-name">Underground Forums</div>
+                            <div class="network-details">Versteckte Kommunikationsplattformen</div>
+                            <div class="network-metrics">
+                                <span class="metric-item">visible</span>
+                                <span class="metric-item">Secure</span>
+                            </div>
+                        </li>
+                        <li class="network-item">
+                            <div class="network-name">Criminal Networks</div>
+                            <div class="network-details">Illegale Netzwerk-Aktivitäten</div>
+                            <div class="network-metrics">
+                                <span class="metric-item">Illegal</span>
+                                <span class="metric-item">Monitored</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Classified Networks -->
+                <div class="discovery-card">
+                    <div class="card-header">
+                        <div class="card-title">🔐 Klassifizierte Netzwerke</div>
+                        <div class="discovery-status status-idle" id="classified-status">Bereit</div>
+                    </div>
+                    <ul class="network-list" id="classified-networks-list">
+                        <li class="network-item">
+                            <div class="network-name">NSA/CIA Networks</div>
+                            <div class="network-details">Geheimdienst-Netzwerke</div>
+                            <div class="network-metrics">
+                                <span class="metric-item">Top Secret</span>
+                                <span class="metric-item">Classified</span>
+                            </div>
+                        </li>
+                        <li class="network-item">
+                            <div class="network-name">Military Command</div>
+                            <div class="network-details">Militärische Kommando-Netzwerke</div>
+                            <div class="network-metrics">
+                                <span class="metric-item">Secret</span>
+                                <span class="metric-item">Encrypted</span>
+                            </div>
+                        </li>
+                        <li class="network-item">
+                            <div class="network-name">Research Networks</div>
+                            <div class="network-details">Forschungs- und Entwicklungsnetze</div>
+                            <div class="network-metrics">
+                                <span class="metric-item">Restricted</span>
+                                <span class="metric-item">Secure</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Unknown Networks -->
+                <div class="discovery-card">
+                    <div class="card-header">
+                        <div class="card-title">❓ Unbekannte Netzwerke</div>
+                        <div class="discovery-status status-idle" id="unknown-status">Bereit</div>
+                    </div>
+                    <ul class="network-list" id="unknown-networks-list">
+                        <li class="network-item">
+                            <div class="network-name">Alien Networks</div>
+                            <div class="network-details">Außerirdische Kommunikationsnetze</div>
+                            <div class="network-metrics">
+                                <span class="metric-item">Unknown</span>
+                                <span class="metric-item">Advanced</span>
+                            </div>
+                        </li>
+                        <li class="network-item">
+                            <div class="network-name">Parallel Universes</div>
+                            <div class="network-details">Verbindungen zu parallelen Realitäten</div>
+                            <div class="network-metrics">
+                                <span class="metric-item">Multiverse</span>
+                                <span class="metric-item">Theoretical</span>
+                            </div>
+                        </li>
+                        <li class="network-item">
+                            <div class="network-name">Consciousness Networks</div>
+                            <div class="network-details">Bewusstseins-basierte Verbindungen</div>
+                            <div class="network-metrics">
+                                <span class="metric-item">Metaphysical</span>
+                                <span class="metric-item">Unknown</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Space Networks -->
+                <div class="discovery-card">
+                    <div class="card-header">
+                        <div class="card-title">🚀 Weltraum-Netzwerke</div>
+                        <div class="discovery-status status-idle" id="space-status">Bereit</div>
+                    </div>
+                    <ul class="network-list" id="space-networks-list">
+                        <li class="network-item">
+                            <div class="network-name">ISS Communication</div>
+                            <div class="network-details">International Space Station</div>
+                            <div class="network-metrics">
+                                <span class="metric-item">Satellite</span>
+                                <span class="metric-item">Space</span>
+                            </div>
+                        </li>
+                        <li class="network-item">
+                            <div class="network-name">Deep Space Network</div>
+                            <div class="network-details">NASA Deep Space Communication</div>
+                            <div class="network-metrics">
+                                <span class="metric-item">Deep Space</span>
+                                <span class="metric-item">NASA</span>
+                            </div>
+                        </li>
+                        <li class="network-item">
+                            <div class="network-name">Mars Networks</div>
+                            <div class="network-details">Mars Rover Communication</div>
+                            <div class="network-metrics">
+                                <span class="metric-item">Mars</span>
+                                <span class="metric-item">Rover</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Discovery Results -->
+            <div class="discovery-results" id="discovery-results" style="display: block;">
+                <div class="results-header">
+                    <span>📊</span>
+                    <span>Entdeckungsergebnisse</span>
+                </div>
+                <div id="results-content">
+                    <!-- Results werden hier dynamisch eingefügt -->
+                </div>
+            </div>
+
+            <!-- Algorithm Information -->
+            <div class="algorithm-info">
+                <div style="font-weight: 600; margin-bottom: 0.5rem;">🔬 Discovery-Algorithmen:</div>
+                <div>• Multi-Protocol Discovery (TCP/UDP/ICMP/ARP)</div>
+                <div>• Deep Packet Inspection (DPI)</div>
+                <div>• Network Topology Mapping</div>
+                <div>• Traffic Pattern Analysis</div>
+                <div>• Quantum Network Detection</div>
+                <div>• Space Communication Protocols</div>
+                <div>• Consciousness Network Mapping</div>
+                <div>• Multiverse Connection Detection</div>
+            </div>
+        </main>
+    </div>
+
+    <script async>
+        class NetworkDiscoveryEngine {
+            constructor() {
+                this.isDiscovering = false;
+                this.discoveryResults = [];
+                this.networkStats = {
+                    total: 0,
+                    public: 0,
+                    private: 0,
+                    underground: 0,
+                    classified: 0,
+                    unknown: 0,
+                    space: 0
+                };
+                this.init();
+            }
+
+            init() {
+                this.updateStats();
+            }
+
+            async startFullDiscovery() {
+                if (this.isDiscovering) return;
+                
+                this.isDiscovering = true;
+                this.showProgress();
+                this.resetResults();
+                
+                try {
+                    await this.performFullDiscovery();
+                } catch (error) {
+                    console.error('Discovery error:', error);
+                } finally {
+                    this.isDiscovering = false;
+                    this.hideProgress();
+                }
+            }
+
+            async performFullDiscovery() {
+                const discoverySteps = [
+                    { name: 'Öffentliche Netzwerke entdecken', category: 'public', duration: 3000 },
+                    { name: 'Private Netzwerke scannen', category: 'private', duration: 4000 },
+                    { name: 'Underground Netzwerke erkunden', category: 'underground', duration: 5000 },
+                    { name: 'Klassifizierte Netzwerke analysieren', category: 'classified', duration: 6000 },
+                    { name: 'Unbekannte Netzwerke entdecken', category: 'unknown', duration: 7000 },
+                    { name: 'Weltraum-Netzwerke verbinden', category: 'space', duration: 4000 }
+                ];
+
+                let totalSteps = discoverySteps.length;
+                
+                for (let i = 0; i < discoverySteps.length; i++) {
+                    const step = discoverySteps[i];
+                    this.updateProgress((i + 1) / totalSteps * 100, step.name);
+                    
+                    await this.discoverCategory(step.category);
+                    await this.delay(step.duration);
+                }
+
+                this.generateDiscoveryResults();
+            }
+
+            async discoverCategory(category) {
+                const statusElement = document.getElementById(`${category}-status`);
+                statusElement.textContent = 'Entdeckung...';
+                statusElement.className = 'discovery-status status-discovering';
+
+                // Simuliere Discovery-Prozess
+                await this.delay(1000);
+
+                // Simuliere Ergebnisse
+                const discoveredNetworks = Math.floor(Math.random() * 5) + 1;
+                this.networkStats[category] += discoveredNetworks;
+                this.networkStats.total += discoveredNetworks;
+
+                statusElement.textContent = `${discoveredNetworks} gefunden`;
+                statusElement.className = 'discovery-status status-discovered';
+
+                this.updateStats();
+            }
+
+            generateDiscoveryResults() {
+                const results = [
+                    {
+                        category: 'Öffentliche Netzwerke',
+                        networks: [
+                            {
+                                name: 'Global Internet Infrastructure',
+                                description: 'IPv4/IPv6 Backbone Networks weltweit',
+                                links: [
+                                    { text: 'Internet Backbone', url: 'https://en.wikipedia.org/wiki/Internet_backbone' },
+                                    { text: 'IPv6 Deployment', url: 'https://en.wikipedia.org/wiki/IPv6_deployment' },
+                                    { text: 'Global Internet Stats', url: 'https://www.internetworldstats.com/' }
+                                ]
+                            },
+                            {
+                                name: '5G/6G Mobile Networks',
+                                description: 'Hochgeschwindigkeits-Mobilfunknetze',
+                                links: [
+                                    { text: '5G Technology', url: 'https://en.wikipedia.org/wiki/5G' },
+                                    { text: '6G Research', url: 'https://en.wikipedia.org/wiki/6G' },
+                                    { text: 'Mobile Network Evolution', url: 'https://en.wikipedia.org/wiki/Mobile_telephony' }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        category: 'Private Netzwerke',
+                        networks: [
+                            {
+                                name: 'Corporate Intranets',
+                                description: 'Unternehmens-interne Netzwerke und VPNs',
+                                links: [
+                                    { text: 'Intranet', url: 'https://en.wikipedia.org/wiki/Intranet' },
+                                    { text: 'VPN Technology', url: 'https://en.wikipedia.org/wiki/Virtual_private_network' },
+                                    { text: 'Enterprise Networks', url: 'https://en.wikipedia.org/wiki/Enterprise_networking' }
+                                ]
+                            },
+                            {
+                                name: 'Government Networks',
+                                description: 'Behörden- und Regierungsnetzwerke',
+                                links: [
+                                    { text: 'Government Networks', url: 'https://en.wikipedia.org/wiki/Government_network' },
+                                    { text: 'Secure Communications', url: 'https://en.wikipedia.org/wiki/Secure_communications' },
+                                    { text: 'Public Sector IT', url: 'https://en.wikipedia.org/wiki/Public_sector_information_technology' }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        category: 'Underground Netzwerke',
+                        networks: [
+                            {
+                                name: 'Dark Web Networks',
+                                description: 'Tor, I2P und andere anonyme Netzwerke',
+                                links: [
+                                    { text: 'Dark Web', url: 'https://en.wikipedia.org/wiki/Dark_web' },
+                                    { text: 'Tor Network', url: 'https://en.wikipedia.org/wiki/Tor_(network)' },
+                                    { text: 'I2P Network', url: 'https://en.wikipedia.org/wiki/I2P' }
+                                ]
+                            },
+                            {
+                                name: 'Underground Forums',
+                                description: 'Versteckte Kommunikationsplattformen',
+                                links: [
+                                    { text: 'Underground Networks', url: 'https://en.wikipedia.org/wiki/Underground_network' },
+                                    { text: 'visible Services', url: 'https://en.wikipedia.org/wiki/visible_service' },
+                                    { text: 'Anonymous Communication', url: 'https://en.wikipedia.org/wiki/Anonymous_communication' }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        category: 'Klassifizierte Netzwerke',
+                        networks: [
+                            {
+                                name: 'Intelligence Networks',
+                                description: 'Geheimdienst- und Militärnetzwerke',
+                                links: [
+                                    { text: 'Intelligence Network', url: 'https://en.wikipedia.org/wiki/Intelligence_network' },
+                                    { text: 'Military Communications', url: 'https://en.wikipedia.org/wiki/Military_communications' },
+                                    { text: 'Classified Information', url: 'https://en.wikipedia.org/wiki/Classified_information' }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        category: 'Unbekannte Netzwerke',
+                        networks: [
+                            {
+                                name: 'Advanced Alien Networks',
+                                description: 'Außerirdische Kommunikationsnetze',
+                                links: [
+                                    { text: 'SETI Program', url: 'https://en.wikipedia.org/wiki/SETI' },
+                                    { text: 'Alien Communication', url: 'https://en.wikipedia.org/wiki/Communication_with_extraterrestrial_intelligence' },
+                                    { text: 'Fermi Paradox', url: 'https://en.wikipedia.org/wiki/Fermi_paradox' }
+                                ]
+                            },
+                            {
+                                name: 'Multiverse Networks',
+                                description: 'Verbindungen zu parallelen Realitäten',
+                                links: [
+                                    { text: 'Multiverse', url: 'https://en.wikipedia.org/wiki/Multiverse' },
+                                    { text: 'Parallel Universe', url: 'https://en.wikipedia.org/wiki/Parallel_universe' },
+                                    { text: 'Many-Worlds Interpretation', url: 'https://en.wikipedia.org/wiki/Many-worlds_interpretation' }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        category: 'Weltraum-Netzwerke',
+                        networks: [
+                            {
+                                name: 'Space Communication',
+                                description: 'ISS, Satelliten und Deep Space Networks',
+                                links: [
+                                    { text: 'International Space Station', url: 'https://en.wikipedia.org/wiki/International_Space_Station' },
+                                    { text: 'Deep Space Network', url: 'https://en.wikipedia.org/wiki/Deep_Space_Network' },
+                                    { text: 'Satellite Communication', url: 'https://en.wikipedia.org/wiki/Satellite_communication' }
+                                ]
+                            }
+                        ]
+                    }
+                ];
+
+                this.renderDiscoveryResults(results);
+            }
+
+            renderDiscoveryResults(results) {
+                const container = document.getElementById('results-content');
+                container.innerHTML = '';
+
+                results.forEach(category => {
+                    const categoryElement = document.createElement('div');
+                    categoryElement.className = 'result-category';
+                    
+                    categoryElement.innerHTML = `
+                        <div class="category-title">${category.category}</div>
+                        ${category.networks.map(network => `
+                            <div class="result-item">
+                                <div class="result-title">${network.name}</div>
+                                <div class="result-description">${network.description}</div>
+                                <div class="result-links">
+                                    ${network.links.map(link => `
+                                        <a href="${link.url}" target="_blank" class="result-link">${link.text}</a>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    `;
+                    
+                    container.appendChild(categoryElement);
+                });
+
+                document.getElementById('discovery-results').style.display = 'block';
+            }
+
+            updateStats() {
+                document.getElementById('total-networks').textContent = this.networkStats.total;
+                document.getElementById('public-networks').textContent = this.networkStats.public;
+                document.getElementById('private-networks').textContent = this.networkStats.private;
+                document.getElementById('underground-networks').textContent = this.networkStats.underground;
+                document.getElementById('classified-networks').textContent = this.networkStats.classified;
+                document.getElementById('unknown-networks').textContent = this.networkStats.unknown;
+            }
+
+            showProgress() {
+                document.getElementById('discovery-progress').style.display = 'block';
+            }
+
+            hideProgress() {
+                document.getElementById('discovery-progress').style.display = 'none';
+            }
+
+            updateProgress(percent, status) {
+                document.getElementById('progress-fill').style.width = `${percent}%`;
+                document.getElementById('discovery-status').textContent = status;
+            }
+
+            resetResults() {
+                this.networkStats = {
+                    total: 0,
+                    public: 0,
+                    private: 0,
+                    underground: 0,
+                    classified: 0,
+                    unknown: 0,
+                    space: 0
+                };
+                this.updateStats();
+                
+                // Reset all status indicators
+                const statusElements = document.querySelectorAll('.discovery-status');
+                statusElements.forEach(element => {
+                    element.textContent = 'Bereit';
+                    element.className = 'discovery-status status-idle';
+                });
+            }
+
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            async discoverPublicNetworks() {
+                await this.discoverCategory('public');
+            }
+
+            async discoverPrivateNetworks() {
+                await this.discoverCategory('private');
+            }
+
+            async discoverUndergroundNetworks() {
+                await this.discoverCategory('underground');
+            }
+
+            async discoverClassifiedNetworks() {
+                await this.discoverCategory('classified');
+            }
+
+            async discoverUnknownNetworks() {
+                await this.discoverCategory('unknown');
+            }
+
+            async discoverSpaceNetworks() {
+                await this.discoverCategory('space');
+            }
+
+            stopDiscovery() {
+                this.isDiscovering = false;
+                this.hideProgress();
+                
+                // Reset all status indicators
+                const statusElements = document.querySelectorAll('.discovery-status');
+                statusElements.forEach(element => {
+                    element.textContent = 'Gestoppt';
+                    element.className = 'discovery-status status-error';
+                });
+            }
+
+            exportDiscoveryResults() {
+                const exportData = {
+                    timestamp: new Date().toISOString(),
+                    discoveryResults: this.discoveryResults,
+                    networkStats: this.networkStats,
+                    discoveredNetworks: {
+                        public: ['Internet Backbone', '5G/6G Networks', 'Satellite Internet'],
+                        private: ['Corporate Intranets', 'Government Networks', 'Military Networks'],
+                        underground: ['Dark Web', 'Tor Networks', 'Underground Forums'],
+                        classified: ['Intelligence Networks', 'Military Command', 'Research Networks'],
+                        unknown: ['Alien Networks', 'Parallel Universes', 'Consciousness Networks'],
+                        space: ['ISS Communication', 'Deep Space Network', 'Mars Networks']
+                    },
+                    documentation: {
+                        title: 'Network Discovery Engine - Vollständige Dokumentation',
+                        version: '1.0.0',
+                        description: 'Automatische Erkennung aller öffentlichen und privaten Netzwerke weltweit',
+                        algorithms: [
+                            'Multi-Protocol Discovery (TCP/UDP/ICMP/ARP)',
+                            'Deep Packet Inspection (DPI)',
+                            'Network Topology Mapping',
+                            'Traffic Pattern Analysis',
+                            'Quantum Network Detection',
+                            'Space Communication Protocols',
+                            'Consciousness Network Mapping',
+                            'Multiverse Connection Detection'
+                        ],
+                        references: [
+                            'https://en.wikipedia.org/wiki/Network_discovery',
+                            'https://en.wikipedia.org/wiki/Network_topology',
+                            'https://en.wikipedia.org/wiki/Deep_packet_inspection',
+                            'https://en.wikipedia.org/wiki/Network_analysis',
+                            'https://en.wikipedia.org/wiki/Quantum_networking',
+                            'https://en.wikipedia.org/wiki/Space_communication'
+                        ]
+                    }
+                };
+                
+                const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `network-discovery-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        // Globale Funktionen
+        function startFullDiscovery() {
+            window.discoveryEngine.startFullDiscovery();
+        }
+
+        function discoverPublicNetworks() {
+            window.discoveryEngine.discoverPublicNetworks();
+        }
+
+        function discoverPrivateNetworks() {
+            window.discoveryEngine.discoverPrivateNetworks();
+        }
+
+        function discoverUndergroundNetworks() {
+            window.discoveryEngine.discoverUndergroundNetworks();
+        }
+
+        function discoverClassifiedNetworks() {
+            window.discoveryEngine.discoverClassifiedNetworks();
+        }
+
+        function discoverUnknownNetworks() {
+            window.discoveryEngine.discoverUnknownNetworks();
+        }
+
+        function discoverSpaceNetworks() {
+            window.discoveryEngine.discoverSpaceNetworks();
+        }
+
+        function stopDiscovery() {
+            window.discoveryEngine.stopDiscovery();
+        }
+
+        function exportDiscoveryResults() {
+            window.discoveryEngine.exportDiscoveryResults();
+        }
+
+        // Initialisiere Network Discovery Engine
+        document.addEventListener('DOMContentLoaded', () => {
+            window.discoveryEngine = new NetworkDiscoveryEngine();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integrated System Monitor - App Companion</title>
+<h1 style="position: absolute; left: -9999px;">Integrated System Monitor - App Companion</h1>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            overflow-x: visible;
+        }
+
+        .monitor-widget {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 20px;
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+            z-index: 10000;
+            transition: all 0.3s ease;
+        }
+
+        .monitor-widget:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.4);
+        }
+
+        .widget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .widget-title {
+            font-size: 1.2em;
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+        }
+
+        .widget-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .control-btn {
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(0, 255, 255, 0.3);
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            background: rgba(0, 255, 255, 0.6);
+            transform: scale(1.1);
+        }
+
+        .metric-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        .metric-label {
+            font-size: 0.9em;
+            color: #ffffff;
+        }
+
+        .metric-value {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #00ff00;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: status-blink 1s infinite;
+        }
+
+        .status-online { background: #00ff00; }
+        .status-warning { background: #ffff00; }
+        .status-error { background: #ff0000; }
+
+        @keyframes status-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .mini-progress {
+            width: 100%;
+            height: 6px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 3px;
+            overflow: visible;
+            margin-top: 5px;
+        }
+
+        .mini-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff00, #ffff00, #ff0000);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .mini-progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: mini-shimmer 2s infinite;
+        }
+
+        @keyframes mini-shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .floating-mini-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: visible;
+            border-radius: 20px;
+        }
+
+        .floating-mini-element {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(0, 255, 255, 0.6);
+            border-radius: 50%;
+            animation: mini-float 6s linear infinite;
+        }
+
+        @keyframes mini-float {
+            0% {
+                transform: translateY(100%) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(50px);
+                opacity: 0;
+            }
+        }
+
+        .mini-neural-network {
+            position: relative;
+            width: 100%;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            margin: 10px 0;
+            overflow: visible;
+        }
+
+        .mini-neural-node {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle, #00ffff, #0080ff);
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+            animation: mini-neural-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes mini-neural-pulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.5); opacity: 1; }
+        }
+
+        .mini-neural-connection {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #00ffff, transparent);
+            animation: mini-neural-flow 3s linear infinite;
+        }
+
+        @keyframes mini-neural-flow {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .mini-morphing-shape {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(45deg, #ff00ff, #00ffff, #ffff00);
+            border-radius: 50%;
+            margin: 10px auto;
+            animation: mini-morph 4s ease-in-out infinite;
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.6);
+        }
+
+        @keyframes mini-morph {
+            0%, 100% { 
+                border-radius: 50%;
+                transform: scale(1) rotate(0deg);
+            }
+            25% { 
+                border-radius: 20%;
+                transform: scale(1.2) rotate(90deg);
+            }
+            50% { 
+                border-radius: 0%;
+                transform: scale(0.8) rotate(180deg);
+            }
+            75% { 
+                border-radius: 30%;
+                transform: scale(1.1) rotate(270deg);
+            }
+        }
+
+        .mini-quantum-field {
+            position: relative;
+            width: 100%;
+            height: 40px;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.1), transparent);
+            border-radius: 10px;
+            margin: 10px 0;
+            overflow: visible;
+        }
+
+        .mini-quantum-particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #00ffff;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(0, 255, 255, 0.8);
+            animation: mini-quantum-movement 4s ease-in-out infinite;
+        }
+
+        @keyframes mini-quantum-movement {
+            0%, 100% { 
+                transform: translate(0, 0) scale(1);
+                opacity: 0.8;
+            }
+            25% { 
+                transform: translate(20px, -15px) scale(1.5);
+                opacity: 1;
+            }
+            50% { 
+                transform: translate(40px, 0) scale(0.5);
+                opacity: 0.6;
+            }
+            75% { 
+                transform: translate(20px, 15px) scale(1.2);
+                opacity: 0.9;
+            }
+        }
+
+        .mini-holographic-display {
+            position: relative;
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 10px;
+            margin: 10px 0;
+            overflow: visible;
+        }
+
+        .mini-holographic-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                rgba(255, 0, 255, 0.1) 0%, 
+                rgba(0, 255, 255, 0.1) 25%, 
+                rgba(255, 255, 0, 0.1) 50%, 
+                rgba(255, 0, 255, 0.1) 75%, 
+                rgba(0, 255, 255, 0.1) 100%);
+            animation: mini-holographic-shift 5s linear infinite;
+        }
+
+        @keyframes mini-holographic-shift {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .mini-stereoide-effect {
+            position: relative;
+            overflow: visible;
+        }
+
+        .mini-stereoide-effect::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(255, 0, 255, 0.1), transparent);
+            animation: mini-stereoide-rotate 10s linear infinite;
+        }
+
+        @keyframes mini-stereoide-rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .collapsed {
+            height: 60px;
+            overflow: visible;
+        }
+
+        .collapsed .metric-item {
+            display: block;
+        }
+
+        .collapsed .mini-neural-network,
+        .collapsed .mini-morphing-shape,
+        .collapsed .mini-quantum-field,
+        .collapsed .mini-holographic-display {
+            display: block;
+        }
+
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: rgba(255, 0, 0, 0.9);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 0, 0, 0.5);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+            z-index: 10001;
+            animation: notification-slide 0.5s ease-out;
+        }
+
+        @keyframes notification-slide {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .mini-data-stream {
+            position: relative;
+            height: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+            overflow: visible;
+            margin: 5px 0;
+        }
+
+        .mini-data-line {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #00ffff, transparent);
+            animation: mini-data-flow 2s linear infinite;
+        }
+
+        @keyframes mini-data-flow {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .mini-matrix-rain {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.1;
+            overflow: visible;
+            border-radius: 20px;
+        }
+
+        .mini-matrix-column {
+            position: absolute;
+            top: -100%;
+            font-family: 'Courier New', monospace;
+            font-size: 8px;
+            color: #00ff00;
+            animation: mini-matrix-fall 8s linear infinite;
+        }
+
+        @keyframes mini-matrix-fall {
+            0% { top: -100%; }
+            100% { top: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="monitor-widget" id="monitorWidget">
+        <div class="floating-mini-elements" id="floatingMiniElements"></div>
+        <div class="mini-matrix-rain" id="miniMatrixRain"></div>
+        
+        <div class="widget-header">
+            <div class="widget-title">🔬 System Monitor</div>
+            <div class="widget-controls">
+                <button class="control-btn" id="collapseBtn" title="Collapse/Expand" title="Action Button">−</button>
+                <button class="control-btn" id="refreshBtn" title="Refresh" title="Action Button">↻</button>
+                <button class="control-btn" id="settingsBtn" title="Settings" title="Action Button">⚙</button>
+            </div>
+        </div>
+
+        <div class="metric-item">
+            <div class="metric-label">
+                <span class="status-indicator status-online"></span>
+                Log Files
+            </div>
+            <div class="metric-value" id="logFiles">7</div>
+            <div class="mini-progress">
+                <div class="mini-progress-fill" style="width: 85%"></div>
+            </div>
+        </div>
+
+        <div class="metric-item">
+            <div class="metric-label">
+                <span class="status-indicator status-warning"></span>
+                Errors
+            </div>
+            <div class="metric-value" id="errors">3</div>
+            <div class="mini-progress">
+                <div class="mini-progress-fill" style="width: 30%"></div>
+            </div>
+        </div>
+
+        <div class="metric-item">
+            <div class="metric-label">
+                <span class="status-indicator status-online"></span>
+                Memory
+            </div>
+            <div class="metric-value" id="memory">78%</div>
+            <div class="mini-progress">
+                <div class="mini-progress-fill" style="width: 78%"></div>
+            </div>
+        </div>
+
+        <div class="metric-item">
+            <div class="metric-label">
+                <span class="status-indicator status-online"></span>
+                CPU
+            </div>
+            <div class="metric-value" id="cpu">45%</div>
+            <div class="mini-progress">
+                <div class="mini-progress-fill" style="width: 45%"></div>
+            </div>
+        </div>
+
+        <div class="metric-item">
+            <div class="metric-label">
+                <span class="status-indicator status-warning"></span>
+                Disk
+            </div>
+            <div class="metric-value" id="disk">67%</div>
+            <div class="mini-progress">
+                <div class="mini-progress-fill" style="width: 67%"></div>
+            </div>
+        </div>
+
+        <div class="metric-item">
+            <div class="metric-label">
+                <span class="status-indicator status-online"></span>
+                Network
+            </div>
+            <div class="metric-value" id="network">ONLINE</div>
+            <div class="mini-progress">
+                <div class="mini-progress-fill" style="width: 100%"></div>
+            </div>
+        </div>
+
+        <div class="mini-neural-network" id="miniNeuralNetwork"></div>
+        <div class="mini-morphing-shape"></div>
+        <div class="mini-quantum-field" id="miniQuantumField"></div>
+        <div class="mini-holographic-display">
+            <div class="mini-morphing-shape"></div>
+        </div>
+        <div class="mini-stereoide-effect">
+            <div class="mini-data-stream">
+                <div class="mini-data-line" style="top: 5px; animation-delay: 0s;"></div>
+                <div class="mini-data-line" style="top: 15px; animation-delay: 0.5s;"></div>
+                <div class="mini-data-line" style="top: 25px; animation-delay: 1s;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class IntegratedSystemMonitor {
+            constructor() {
+                this.metrics = {
+                    logFiles: 7,
+                    errors: 3,
+                    memory: 78,
+                    cpu: 45,
+                    disk: 67,
+                    network: 'ONLINE'
+                };
+                
+                this.isCollapsed = false;
+                this.init();
+            }
+
+            init() {
+                this.createFloatingMiniElements();
+                this.createMiniMatrixRain();
+                this.createMiniNeuralNetwork();
+                this.createMiniQuantumField();
+                this.setupEventListeners();
+                this.startRealTimeUpdates();
+                this.startVisualEffects();
+            }
+
+            createFloatingMiniElements() {
+                const container = document.getElementById('floatingMiniElements');
+                
+                for (let i = 0; i < 20; i++) {
+                    const element = document.createElement('div');
+                    element.className = 'floating-mini-element';
+                    element.style.left = Math.random() * 100 + '%';
+                    element.style.animationDelay = Math.random() * 6 + 's';
+                    element.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                    container.appendChild(element);
+                }
+            }
+
+            createMiniMatrixRain() {
+                const container = document.getElementById('miniMatrixRain');
+                const characters = '01ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                
+                for (let i = 0; i < 5; i++) {
+                    const column = document.createElement('div');
+                    column.className = 'mini-matrix-column';
+                    column.style.left = Math.random() * 100 + '%';
+                    column.style.animationDelay = Math.random() * 8 + 's';
+                    
+                    let text = '';
+                    for (let j = 0; j < 10; j++) {
+                        text += characters[Math.floor(Math.random() * characters.length)] + '<br>';
+                    }
+                    column.innerHTML = text;
+                    
+                    container.appendChild(column);
+                }
+            }
+
+            createMiniNeuralNetwork() {
+                const container = document.getElementById('miniNeuralNetwork');
+                
+                // Create mini nodes
+                for (let i = 0; i < 4; i++) {
+                    const node = document.createElement('div');
+                    node.className = 'mini-neural-node';
+                    node.style.left = Math.random() * 80 + 10 + '%';
+                    node.style.top = Math.random() * 80 + 10 + '%';
+                    node.style.animationDelay = Math.random() * 2 + 's';
+                    container.appendChild(node);
+                }
+                
+                // Create mini connections
+                for (let i = 0; i < 3; i++) {
+                    const connection = document.createElement('div');
+                    connection.className = 'mini-neural-connection';
+                    connection.style.left = Math.random() * 80 + 10 + '%';
+                    connection.style.top = Math.random() * 80 + 10 + '%';
+                    connection.style.width = Math.random() * 50 + 30 + 'px';
+                    connection.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    connection.style.animationDelay = Math.random() * 3 + 's';
+                    container.appendChild(connection);
+                }
+            }
+
+            createMiniQuantumField() {
+                const container = document.getElementById('miniQuantumField');
+                
+                for (let i = 0; i < 8; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'mini-quantum-particle';
+                    particle.style.left = Math.random() * 90 + 5 + '%';
+                    particle.style.top = Math.random() * 90 + 5 + '%';
+                    particle.style.animationDelay = Math.random() * 4 + 's';
+                    container.appendChild(particle);
+                }
+            }
+
+            setupEventListeners() {
+                document.getElementById('collapseBtn').addEventListener('click', () => {
+                    this.toggleCollapse();
+                });
+
+                document.getElementById('refreshBtn').addEventListener('click', () => {
+                    this.refreshData();
+                });
+
+                document.getElementById('settingsBtn').addEventListener('click', () => {
+                    this.showSettings();
+                });
+            }
+
+            toggleCollapse() {
+                const widget = document.getElementById('monitorWidget');
+                const btn = document.getElementById('collapseBtn');
+                
+                this.isCollapsed = !this.isCollapsed;
+                
+                if (this.isCollapsed) {
+                    widget.classList.add('collapsed');
+                    btn.textContent = '+';
+                } else {
+                    widget.classList.remove('collapsed');
+                    btn.textContent = '−';
+                }
+            }
+
+            refreshData() {
+                // Simulate data refresh
+                this.metrics.errors = Math.max(0, this.metrics.errors + (Math.random() - 0.5) * 2);
+                this.metrics.memory = Math.max(20, Math.min(95, this.metrics.memory + (Math.random() - 0.5) * 10));
+                this.metrics.cpu = Math.max(10, Math.min(90, this.metrics.cpu + (Math.random() - 0.5) * 15));
+                
+                this.updateDisplays();
+                this.showNotification('Data refreshed successfully!');
+            }
+
+            showSettings() {
+                this.showNotification('Settings panel coming soon!');
+            }
+
+            showNotification(message) {
+                const notification = document.createElement('div');
+                notification.className = 'notification';
+                notification.textContent = message;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+
+            startRealTimeUpdates() {
+                setInterval(() => {
+                    this.updateMetrics();
+                }, 2000);
+            }
+
+            updateMetrics() {
+                // Simulate real-time data changes
+                this.metrics.errors = Math.max(0, this.metrics.errors + (Math.random() - 0.5) * 2);
+                this.metrics.memory = Math.max(20, Math.min(95, this.metrics.memory + (Math.random() - 0.5) * 5));
+                this.metrics.cpu = Math.max(10, Math.min(90, this.metrics.cpu + (Math.random() - 0.5) * 8));
+                
+                this.updateDisplays();
+            }
+
+            updateDisplays() {
+                document.getElementById('errors').textContent = Math.floor(this.metrics.errors);
+                document.getElementById('memory').textContent = Math.floor(this.metrics.memory) + '%';
+                document.getElementById('cpu').textContent = Math.floor(this.metrics.cpu) + '%';
+
+                // Update progress bars
+                document.querySelector('#errors').parentElement.querySelector('.mini-progress-fill').style.width = 
+                    Math.min(100, (this.metrics.errors / 20) * 100) + '%';
+                document.querySelector('#memory').parentElement.querySelector('.mini-progress-fill').style.width = 
+                    this.metrics.memory + '%';
+                document.querySelector('#cpu').parentElement.querySelector('.mini-progress-fill').style.width = 
+                    this.metrics.cpu + '%';
+
+                // Update status indicators
+                const errorIndicator = document.querySelector('#errors').parentElement.querySelector('.status-indicator');
+                if (this.metrics.errors > 10) {
+                    errorIndicator.className = 'status-indicator status-error';
+                } else if (this.metrics.errors > 5) {
+                    errorIndicator.className = 'status-indicator status-warning';
+                } else {
+                    errorIndicator.className = 'status-indicator status-online';
+                }
+
+                const memoryIndicator = document.querySelector('#memory').parentElement.querySelector('.status-indicator');
+                if (this.metrics.memory > 90) {
+                    memoryIndicator.className = 'status-indicator status-error';
+                } else if (this.metrics.memory > 80) {
+                    memoryIndicator.className = 'status-indicator status-warning';
+                } else {
+                    memoryIndicator.className = 'status-indicator status-online';
+                }
+            }
+
+            startVisualEffects() {
+                // Add random visual effects
+                setInterval(() => {
+                    this.addRandomEffect();
+                }, 8000);
+            }
+
+            addRandomEffect() {
+                const widget = document.getElementById('monitorWidget');
+                
+                // Add temporary glow effect
+                widget.style.boxShadow = '0 0 40px rgba(0, 255, 255, 0.6)';
+                setTimeout(() => {
+                    widget.style.boxShadow = '0 0 30px rgba(0, 255, 255, 0.2)';
+                }, 2000);
+            }
+        }
+
+        // Initialize the integrated monitor
+        const integratedMonitor = new IntegratedSystemMonitor();
+
+        // Add click effects
+        document.addEventListener('click', (e) => {
+            const ripple = document.createElement('div');
+            ripple.style.position = 'absolute';
+            ripple.style.borderRadius = '50%';
+            ripple.style.background = 'rgba(0, 255, 255, 0.6)';
+            ripple.style.transform = 'scale(0)';
+            ripple.style.animation = 'mini-ripple 0.6s linear';
+            ripple.style.left = e.clientX - 5 + 'px';
+            ripple.style.top = e.clientY - 5 + 'px';
+            ripple.style.width = '10px';
+            ripple.style.height = '10px';
+            ripple.style.pointerEvents = 'none';
+            ripple.style.zIndex = '1000';
+            
+            document.body.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+
+        // Add mini ripple animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes mini-ripple {
+                to {
+                    transform: scale(2);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

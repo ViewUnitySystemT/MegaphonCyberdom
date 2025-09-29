@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔌 Persistent Connections Demo</title>
+<h1 style="position: absolute; left: -9999px;">🔌 Persistent Connections Demo</h1>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .demo-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .demo-title {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+        
+        .demo-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+        
+        .demo-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+        
+        .demo-btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+        
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+        
+        .demo-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .demo-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .demo-btn.danger {
+            background: linear-gradient(45deg, #ef4444, #dc2626);
+        }
+        
+        .demo-info {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            margin-bottom: 2rem;
+        }
+        
+        .demo-info h3 {
+            margin-top: 0;
+            color: #3b82f6;
+        }
+        
+        .connection-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .status-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .status-card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .status-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .status-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #3b82f6;
+        }
+        
+        .status-description {
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-indicator.active {
+            background: #10b981;
+            box-shadow: 0 0 12px #10b981;
+        }
+        
+        .status-indicator.disconnected {
+            background: #ef4444;
+            box-shadow: 0 0 12px #ef4444;
+        }
+        
+        .status-indicator.reconnecting {
+            background: #f59e0b;
+            box-shadow: 0 0 12px #f59e0b;
+        }
+        
+        .connection-list {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .connection-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .connection-item:last-child {
+            border-bottom: none;
+        }
+        
+        .connection-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .connection-metrics {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 10000;
+            max-width: 300px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+        
+        .app-status {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            z-index: 10000;
+        }
+        
+        .app-status.background {
+            background: rgba(245, 158, 11, 0.8);
+        }
+        
+        .app-status.foreground {
+            background: rgba(16, 185, 129, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-status" id="appStatus">App: Aktiv</div>
+    
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1 class="demo-title">🔌 Persistent Connections</h1>
+            <p class="demo-subtitle">Verbindungen bleiben auch nach App-Schließung aktiv • Service Worker • Background Sync</p>
+        </div>
+        
+        <div class="demo-controls">
+            <button class="demo-btn" onclick="startPersistentConnections()" title="Action Button">
+                🚀 Persistent Connections starten
+            </button>
+            <button class="demo-btn secondary" onclick="simulateWebRTC()" title="Action Button">
+                📹 WebRTC simulieren
+            </button>
+            <button class="demo-btn secondary" onclick="simulateWebSocket()" title="Action Button">
+                🔌 WebSocket simulieren
+            </button>
+            <button class="demo-btn secondary" onclick="simulateBCI()" title="Action Button">
+                🧠 BCI simulieren
+            </button>
+            <button class="demo-btn secondary" onclick="simulateMedical()" title="Action Button">
+                🏥 Medizinische Geräte simulieren
+            </button>
+            <button class="demo-btn danger" onclick="disconnectAll()" title="Action Button">
+                🔌 Alle Verbindungen trennen
+            </button>
+        </div>
+        
+        <div class="demo-info">
+            <h3>🎯 Wie funktionieren Persistent Connections?</h3>
+            <p>Das System hält Verbindungen auch nach App-Schließung aufrecht:</p>
+            <ul>
+                <li><strong>Service Worker:</strong> Läuft im Hintergrund und überwacht Verbindungen</li>
+                <li><strong>Background Sync:</strong> Synchronisiert Daten auch offline</li>
+                <li><strong>Visibility API:</strong> Erkennt wenn App im Hintergrund ist</li>
+                <li><strong>Reconnect-Logik:</strong> Automatische Wiederherstellung getrennter Verbindungen</li>
+                <li><strong>Keep-Alive:</strong> Regelmäßige Signale zur Verbindungsaufrechterhaltung</li>
+            </ul>
+        </div>
+        
+        <div class="connection-status">
+            <div class="status-card">
+                <div class="status-icon">🌐</div>
+                <div class="status-title">WebRTC-Verbindungen</div>
+                <div class="status-description">
+                    <span class="status-indicator" id="webrtcStatus"></span>
+                    Peer-to-Peer Verbindungen für Echtzeit-Kommunikation
+                </div>
+            </div>
+            
+            <div class="status-card">
+                <div class="status-icon">🔌</div>
+                <div class="status-title">WebSocket-Verbindungen</div>
+                <div class="status-description">
+                    <span class="status-indicator" id="websocketStatus"></span>
+                    Bidirektionale Kommunikation mit dem Server
+                </div>
+            </div>
+            
+            <div class="status-card">
+                <div class="status-icon">🧠</div>
+                <div class="status-title">BCI/EEG-Verbindungen</div>
+                <div class="status-description">
+                    <span class="status-indicator" id="bciStatus"></span>
+                    Brain-Computer Interface für Gedankensteuerung
+                </div>
+            </div>
+            
+            <div class="status-card">
+                <div class="status-icon">🏥</div>
+                <div class="status-title">Medizinische Geräte</div>
+                <div class="status-description">
+                    <span class="status-indicator" id="medicalStatus"></span>
+                    MRI, Ultraschall und andere medizinische Geräte
+                </div>
+            </div>
+        </div>
+        
+        <div class="connection-list">
+            <h3>📊 Aktive Verbindungen</h3>
+            <div id="connectionList">
+                <div class="connection-item">
+                    <div class="connection-info">
+                        <span>Keine aktiven Verbindungen</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="demo-info">
+            <h3>🧪 Test-Anweisungen</h3>
+            <ol>
+                <li><strong>Verbindungen starten:</strong> Klicken Sie auf "Persistent Connections starten"</li>
+                <li><strong>Verschiedene Verbindungen simulieren:</strong> WebRTC, WebSocket, BCI, Medizinische Geräte</li>
+                <li><strong>App minimieren:</strong> Minimieren Sie das Browser-Fenster</li>
+                <li><strong>Tab wechseln:</strong> Wechseln Sie zu einem anderen Tab</li>
+                <li><strong>App schließen:</strong> Schließen Sie den Browser (Service Worker läuft weiter)</li>
+                <li><strong>App wieder öffnen:</strong> Verbindungen werden automatisch wiederhergestellt</li>
+            </ol>
+        </div>
+    </div>
+
+    <script src="/web/shared/persistent-connections.js"></script>
+    <script>
+        let persistentConnections = null;
+        let connections = new Map();
+        let appStatus = 'foreground';
+        
+        // App-Status überwachen
+        document.addEventListener('visibilitychange', () => {
+            if (document.visible) {
+                appStatus = 'background';
+                updateAppStatus('App: Hintergrund');
+                showNotification('App im Hintergrund', 'Verbindungen werden aufrechterhalten', 'info');
+            } else {
+                appStatus = 'foreground';
+                updateAppStatus('App: Aktiv');
+                showNotification('App im Vordergrund', 'Alle Verbindungen aktiv', 'success');
+            }
+        });
+        
+        window.addEventListener('focus', () => {
+            appStatus = 'foreground';
+            updateAppStatus('App: Fokussiert');
+        });
+        
+        window.addEventListener('blur', () => {
+            appStatus = 'background';
+            updateAppStatus('App: Verlassen');
+        });
+        
+        function updateAppStatus(status) {
+            const statusEl = document.getElementById('appStatus');
+            statusEl.textContent = status;
+            statusEl.className = `app-status ${appStatus}`;
+        }
+        
+        async function startPersistentConnections() {
+            try {
+                if (persistentConnections) {
+                    showNotification('Bereits aktiv', 'Persistent Connections laufen bereits', 'info');
+                    return;
+                }
+                
+                console.log('🚀 Starting Persistent Connections...');
+                
+                // Service Worker registrieren
+                if ('serviceWorker' in navigator) {
+                    try {
+                        const registration = await navigator.serviceWorker.register('/sw-persistent.js');
+                        console.log('✅ Service Worker registriert:', registration);
+                    } catch (error) {
+                        console.warn('⚠️ Service Worker nicht verfügbar:', error);
+                    }
+                }
+                
+                // Persistent Connections initialisieren
+                persistentConnections = new PersistentConnections();
+                
+                // Connection Status Updates
+                setInterval(() => {
+                    updateConnectionStatus();
+                }, 2000);
+                
+                showNotification('Persistent Connections gestartet', 'Service Worker aktiv', 'success');
+                
+            } catch (error) {
+                console.error('❌ Failed to start Persistent Connections:', error);
+                showNotification('Fehler beim Starten', error.message, 'error');
+            }
+        }
+        
+        function simulateWebRTC() {
+            if (!persistentConnections) {
+                showNotification('System nicht aktiv', 'Starten Sie zuerst Persistent Connections', 'error');
+                return;
+            }
+            
+            // Simulate WebRTC connection
+            const mockPeerConnection = {
+                connectionState: 'connected',
+                getSenders: () => [],
+                close: () => console.log('WebRTC connection closed'),
+                dataChannel: {
+                    send: (data) => console.log('WebRTC data sent:', data)
+                }
+            };
+            
+            const connectionId = persistentConnections.registerWebRTCConnection(mockPeerConnection, {
+                url: 'wss://example.com/webrtc'
+            });
+            
+            connections.set(connectionId, {
+                id: connectionId,
+                type: 'webrtc',
+                status: 'active',
+                name: 'WebRTC Peer Connection',
+                lastActivity: Date.now()
+            });
+            
+            updateConnectionList();
+            updateStatusIndicator('webrtcStatus', 'active');
+            showNotification('WebRTC simuliert', 'Peer-to-Peer Verbindung aktiv', 'success');
+        }
+        
+        function simulateWebSocket() {
+            if (!persistentConnections) {
+                showNotification('System nicht aktiv', 'Starten Sie zuerst Persistent Connections', 'error');
+                return;
+            }
+            
+            // Simulate WebSocket connection
+            const mockWebSocket = {
+                readyState: WebSocket.OPEN,
+                send: (data) => console.log('WebSocket data sent:', data),
+                close: () => console.log('WebSocket connection closed')
+            };
+            
+            const connectionId = persistentConnections.registerWebSocketConnection(mockWebSocket, {
+                url: 'wss://example.com/websocket'
+            });
+            
+            connections.set(connectionId, {
+                id: connectionId,
+                type: 'websocket',
+                status: 'active',
+                name: 'WebSocket Server Connection',
+                lastActivity: Date.now()
+            });
+            
+            updateConnectionList();
+            updateStatusIndicator('websocketStatus', 'active');
+            showNotification('WebSocket simuliert', 'Server-Verbindung aktiv', 'success');
+        }
+        
+        function simulateBCI() {
+            if (!persistentConnections) {
+                showNotification('System nicht aktiv', 'Starten Sie zuerst Persistent Connections', 'error');
+                return;
+            }
+            
+            // Simulate BCI device
+            const mockBCIDevice = {
+                connect: () => console.log('BCI device connected'),
+                disconnect: () => console.log('BCI device disconnected'),
+                reconnect: () => console.log('BCI device reconnected'),
+                getSignal: () => Math.random() * 100
+            };
+            
+            const connectionId = persistentConnections.registerBCIConnection(mockBCIDevice, {
+                channels: 8,
+                sampleRate: 250
+            });
+            
+            connections.set(connectionId, {
+                id: connectionId,
+                type: 'bci',
+                status: 'active',
+                name: 'BCI/EEG Device',
+                lastActivity: Date.now()
+            });
+            
+            updateConnectionList();
+            updateStatusIndicator('bciStatus', 'active');
+            showNotification('BCI simuliert', 'Brain-Computer Interface aktiv', 'success');
+        }
+        
+        function simulateMedical() {
+            if (!persistentConnections) {
+                showNotification('System nicht aktiv', 'Starten Sie zuerst Persistent Connections', 'error');
+                return;
+            }
+            
+            // Simulate medical device
+            const mockMedicalDevice = {
+                connect: () => console.log('Medical device connected'),
+                disconnect: () => console.log('Medical device disconnected'),
+                reconnect: () => console.log('Medical device reconnected'),
+                getData: () => ({ type: 'MRI', slices: 100 })
+            };
+            
+            const connectionId = persistentConnections.registerMedicalConnection(mockMedicalDevice, {
+                type: 'MRI',
+                resolution: '512x512'
+            });
+            
+            connections.set(connectionId, {
+                id: connectionId,
+                type: 'medical',
+                status: 'active',
+                name: 'MRI Scanner',
+                lastActivity: Date.now()
+            });
+            
+            updateConnectionList();
+            updateStatusIndicator('medicalStatus', 'active');
+            showNotification('Medizinische Geräte simuliert', 'MRI Scanner aktiv', 'success');
+        }
+        
+        function disconnectAll() {
+            if (!persistentConnections) {
+                showNotification('System nicht aktiv', 'Keine Verbindungen zu trennen', 'info');
+                return;
+            }
+            
+            persistentConnections.disconnectAll();
+            connections.clear();
+            updateConnectionList();
+            
+            // Reset all status indicators
+            updateStatusIndicator('webrtcStatus', 'disconnected');
+            updateStatusIndicator('websocketStatus', 'disconnected');
+            updateStatusIndicator('bciStatus', 'disconnected');
+            updateStatusIndicator('medicalStatus', 'disconnected');
+            
+            showNotification('Alle Verbindungen getrennt', 'System zurückgesetzt', 'info');
+        }
+        
+        function updateConnectionStatus() {
+            if (persistentConnections) {
+                const status = persistentConnections.getConnectionStatus();
+                
+                // Update connection list with real status
+                connections.forEach((connection, id) => {
+                    const realConnection = status.connections.find(c => c.id === id);
+                    if (realConnection) {
+                        connection.status = realConnection.status;
+                        connection.lastActivity = realConnection.lastActivity;
+                    }
+                });
+                
+                updateConnectionList();
+            }
+        }
+        
+        function updateConnectionList() {
+            const listEl = document.getElementById('connectionList');
+            
+            if (connections.size === 0) {
+                listEl.innerHTML = `
+                    <div class="connection-item">
+                        <div class="connection-info">
+                            <span>Keine aktiven Verbindungen</span>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            const connectionsHtml = Array.from(connections.values()).map(connection => {
+                const statusClass = connection.status === 'active' ? 'active' : 
+                                  connection.status === 'disconnected' ? 'disconnected' : 'reconnecting';
+                
+                const timeAgo = Math.floor((Date.now() - connection.lastActivity) / 1000);
+                
+                return `
+                    <div class="connection-item">
+                        <div class="connection-info">
+                            <span class="status-indicator ${statusClass}"></span>
+                            <span>${connection.name}</span>
+                        </div>
+                        <div class="connection-metrics">
+                            ${connection.status} • ${timeAgo}s ago
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            listEl.innerHTML = connectionsHtml;
+        }
+        
+        function updateStatusIndicator(elementId, status) {
+            const indicator = document.getElementById(elementId);
+            indicator.className = `status-indicator ${status}`;
+        }
+        
+        function showNotification(title, message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.innerHTML = `
+                <div style="font-weight: 600; margin-bottom: 4px;">${title}</div>
+                <div style="opacity: 0.9; font-size: 0.9rem;">${message}</div>
+            `;
+            
+            notification.style.background = type === 'success' ? '#10b981' : 
+                                          type === 'error' ? '#ef4444' : 
+                                          type === 'warning' ? '#f59e0b' : '#3b82f6';
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Auto-start nach 2 Sekunden
+        setTimeout(() => {
+            startPersistentConnections();
+        }, 2000);
+    </script>
+</body>
+</html>

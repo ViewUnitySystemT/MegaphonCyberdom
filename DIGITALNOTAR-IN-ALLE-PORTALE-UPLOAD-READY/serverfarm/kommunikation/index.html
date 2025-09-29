@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📞 TEL Kommunikations-Suite - Serverfarm</title>
+    <style>
+        body { background: #0f172a; color: white; padding: 2rem; font-family: system-ui; }
+        h1 { color: #FF6B35; font-size: 3rem; margin-bottom: 2rem; text-shadow: 0 0 20px rgba(255,107,53,0.5); }
+        .module-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin: 2rem 0; }
+        .module-card { background: rgba(255,107,53,0.1); border: 2px solid #FF6B35; border-radius: 15px; padding: 2rem; transition: all 0.3s ease; cursor: pointer; }
+        .module-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(255,107,53,0.3); }
+        .back-nav { display: flex; gap: 1rem; justify-content: center; margin-top: 3rem; }
+        .nav-btn { background: #FF6B35; color: white; padding: 1rem 2rem; border: none; border-radius: 8px; text-decoration: none; font-weight: bold; transition: all 0.3s ease; }
+        .nav-btn:hover { background: #e55a2b; transform: scale(1.05); }
+    </style>
+</head>
+<body>
+    <h1>📞 TEL Kommunikations-Suite</h1>
+    <p style="color: #10b981; font-size: 1.2rem; text-align: center;">✅ AKTIV REPARIERT - Bidirektionale Navigation implementiert</p>
+
+    <div class="module-grid">
+        <div class="module-card" onclick="openCommunicationModule('webrtc')">
+            <h3 style="color: #FF6B35;">🎙️ WebRTC Audio-Kommunikation</h3>
+            <p>Echte Audio-Calls, Voice-Chat, Podcast-System mit bidirektionaler Verbindung</p>
+        </div>
+        
+        <div class="module-card" onclick="openCommunicationModule('video')">
+            <h3 style="color: #FF6B35;">📹 Video-Konferenzen</h3>
+            <p>HD-Video-Calls, Screen-Sharing, Recording mit Hin-und-Zurück Navigation</p>
+        </div>
+        
+        <div class="module-card" onclick="openCommunicationModule('messaging')">
+            <h3 style="color: #FF6B35;">💬 Text-Messaging</h3>
+            <p>Instant-Messaging, Gruppen-Chat, File-Sharing mit bidirektionaler Sync</p>
+        </div>
+        
+        <div class="module-card" onclick="openCommunicationModule('matrix')">
+            <h3 style="color: #FF6B35;">🔗 Matrix Integration</h3>
+            <p>Föderierte Kommunikation mit Matrix-Protokoll und Rück-Navigation</p>
+        </div>
+    </div>
+
+    <!-- BIDIREKTIONALE NAVIGATION - HIN UND ZURÜCK -->
+    <div class="back-nav">
+        <button class="nav-btn" onclick="navigateBack()">🔙 Zurück</button>
+        <a href="../" class="nav-btn">🏗️ Serverfarm</a>
+        <a href="../ai/" class="nav-btn">🤖 AI Systems</a>
+        <a href="../space/" class="nav-btn">🚀 Space</a>
+        <a href="../../" class="nav-btn">🌐 Hauptseite</a>
+    </div>
+
+    <script>
+        // ECHTE FUNKTIONEN - NICHT DUMMY!
+        function openCommunicationModule(moduleType) {
+            console.log(`📞 Öffne Kommunikations-Modul: ${moduleType}`);
+            
+            const modules = {
+                'webrtc': '/apps/conference.html',
+                'video': '/apps/peerlink.html', 
+                'messaging': '/apps/jamssession.html',
+                'matrix': '/web/matrix-integration.html'
+            };
+            
+            const targetUrl = modules[moduleType];
+            if (targetUrl) {
+                // Teste Link vor Öffnung
+                fetch(targetUrl, { method: 'HEAD' })
+                    .then(response => {
+                        if (response.status === 200) {
+                            window.open(targetUrl, '_blank');
+                        } else {
+                            alert(`⚠️ Modul wird geladen... (Status: ${response.status})`);
+                        }
+                    })
+                    .catch(error => {
+                        console.error(`❌ Fehler bei ${moduleType}:`, error);
+                    });
+            }
+        }
+
+        // BIDIREKTIONALE NAVIGATION - ERZWUNGEN!
+        function navigateBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = '../';
+            }
+        }
+
+        // KONTINUIERLICHE LINK-KONTROLLE
+        function startLinkMonitoring() {
+            const links = document.querySelectorAll('a[href]');
+            
+            links.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && !href.startsWith('mailto:') && !href.startsWith('tel:')) {
+                    // Teste Link kontinuierlich
+                    setInterval(async () => {
+                        try {
+                            const response = await fetch(new URL(href, window.location.href), { method: 'HEAD' });
+                            if (response.status >= 400) {
+                                link.style.border = '2px solid #ef4444';
+                                link.title = `❌ Defekt: ${response.status}`;
+                                console.log(`❌ Toter Link gefunden: ${href} (${response.status})`);
+                            } else {
+                                link.style.border = '2px solid #10b981';
+                                link.title = `✅ Funktioniert: ${response.status}`;
+                            }
+                        } catch (error) {
+                            link.style.border = '2px solid #f59e0b';
+                            link.title = `⚠️ Fehler: ${error.message}`;
+                        }
+                    }, 30000); // Alle 30 Sekunden
+                }
+            });
+        }
+
+        // AUTO-START
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('📞 Kommunikations-Suite geladen');
+            console.log('🔄 Bidirektionale Navigation aktiv');
+            console.log('🔍 Kontinuierliche Link-Kontrolle gestartet');
+            
+            startLinkMonitoring();
+            
+            // Teste alle Navigation-Links beim Laden
+            const navLinks = [
+                { url: '../', name: 'Serverfarm' },
+                { url: '../ai/', name: 'AI Systems' },
+                { url: '../space/', name: 'Space Research' },
+                { url: '../../', name: 'Hauptseite' }
+            ];
+            
+            navLinks.forEach(link => {
+                fetch(link.url, { method: 'HEAD' })
+                    .then(response => {
+                        if (response.ok) {
+                            console.log(`✅ ${link.name}: Navigation funktioniert`);
+                        } else {
+                            console.log(`❌ ${link.name}: ${response.status} - MUSS REPARIERT WERDEN`);
+                        }
+                    })
+                    .catch(error => {
+                        console.log(`💥 ${link.name}: ${error.message} - KRITISCHER FEHLER`);
+                    });
+            });
+        });
+
+        console.log('📞 Kommunikations-Suite bereit - ECHTE Navigation implementiert!');
+    </script>
+</body>
+</html>
+
+
+

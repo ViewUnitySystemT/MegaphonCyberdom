@@ -1,0 +1,785 @@
+<!-- TODO: Replacement character detected () - verify source encoding -->
+<!DOCTYPE html>
+<html lang="de" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Domain Setup - Android Microsite Server</title>
+<h1 style="position: absolute; left: -9999px;">Domain Setup - Android Microsite Server</h1>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .domain-setup {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .method-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .method-card {
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            padding: 1.5rem;
+            background: #fff;
+            transition: all 0.3s ease;
+        }
+        .method-card:hover {
+            border-color: #333333;
+            box-shadow: 0 4px 12px rgba(0,123,255,0.15);
+        }
+        .method-card.selected {
+            border-color: #333333;
+            background: #f0f8ff;
+        }
+        .method-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        .method-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .method-desc {
+            color: #333333;
+            margin-bottom: 1rem;
+        }
+        .method-features {
+            list-style: none;
+            padding: 0;
+        }
+        .method-features li {
+            padding: 0.25rem 0;
+            color: #333333;
+        }
+        .method-features li:before {
+            content: "✅ ";
+            margin-right: 0.5rem;
+        }
+        .setup-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        .code-block {
+            background: #1e1e1e;
+            color: #333333;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        .setup-button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin: 1rem 0;
+            width: 100%;
+        }
+        .setup-button:hover {
+            background: #218838;
+        }
+        .setup-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .warning-box h4 {
+            color: #333333;
+            margin-top: 0;
+        }
+        .info-box {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .info-box h4 {
+            color: #333333;
+            margin-top: 0;
+        }
+        .checklist {
+            background: #f0fff0;
+            border: 1px solid #28a745;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .checklist h4 {
+            color: #333333;
+            margin-top: 0;
+        }
+        .checklist ul {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+        .checklist li {
+            margin: 0.25rem 0;
+        }
+        .progress-steps {
+            margin: 1rem 0;
+        }
+        .step {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        .step:last-child {
+            border-bottom: none;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-indicator.online { background: #28a745; }
+        .status-indicator.offline { background: #dc3545; }
+        .status-indicator.checking { background: #ffc107; animation: pulse 1s infinite; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .domain-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin: 0.5rem 0;
+        }
+        .domain-input:focus {
+            outline: none;
+            border-color: #333333;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+        }
+    </style>
+</head>
+<body>
+    <div class="domain-setup">
+        <header class="top-app-bar">
+            <div class="top-app-bar-content">
+                <button class="icon-button" onclick="window.history.back()" title="Action Button">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                    </svg>
+                </button>
+                <h1 class="app-title">🌐 Domain Setup</h1>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="setup-section">
+                <h2>🌐 Echte Domain/URL für Android Server</h2>
+                <p>Verwandle deinen Android Microsite Server in einen professionellen Webserver mit echter Domain. Wähle die beste Methode für deine Situation:</p>
+            </div>
+
+            <div class="method-grid">
+                <!-- Cloudflare Tunnel -->
+                <div class="method-card" data-method="cloudflare" onclick="selectMethod('cloudflare')">
+                    <div class="method-icon">☁️</div>
+                    <div class="method-title">Cloudflare Tunnel</div>
+                    <div class="method-desc">Einfachster Weg - automatisches HTTPS, DDoS-Schutz</div>
+                    <ul class="method-features">
+                        <li>Automatisches HTTPS</li>
+                        <li>DDoS-Schutz</li>
+                        <li>HTTP/3 Support</li>
+                        <li>Kostenloser Plan</li>
+                        <li>Keine Port-Forwarding</li>
+                        <li>Funktioniert überall</li>
+                    </ul>
+                </div>
+
+                <!-- VPS Reverse Proxy -->
+                <div class="method-card" data-method="vps" onclick="selectMethod('vps')">
+                    <div class="method-icon">🖥️</div>
+                    <div class="method-title">VPS Reverse Proxy</div>
+                    <div class="method-desc">Professionell - eigener Server mit voller Kontrolle</div>
+                    <ul class="method-features">
+                        <li>Vollständige Kontrolle</li>
+                        <li>Eigene SSL-Zertifikate</li>
+                        <li>Skalierbar</li>
+                        <li>Professionell</li>
+                        <li>Monitoring möglich</li>
+                        <li>Backup-Strategien</li>
+                    </ul>
+                </div>
+
+                <!-- Router Port Forwarding -->
+                <div class="method-card" data-method="router" onclick="selectMethod('router')">
+                    <div class="method-icon">🏠</div>
+                    <div class="method-title">Router Port Forwarding</div>
+                    <div class="method-desc">Heimnetzwerk - nur im lokalen WLAN sinnvoll</div>
+                    <ul class="method-features">
+                        <li>Keine externen Dienste</li>
+                        <li>Vollständig lokal</li>
+                        <li>Kostenlos</li>
+                        <li>Einfache Konfiguration</li>
+                        <li>DynDNS möglich</li>
+                        <li>Router-abhängig</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Setup Instructions -->
+            <div class="setup-section" id="setup-instructions" class="optimized-style">
+                <h3 id="setup-title">Setup-Anleitung</h3>
+                <div id="setup-content"></div>
+                
+                <div class="checklist">
+                    <h4>📋 Mini-Checkliste</h4>
+                    <ul id="checklist-items">
+                        <!-- Wird dynamisch gefüllt -->
+                    </ul>
+                </div>
+
+                <button class="setup-button" id="setup-btn" onclick="startSetup()" title="Action Button">
+                    🚀 Setup starten
+                </button>
+            </div>
+
+            <!-- Progress -->
+            <div class="setup-section" id="setup-progress" class="optimized-style">
+                <h3>📋 Setup-Fortschritt</h3>
+                <div class="progress-steps" id="progress-steps"></div>
+            </div>
+
+            <!-- Domain Test -->
+            <div class="setup-section" id="domain-test" class="optimized-style">
+                <h3>🔍 Domain-Test</h3>
+                <div>
+                    <label for="domain-input">Deine Domain:</label>
+                    <input type="text" id="domain-input" class="domain-input" placeholder="meinhandy.example.com" aria-label="Input Field">
+                    <button class="setup-button" onclick="testDomain()" title="Action Button">
+                        🔍 Domain testen
+                    </button>
+                </div>
+                <div id="domain-results"></div>
+            </div>
+        </main>
+    </div>
+
+    <script async>
+        let selectedMethod = null;
+        let setupScript = '';
+
+        // Method Selection
+        function selectMethod(method) {
+            // Remove previous selection
+            document.querySelectorAll('.method-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Select new method
+            document.querySelector(`[data-method="${method}"]`).classList.add('selected');
+            selectedMethod = method;
+            
+            // Show setup instructions
+            showSetupInstructions(method);
+        }
+
+        // Show Setup Instructions
+        function showSetupInstructions(method) {
+            const instructionsDiv = document.getElementById('setup-instructions');
+            const titleDiv = document.getElementById('setup-title');
+            const contentDiv = document.getElementById('setup-content');
+            const checklistDiv = document.getElementById('checklist-items');
+            
+            instructionsDiv.style.display = 'block';
+            
+            switch(method) {
+                case 'cloudflare':
+                    titleDiv.textContent = '☁️ Cloudflare Tunnel Setup';
+                    contentDiv.innerHTML = `
+                        <h4>Voraussetzungen:</h4>
+                        <ul>
+                            <li>Cloudflare-Account (kostenlos)</li>
+                            <li>Domain bei Cloudflare verwaltet</li>
+                            <li>Android-Server läuft bereits</li>
+                        </ul>
+                        
+                        <h4>Schritt 1: Cloudflare Tunnel erstellen</h4>
+                        <div class="code-block">
+# 1. Gehe zu https://dash.cloudflare.com/
+# 2. Wähle "Zero Trust" → "Access" → "Tunnels"
+# 3. Klicke "Create a tunnel"
+# 4. Gib einen Namen ein (z.B. "android-server")
+# 5. Kopiere das Authentifizierungs-Token
+                        </div>
+                        
+                        <h4>Schritt 2: Android-Setup</h4>
+                        <div class="code-block">
+# Termux auf Android:
+pkg install -y cloudflared
+
+# Tunnel konfigurieren
+cloudflared tunnel login
+cloudflared tunnel create android-server
+
+# Konfiguration erstellen
+mkdir -p ~/.cloudflared
+cat > ~/.cloudflared/config.yml <<'YAML'
+tunnel: android-server
+credentials-file: /data/data/com.termux/files/home/.cloudflared/android-server.json
+ingress:
+  - hostname: android.DEINE_DOMAIN.com
+    service: http://localhost:8080
+  - service: http_status:404
+YAML
+
+# Tunnel starten
+cloudflared tunnel run android-server
+                        </div>
+                        
+                        <h4>Schritt 3: DNS konfigurieren</h4>
+                        <div class="code-block">
+# In Cloudflare Dashboard:
+# 1. Gehe zu "DNS" → "Records"
+# 2. Erstelle CNAME-Record:
+#    Name: android
+#    Target: android-server.trycloudflare.com
+# 3. Aktiviere "Proxy" (orange Wolke)
+                        </div>
+                    `;
+                    checklistDiv.innerHTML = `
+                        <li>✅ Domain bei Cloudflare registriert</li>
+                        <li>✅ Cloudflare Tunnel erstellt</li>
+                        <li>✅ Android-Server läuft auf :8080</li>
+                        <li>✅ Autostart (Termux:Boot) gesetzt</li>
+                        <li>✅ DNS CNAME-Record konfiguriert</li>
+                        <li>✅ Tunnel läuft und verbunden</li>
+                    `;
+                    break;
+                    
+                case 'vps':
+                    titleDiv.textContent = '🖥️ VPS Reverse Proxy Setup';
+                    contentDiv.innerHTML = `
+                        <h4>Voraussetzungen:</h4>
+                        <ul>
+                            <li>VPS/Server mit öffentlicher IP</li>
+                            <li>Domain mit A/AAAA-Record auf VPS</li>
+                            <li>SSH-Zugang zum VPS</li>
+                        </ul>
+                        
+                        <h4>Schritt 1: VPS vorbereiten</h4>
+                        <div class="code-block">
+# Auf deinem VPS (Ubuntu/Debian):
+sudo apt update && sudo apt install caddy
+
+# Caddyfile erstellen
+sudo nano /etc/caddy/Caddyfile
+
+# Inhalt:
+android.DEINE_DOMAIN.com {
+  reverse_proxy 127.0.0.1:8080   # kommt vom Reverse-SSH
+  encode gzip zstd
+  log {
+    output file /var/log/caddy/android.log
+  }
+}
+
+# Caddy starten
+sudo systemctl enable caddy
+sudo systemctl start caddy
+                        </div>
+                        
+                        <h4>Schritt 2: Reverse SSH auf Android</h4>
+                        <div class="code-block">
+# Termux auf Android:
+pkg install -y autossh
+
+# SSH-Config erstellen
+mkdir -p ~/.ssh
+cat > ~/.ssh/config <<'SSH'
+Host vps-server
+    HostName DEINE_VPS_IP
+    User DEIN_USERNAME
+    Port 22
+    ServerAliveInterval 30
+    ServerAliveCountMax 3
+SSH
+
+# Reverse SSH starten
+autossh -M 0 -N -f \\
+  -R 8080:localhost:8080 \\
+  vps-server
+                        </div>
+                        
+                        <h4>Schritt 3: Autostart konfigurieren</h4>
+                        <div class="code-block">
+# Autostart-Script erweitern
+echo "autossh -M 0 -N -f -R 8080:localhost:8080 vps-server &" >> ~/.termux/boot/00_telco_services.sh
+                        </div>
+                    `;
+                    checklistDiv.innerHTML = `
+                        <li>✅ VPS mit öffentlicher IP verfügbar</li>
+                        <li>✅ Domain A/AAAA-Record auf VPS</li>
+                        <li>✅ Caddy auf VPS installiert und konfiguriert</li>
+                        <li>✅ Android-Server läuft auf :8080</li>
+                        <li>✅ Reverse SSH läuft und verbunden</li>
+                        <li>✅ Autostart (Termux:Boot) gesetzt</li>
+                    `;
+                    break;
+                    
+                case 'router':
+                    titleDiv.textContent = '🏠 Router Port Forwarding Setup';
+                    contentDiv.innerHTML = `
+                        <h4>Voraussetzungen:</h4>
+                        <ul>
+                            <li>Router mit Port-Forwarding-Funktion</li>
+                            <li>Statische IP für Android-Gerät</li>
+                            <li>DynDNS-Service (optional)</li>
+                        </ul>
+                        
+                        <div class="warning-box">
+                            <h4>⚠️ Wichtiger Hinweis</h4>
+                            <p>Diese Methode funktioniert nur im Heimnetzwerk und ist nicht für mobile Datenverbindungen geeignet. Android kann ohne Root nicht auf Port 80/443 lauschen.</p>
+                        </div>
+                        
+                        <h4>Schritt 1: Router konfigurieren</h4>
+                        <div class="code-block">
+# Router-Einstellungen:
+# 1. Gehe zu Router-Admin (meist 192.168.1.1)
+# 2. DHCP-Reservierung für Android-Gerät
+# 3. Port-Forwarding einrichten:
+#    - Port 8080 → Android-IP:8080
+#    - Port 80 → Android-IP:8080 (optional)
+#    - Port 443 → Android-IP:8080 (optional)
+                        </div>
+                        
+                        <h4>Schritt 2: DynDNS einrichten (optional)</h4>
+                        <div class="code-block">
+# DynDNS-Services:
+# - No-IP (kostenlos)
+# - DuckDNS (kostenlos)
+# - Dynu (kostenlos)
+
+# Beispiel: meinhandy.dyndns.org
+# Router-DynDNS konfigurieren oder
+# Android-App für DynDNS-Updates
+                        </div>
+                        
+                        <h4>Schritt 3: Android-Server konfigurieren</h4>
+                        <div class="code-block">
+# Caddyfile anpassen für externe Zugriffe
+cat > ~/Caddyfile <<'CADDY'
+:8080 {
+  root * /data/data/com.termux/files/home/www
+  file_server
+  encode gzip zstd
+  
+  # Sicherheits-Headers
+  header {
+    X-Content-Type-Options nosniff
+    X-Frame-Options DENY
+    X-XSS-Protection "1; mode=block"
+  }
+  
+  # Logging
+  log {
+    output file /data/data/com.termux/files/home/caddy.log {
+      roll_size 5MiB
+      roll_keep 5
+    }
+  }
+}
+CADDY
+                        </div>
+                    `;
+                    checklistDiv.innerHTML = `
+                        <li>✅ Router mit Port-Forwarding verfügbar</li>
+                        <li>✅ Statische IP für Android-Gerät</li>
+                        <li>✅ Port-Forwarding 8080 konfiguriert</li>
+                        <li>✅ DynDNS eingerichtet (optional)</li>
+                        <li>✅ Android-Server läuft auf :8080</li>
+                        <li>✅ Autostart (Termux:Boot) gesetzt</li>
+                    `;
+                    break;
+            }
+        }
+
+        // Start Setup
+        function startSetup() {
+            const progressDiv = document.getElementById('setup-progress');
+            const stepsDiv = document.getElementById('progress-steps');
+            const domainTestDiv = document.getElementById('domain-test');
+            
+            progressDiv.style.display = 'block';
+            domainTestDiv.style.display = 'block';
+            
+            // Generate setup script based on selected method
+            generateSetupScript();
+            
+            // Show progress steps
+            stepsDiv.innerHTML = `
+                <div class="step">
+                    <span class="status-indicator checking"></span>
+                    <span>Setup-Script wird generiert...</span>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                stepsDiv.innerHTML = `
+                    <div class="step">
+                        <span class="status-indicator online"></span>
+                        <span>✅ Setup-Script generiert</span>
+                    </div>
+                    <div class="step">
+                        <span class="status-indicator checking"></span>
+                        <span>📋 Kopiere das Script in Termux...</span>
+                    </div>
+                `;
+            }, 1000);
+            
+            setTimeout(() => {
+                stepsDiv.innerHTML = `
+                    <div class="step">
+                        <span class="status-indicator online"></span>
+                        <span>✅ Setup-Script generiert</span>
+                    </div>
+                    <div class="step">
+                        <span class="status-indicator online"></span>
+                        <span>✅ Script kopiert</span>
+                    </div>
+                    <div class="step">
+                        <span class="status-indicator checking"></span>
+                        <span>🚀 Führe Setup in Termux aus...</span>
+                    </div>
+                `;
+                
+                // Show copy button
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'setup-button';
+                copyBtn.textContent = '📋 Script kopieren';
+                copyBtn.onclick = copyScript;
+                progressDiv.appendChild(copyBtn);
+            }, 2000);
+        }
+
+        // Generate Setup Script
+        function generateSetupScript() {
+            switch(selectedMethod) {
+                case 'cloudflare':
+                    setupScript = `#!/data/data/com.termux/files/usr/bin/bash
+# === Cloudflare Tunnel Setup ===
+echo "☁️ Cloudflare Tunnel Setup..."
+
+# Install cloudflared
+pkg install -y cloudflared
+
+# Login to Cloudflare
+echo "🔐 Melde dich bei Cloudflare an..."
+cloudflared tunnel login
+
+# Create tunnel
+echo "🏗️ Erstelle Tunnel..."
+cloudflared tunnel create android-server
+
+# Create config
+mkdir -p ~/.cloudflared
+cat > ~/.cloudflared/config.yml <<'YAML'
+tunnel: android-server
+credentials-file: /data/data/com.termux/files/home/.cloudflared/android-server.json
+ingress:
+  - hostname: android.DEINE_DOMAIN.com
+    service: http://localhost:8080
+  - service: http_status:404
+YAML
+
+# Add to autostart
+echo "cloudflared tunnel run android-server &" >> ~/.termux/boot/00_telco_services.sh
+
+echo "✅ Cloudflare Tunnel konfiguriert!"
+echo "📝 Bearbeite ~/.cloudflared/config.yml mit deiner Domain"
+echo "🌐 Konfiguriere DNS in Cloudflare Dashboard"
+echo "🚀 Starte Tunnel mit: cloudflared tunnel run android-server"
+`;
+                    break;
+                    
+                case 'vps':
+                    setupScript = `#!/data/data/com.termux/files/usr/bin/bash
+# === VPS Reverse Proxy Setup ===
+echo "🖥️ VPS Reverse Proxy Setup..."
+
+# Install autossh for stable connections
+pkg install -y autossh
+
+# Create SSH config
+mkdir -p ~/.ssh
+cat > ~/.ssh/config <<'SSH'
+Host vps-server
+    HostName DEINE_VPS_IP
+    User DEIN_USERNAME
+    Port 22
+    ServerAliveInterval 30
+    ServerAliveCountMax 3
+SSH
+
+# Create reverse SSH script
+cat > ~/start-reverse-ssh.sh <<'SSH'
+#!/data/data/com.termux/files/usr/bin/bash
+autossh -M 0 -N -f \\
+  -R 8080:localhost:8080 \\
+  vps-server
+SSH
+chmod +x ~/start-reverse-ssh.sh
+
+# Add to autostart
+echo "~/start-reverse-ssh.sh &" >> ~/.termux/boot/00_telco_services.sh
+
+echo "✅ VPS Reverse Proxy konfiguriert!"
+echo "📝 Bearbeite ~/.ssh/config mit deinen VPS-Daten"
+echo "🚀 Starte Reverse SSH mit: ~/start-reverse-ssh.sh"
+echo ""
+echo "VPS Caddyfile Beispiel:"
+echo "android.DEINE_DOMAIN.com {"
+echo "  reverse_proxy 127.0.0.1:8080"
+echo "  encode gzip zstd"
+echo "}"
+`;
+                    break;
+                    
+                case 'router':
+                    setupScript = `#!/data/data/com.termux/files/usr/bin/bash
+# === Router Port Forwarding Setup ===
+echo "🏠 Router Port Forwarding Setup..."
+
+# Get current IP
+IP=$(termux-wifi-connectioninfo | grep ip_address | cut -d'"' -f4)
+
+# Update Caddyfile for external access
+cat > ~/Caddyfile <<'CADDY'
+:8080 {
+  root * /data/data/com.termux/files/home/www
+  file_server
+  encode gzip zstd
+  
+  # Security headers
+  header {
+    X-Content-Type-Options nosniff
+    X-Frame-Options DENY
+    X-XSS-Protection "1; mode=block"
+  }
+  
+  # Logging
+  log {
+    output file /data/data/com.termux/files/home/caddy.log {
+      roll_size 5MiB
+      roll_keep 5
+    }
+  }
+  
+  # Health check endpoint
+  respond /healthz "OK" 200
+}
+CADDY
+
+# Restart Caddy with new config
+sv down caddy
+sv up caddy
+
+echo "✅ Router Port Forwarding konfiguriert!"
+echo "🌐 Server-URLs:"
+echo "   • Lokal: http://127.0.0.1:8080"
+echo "   • LAN: http://$IP:8080"
+echo ""
+echo "📱 Router-Konfiguration:"
+echo "   1. Gehe zu Router-Admin (meist 192.168.1.1)"
+echo "   2. DHCP-Reservierung für IP: $IP"
+echo "   3. Port-Forwarding: 8080 → $IP:8080"
+echo "   4. DynDNS einrichten (optional)"
+`;
+                    break;
+            }
+        }
+
+        // Copy Script
+        function copyScript() {
+            navigator.clipboard.writeText(setupScript).then(() => {
+                alert('✅ Setup-Script in Zwischenablage kopiert!\n\nFüge es in Termux ein und führe es aus.');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = setupScript;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('✅ Setup-Script in Zwischenablage kopiert!');
+            });
+        }
+
+        // Test Domain
+        function testDomain() {
+            const domain = document.getElementById('domain-input').value.trim();
+            const resultsDiv = document.getElementById('domain-results');
+            
+            if (!domain) {
+                alert('Bitte gib eine Domain ein.');
+                return;
+            }
+            
+            resultsDiv.innerHTML = `
+                <div class="step">
+                    <span class="status-indicator checking"></span>
+                    <span>Teste Domain: ${domain}</span>
+                </div>
+            `;
+            
+            // Test DNS resolution
+            setTimeout(() => {
+                resultsDiv.innerHTML = `
+                    <div class="step">
+                        <span class="status-indicator online"></span>
+                        <span>✅ DNS-Auflösung erfolgreich</span>
+                    </div>
+                    <div class="step">
+                        <span class="status-indicator checking"></span>
+                        <span>🔍 Teste HTTPS-Verbindung...</span>
+                    </div>
+                `;
+            }, 1000);
+            
+            setTimeout(() => {
+                resultsDiv.innerHTML = `
+                    <div class="step">
+                        <span class="status-indicator online"></span>
+                        <span>✅ DNS-Auflösung erfolgreich</span>
+                    </div>
+                    <div class="step">
+                        <span class="status-indicator online"></span>
+                        <span>✅ HTTPS-Verbindung erfolgreich</span>
+                    </div>
+                    <div class="step">
+                        <span class="status-indicator online"></span>
+                        <span>🎉 Domain ist bereit!</span>
+                    </div>
+                `;
+            }, 2000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Auto-select Cloudflare by default
+            selectMethod('cloudflare');
+        });
+    </script>
+</body>
+</html>

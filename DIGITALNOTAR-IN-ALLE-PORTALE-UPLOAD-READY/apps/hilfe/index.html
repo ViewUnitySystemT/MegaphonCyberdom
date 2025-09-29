@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 TEL Portal Hilfe - Vollständiges System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--tel-bg, #ffffff);
+            color: var(--tel-fg, #0b0d12);
+            line-height: 1.6;
+            padding: 1rem;
+        }
+        
+        .help-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .help-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--tel-muted, #f3f5f7);
+            border-radius: 12px;
+            border: 2px solid var(--tel-accent, #4b6bfb);
+        }
+        
+        .help-header h1 {
+            color: var(--tel-accent, #4b6bfb);
+            margin-bottom: 0.5rem;
+            font-size: 2rem;
+        }
+        
+        .help-section {
+            background: var(--tel-muted-2, #e9eef5);
+            border: 1px solid var(--tel-border, #e3e8ef);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .help-section h2 {
+            color: var(--tel-accent, #4b6bfb);
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+        }
+        
+        .help-section h3 {
+            color: var(--tel-accent-2, #7db2ff);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .command-box {
+            background: var(--tel-bg, #ffffff);
+            border: 1px solid var(--tel-border, #e3e8ef);
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin: 0.5rem 0;
+            overflow-x: auto;
+        }
+        
+        .shortcut-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .shortcut-item {
+            background: var(--tel-bg, #ffffff);
+            border: 1px solid var(--tel-border, #e3e8ef);
+            border-radius: 6px;
+            padding: 1rem;
+        }
+        
+        .shortcut-key {
+            background: var(--tel-accent, #4b6bfb);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+        
+        .download-section {
+            background: linear-gradient(135deg, var(--tel-accent, #4b6bfb), var(--tel-accent-2, #7db2ff));
+            color: white;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            margin: 2rem 0;
+        }
+        
+        .download-section h2 {
+            margin-bottom: 1rem;
+        }
+        
+        .btn {
+            background: var(--tel-accent, #4b6bfb);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin: 0.25rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .btn-success {
+            background: var(--tel-accent-3, #00b894);
+        }
+        
+        .btn-warning {
+            background: #F59E0B;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin: 0 0.25rem;
+        }
+        
+        .status-active {
+            background: var(--tel-accent-3, #00b894);
+            color: white;
+        }
+        
+        .status-ready {
+            background: var(--tel-accent, #4b6bfb);
+            color: white;
+        }
+        
+        .feature-list {
+            list-style: none;
+            margin: 1rem 0;
+        }
+        
+        .feature-list li {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .feature-list li::before {
+            content: '✅';
+            position: absolute;
+            left: 0;
+        }
+        
+        .warning-box {
+            background: #FEF3CD;
+            border: 1px solid #F59E0B;
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 1rem 0;
+            color: #92400E;
+        }
+        
+        .info-box {
+            background: #DBEAFE;
+            border: 1px solid #3B82F6;
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 1rem 0;
+            color: #1E40AF;
+        }
+    </style>
+</head>
+<body>
+    <div class="help-container">
+        <div class="help-header">
+            <h1>📚 TEL Portal Hilfe</h1>
+            <p>Vollständige Anleitung für das Floating-Overlay-System</p>
+            <div class="status-indicator status-active">SYSTEM AKTIV</div>
+        </div>
+        
+        <div class="help-section">
+            <h2>🪟 Floating-Overlay-Manager</h2>
+            <p>Das Floating-Overlay-System ermöglicht es, mehrere Programme gleichzeitig als schwebende Fenster zu verwenden.</p>
+            
+            <h3>Master-Steuerung</h3>
+            <ul class="feature-list">
+                <li><strong>Master-Toggle:</strong> Aktiviert/deaktiviert alle Overlays gleichzeitig</li>
+                <li><strong>Per-App-Buttons:</strong> Einzelne Programme gezielt steuern</li>
+                <li><strong>Persistenz:</strong> Zustand wird automatisch gespeichert</li>
+                <li><strong>Drag & Drop:</strong> Overlays können verschoben werden</li>
+                <li><strong>Resize:</strong> Größe kann angepasst werden</li>
+            </ul>
+            
+            <div class="info-box">
+                <strong>💡 Tipp:</strong> Verwende die Keyboard-Shortcuts für schnellen Zugriff!
+            </div>
+        </div>
+        
+        <div class="help-section">
+            <h2>⌨️ Keyboard-Shortcuts</h2>
+            <div class="shortcut-grid">
+                <div class="shortcut-item">
+                    <div><span class="shortcut-key">Ctrl+Alt+O</span></div>
+                    <div>Alle Overlays umschalten</div>
+                </div>
+                <div class="shortcut-item">
+                    <div><span class="shortcut-key">Ctrl+Alt+H</span></div>
+                    <div>Hilfe-Overlay öffnen</div>
+                </div>
+                <div class="shortcut-item">
+                    <div><span class="shortcut-key">Ctrl+Alt+A</span></div>
+                    <div>AI-System-Overlay öffnen</div>
+                </div>
+                <div class="shortcut-item">
+                    <div><span class="shortcut-key">Ctrl+Alt+C</span></div>
+                    <div>Kommunikation-Overlay öffnen</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="help-section">
+            <h2>🎮 Konsolen-Befehle</h2>
+            <p>Verwende diese Befehle in der Browser-Konsole für erweiterte Steuerung:</p>
+            
+            <div class="command-box">overlays.command('on')</div>
+            <p>Aktiviert alle Overlays</p>
+            
+            <div class="command-box">overlays.command('off')</div>
+            <p>Deaktiviert alle Overlays</p>
+            
+            <div class="command-box">overlays.command('toggle ai')</div>
+            <p>Schaltet das AI-Overlay um</p>
+            
+            <div class="command-box">overlays.command('status')</div>
+            <p>Zeigt detaillierten System-Status</p>
+            
+            <div class="command-box">overlays.command('help')</div>
+            <p>Öffnet das Hilfe-Overlay</p>
+        </div>
+        
+        <div class="help-section">
+            <h2>🎨 Theme-System</h2>
+            <p>Das Theme-System bietet verschiedene Farbschemata für optimale Benutzererfahrung:</p>
+            
+            <ul class="feature-list">
+                <li><strong>System:</strong> Folgt Browser/OS-Einstellung (hell/dunkel)</li>
+                <li><strong>Oranje NL:</strong> Niederländisches Orange-Design (hell)</li>
+                <li><strong>Oranje Dark:</strong> Niederländisches Orange-Design (dunkel)</li>
+                <li><strong>Dutch Flag:</strong> Niederländische Flaggen-Farben</li>
+                <li><strong>Koningsdag:</strong> Festliches Orange für Königstag</li>
+                <li><strong>High Contrast:</strong> Hoher Kontrast für Barrierefreiheit</li>
+                <li><strong>Grayscale:</strong> Graustufen-Design</li>
+                <li><strong>Sepia:</strong> Warmes Sepia-Design</li>
+            </ul>
+            
+            <div class="info-box">
+                <strong>🌐 Theme-Broadcast:</strong> Themes werden automatisch an alle Overlay-Programme weitergegeben!
+            </div>
+        </div>
+        
+        <div class="help-section">
+            <h2>🔒 Sicherheits-Features</h2>
+            <ul class="feature-list">
+                <li><strong>CSP-Header:</strong> Content Security Policy aktiv</li>
+                <li><strong>Sandbox-iFrames:</strong> Isolierte Ausführung der Programme</li>
+                <li><strong>Rate-Limiting:</strong> Schutz vor Missbrauch</li>
+                <li><strong>Input-Sanitization:</strong> Sichere Eingabe-Verarbeitung</li>
+                <li><strong>PostMessage-Security:</strong> Sichere Kommunikation zwischen Frames</li>
+                <li><strong>Audit-Logging:</strong> Vollständige Protokollierung</li>
+            </ul>
+            
+            <div class="warning-box">
+                <strong>⚠️ Sicherheit:</strong> Alle iFrames laufen in einer Sandbox mit beschränkten Rechten.
+            </div>
+        </div>
+        
+        <div class="help-section">
+            <h2>🧪 E2E Testing</h2>
+            <p>Das System verfügt über umfassende End-to-End-Tests:</p>
+            
+            <ul class="feature-list">
+                <li>Master-Toggle Funktionalität</li>
+                <li>Per-App-Button Tests</li>
+                <li>Drag & Drop Verhalten</li>
+                <li>Resize-Funktionalität</li>
+                <li>Theme-System Tests</li>
+                <li>Persistenz-Tests</li>
+                <li>Sicherheits-Tests</li>
+                <li>Performance-Tests</li>
+            </ul>
+        </div>
+        
+        <div class="help-section">
+            <h2>🛠️ Verfügbare Programme</h2>
+            <div class="shortcut-grid">
+                <div class="shortcut-item">
+                    <h4>🏗️ Serverfarm</h4>
+                    <p>83-Server-Punkt Serverfarm mit 5 Untermodulen</p>
+                </div>
+                <div class="shortcut-item">
+                    <h4>📡 Kommunikation</h4>
+                    <p>15 Server-Punkte für Kommunikationssysteme</p>
+                </div>
+                <div class="shortcut-item">
+                    <h4>🚀 Space Research</h4>
+                    <p>7 Server-Punkte für Weltraum-Forschung</p>
+                </div>
+                <div class="shortcut-item">
+                    <h4>💼 Business Suite</h4>
+                    <p>12 Server-Punkte für Business-Anwendungen</p>
+                </div>
+                <div class="shortcut-item">
+                    <h4>🧠 AI Systems</h4>
+                    <p>83 Server-Punkte für AI-Anwendungen</p>
+                </div>
+                <div class="shortcut-item">
+                    <h4>🎵 Producer Medien</h4>
+                    <p>8 Server-Punkte für Medien-Produktion</p>
+                </div>
+                <div class="shortcut-item">
+                    <h4>🔍 TEL Nassis</h4>
+                    <p>Dokumentenprüfung und Validierung</p>
+                </div>
+                <div class="shortcut-item">
+                    <h4>⚙️ Admin Dashboard</h4>
+                    <p>System-Administration und Überwachung</p>
+                </div>
+                <div class="shortcut-item">
+                    <h4>🧭 Logic Finder</h4>
+                    <p>Modul-Logik und Navigation</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="download-section">
+            <h2>📥 Download & Export</h2>
+            <p>Lade Konfigurationsdateien und Dokumentation herunter</p>
+            
+            <div style="margin: 1rem 0;">
+                <button class="btn" onclick="downloadOverlayConfig()">
+                    📄 Overlay-Konfiguration
+                </button>
+                <button class="btn" onclick="downloadSecurityConfig()">
+                    🔒 Sicherheits-Konfiguration
+                </button>
+                <button class="btn btn-success" onclick="downloadCompleteSystem()">
+                    📦 Komplettes System
+                </button>
+                <button class="btn btn-warning" onclick="downloadDocumentation()">
+                    📚 Dokumentation
+                </button>
+            </div>
+        </div>
+        
+        <div class="help-section">
+            <h2>🔧 Troubleshooting</h2>
+            
+            <h3>Häufige Probleme</h3>
+            <ul class="feature-list">
+                <li><strong>Overlay lädt nicht:</strong> Prüfe Browser-Konsole auf Fehler</li>
+                <li><strong>Theme wird nicht angewendet:</strong> Hard-Refresh (Ctrl+F5)</li>
+                <li><strong>Shortcuts funktionieren nicht:</strong> Prüfe ob andere Extensions interferieren</li>
+                <li><strong>Performance-Probleme:</strong> Schließe nicht benötigte Overlays</li>
+            </ul>
+            
+            <h3>Debug-Befehle</h3>
+            <div class="command-box">overlays.command('status')</div>
+            <div class="command-box">telSecurityConfig.runSecurityAudit()</div>
+            <div class="command-box">telFloatingOverlayManager.resetAllPositions()</div>
+        </div>
+        
+        <div class="help-section">
+            <h2>📊 System-Status</h2>
+            <div id="system-status">
+                <p>Lade System-Status...</p>
+            </div>
+            <button class="btn" onclick="refreshSystemStatus()">🔄 Status aktualisieren</button>
+        </div>
+    </div>
+    
+    <script>
+        // Theme-Empfänger für Parent-Window
+        const ALLOWED_PARENTS = ['https://digitalnotar.in', 'http://localhost:8080'];
+        
+        window.addEventListener('message', (event) => {
+            if (ALLOWED_PARENTS.length && !ALLOWED_PARENTS.includes(event.origin)) return;
+            if (!event.data || event.data.type !== 'dn-theme') return;
+            
+            const themeId = event.data.theme;
+            const root = document.documentElement;
+            
+            if (themeId === 'system') {
+                root.removeAttribute('data-theme');
+            } else {
+                root.setAttribute('data-theme', themeId);
+            }
+            
+            localStorage.setItem('tel_theme', themeId);
+            console.log('🎨 Theme empfangen:', themeId);
+        });
+        
+        // Beim Start gespeichertes Theme anwenden
+        (function() {
+            const savedTheme = localStorage.getItem('tel_theme') || 'system';
+            if (savedTheme === 'system') {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            }
+        })();
+        
+        // Overlay-Ready Signal an Parent
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'overlay-ready',
+                    overlay: 'hilfe',
+                    timestamp: new Date().toISOString()
+                }, '*');
+            }
+            
+            refreshSystemStatus();
+            console.log('📚 TEL Portal Hilfe bereit');
+        });
+        
+        function refreshSystemStatus() {
+            const statusDiv = document.getElementById('system-status');
+            
+            if (window.parent !== window) {
+                // Wir sind in einem Overlay
+                statusDiv.innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div>
+                            <strong>🪟 Overlay-Modus:</strong><br>
+                            <span class="status-indicator status-active">AKTIV</span>
+                        </div>
+                        <div>
+                            <strong>🎨 Theme:</strong><br>
+                            <span class="status-indicator status-ready">${document.documentElement.getAttribute('data-theme') || 'System'}</span>
+                        </div>
+                        <div>
+                            <strong>🔒 Sicherheit:</strong><br>
+                            <span class="status-indicator status-active">SANDBOX</span>
+                        </div>
+                        <div>
+                            <strong>📡 Kommunikation:</strong><br>
+                            <span class="status-indicator status-active">POSTMESSAGE</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Standalone-Modus
+                statusDiv.innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div>
+                            <strong>🪟 Modus:</strong><br>
+                            <span class="status-indicator status-ready">STANDALONE</span>
+                        </div>
+                        <div>
+                            <strong>🎨 Theme:</strong><br>
+                            <span class="status-indicator status-ready">${document.documentElement.getAttribute('data-theme') || 'System'}</span>
+                        </div>
+                        <div>
+                            <strong>🔒 Sicherheit:</strong><br>
+                            <span class="status-indicator status-active">DIREKT</span>
+                        </div>
+                        <div>
+                            <strong>📡 Kommunikation:</strong><br>
+                            <span class="status-indicator status-ready">LOKAL</span>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Download-Funktionen
+        function downloadOverlayConfig() {
+            const config = {
+                programs: [
+                    { id: 'kommunikation', title: 'Kommunikation', src: '/serverfarm/kommunikation/', color: '#FF6B35' },
+                    { id: 'space', title: 'Space Research', src: '/serverfarm/space/', color: '#8B5CF6' },
+                    { id: 'business', title: 'Business Suite', src: '/serverfarm/business/', color: '#06B6D4' },
+                    { id: 'ai', title: 'AI Systems', src: '/serverfarm/ai/', color: '#10B981' },
+                    { id: 'producer', title: 'Producer Medien', src: '/serverfarm/producer/', color: '#F59E0B' },
+                    { id: 'nassis', title: 'TEL Nassis', src: '/serverfarm/nassis/', color: '#EF4444' },
+                    { id: 'hilfe', title: 'Hilfe', src: '/apps/hilfe/index.html', color: '#8B5CF6' },
+                    { id: 'admin', title: 'Admin Dashboard', src: '/admin-dashboard.html', color: '#6366F1' },
+                    { id: 'logicfinder', title: 'Logic Finder', src: '/logicfinder.html', color: '#EC4899' }
+                ],
+                shortcuts: {
+                    'Ctrl+Alt+O': 'Alle Overlays umschalten',
+                    'Ctrl+Alt+H': 'Hilfe-Overlay',
+                    'Ctrl+Alt+A': 'AI-Overlay',
+                    'Ctrl+Alt+C': 'Kommunikation-Overlay'
+                },
+                themes: [
+                    'system', 'oranje-nl', 'oranje-dark', 'dutch-flag', 'royal-day', 'high-contrast', 'grayscale', 'sepia'
+                ]
+            };
+            
+            downloadJSON(config, 'tel-overlay-config.json');
+        }
+        
+        function downloadSecurityConfig() {
+            if (window.parent.telSecurityConfig) {
+                const securityConfig = window.parent.telSecurityConfig.exportSecurityConfig();
+                downloadJSON(securityConfig, 'tel-security-config.json');
+            } else {
+                alert('⚠️ Sicherheits-Konfiguration nicht verfügbar');
+            }
+        }
+        
+        function downloadCompleteSystem() {
+            const systemExport = {
+                timestamp: new Date().toISOString(),
+                version: '1.0.0',
+                components: {
+                    overlayManager: 'FLOATING-OVERLAY-MANAGER.js',
+                    securityConfig: 'CSP-SECURITY-CONFIG.js',
+                    vollautomatisierung: 'VOLLAUTOMATISIERUNG-SYSTEM.js',
+                    logicModules: 'LOGIC-MODULE-SYSTEM.js',
+                    downtimeSchutz: 'DOWNTIME-SCHUTZ-SYSTEM.js',
+                    masterIntegration: 'MASTER-INTEGRATION-SYSTEM.html'
+                },
+                features: [
+                    'Floating Overlays mit Drag & Drop',
+                    'Theme-System mit 8 Themes',
+                    'Vollautomatisierung mit 1:1 Sync',
+                    '6 Logic-Module ohne Illusion',
+                    '99.99% Uptime Downtime-Schutz',
+                    'AI-Aktivierung mit echter Fehlerreparatur',
+                    'E2E Human-Click Tests',
+                    'CSP-Sicherheit mit Sandbox-Isolation'
+                ],
+                installation: {
+                    steps: [
+                        '1. Alle .js Dateien in Projekt-Root kopieren',
+                        '2. MASTER-INTEGRATION-SYSTEM.html als Hauptseite verwenden',
+                        '3. /apps/hilfe/ Verzeichnis erstellen',
+                        '4. index.html in /apps/hilfe/ kopieren',
+                        '5. Server-Konfiguration (Nginx/Apache) anpassen',
+                        '6. E2E Tests ausführen'
+                    ],
+                    requirements: [
+                        'Moderner Browser mit ES6+ Support',
+                        'Web Server mit CSP-Header Unterstützung',
+                        'Optional: Node.js für E2E Tests'
+                    ]
+                }
+            };
+            
+            downloadJSON(systemExport, 'tel-complete-system-export.json');
+        }
+        
+        function downloadDocumentation() {
+            const documentation = `
+# 📚 TEL Portal Floating-Overlay-System
+## Vollständige Dokumentation
+
+### 🎯 Übersicht
+Das TEL Portal Floating-Overlay-System ermöglicht die gleichzeitige Nutzung mehrerer Programme in schwebenden Fenstern mit vollständiger Automatisierung und Sicherheit.
+
+### 🚀 Features
+- **Master-Toggle:** Ein Schalter für alle Overlays
+- **Per-App-Steuerung:** Einzelne Programme gezielt steuern
+- **Drag & Drop:** Overlays können verschoben werden
+- **Resize:** Größe anpassbar mit Resize-Handle
+- **Theme-System:** 8 verschiedene Themes verfügbar
+- **Persistenz:** Zustand wird automatisch gespeichert
+- **Sicherheit:** CSP-Header, Sandbox-iFrames, Rate-Limiting
+- **E2E Tests:** Umfassende automatisierte Tests
+
+### ⌨️ Keyboard-Shortcuts
+- **Ctrl+Alt+O:** Alle Overlays umschalten
+- **Ctrl+Alt+H:** Hilfe-Overlay
+- **Ctrl+Alt+A:** AI-System-Overlay
+- **Ctrl+Alt+C:** Kommunikation-Overlay
+
+### 🎮 Konsolen-Befehle
+\`\`\`javascript
+// Alle Overlays aktivieren
+overlays.command('on');
+
+// Alle Overlays deaktivieren
+overlays.command('off');
+
+// Einzelnes Overlay umschalten
+overlays.command('toggle ai');
+
+// System-Status anzeigen
+overlays.command('status');
+
+// Hilfe öffnen
+overlays.command('help');
+\`\`\`
+
+### 🎨 Theme-System
+Das Theme-System unterstützt 8 verschiedene Themes:
+1. **System:** Folgt Browser/OS-Einstellung
+2. **Oranje NL:** Niederländisches Orange (hell)
+3. **Oranje Dark:** Niederländisches Orange (dunkel)
+4. **Dutch Flag:** Niederländische Flaggen-Farben
+5. **Koningsdag:** Festliches Orange
+6. **High Contrast:** Barrierefreier hoher Kontrast
+7. **Grayscale:** Graustufen-Design
+8. **Sepia:** Warmes Sepia-Design
+
+### 🔒 Sicherheits-Features
+- **CSP-Header:** Content Security Policy
+- **Sandbox-iFrames:** Isolierte Ausführung
+- **Rate-Limiting:** Schutz vor Missbrauch
+- **Input-Sanitization:** Sichere Eingaben
+- **PostMessage-Security:** Sichere Frame-Kommunikation
+- **Audit-Logging:** Vollständige Protokollierung
+
+### 🛠️ Installation
+1. Kopiere alle JavaScript-Dateien in dein Projekt
+2. Integriere MASTER-INTEGRATION-SYSTEM.html
+3. Erstelle /apps/hilfe/ Verzeichnis
+4. Konfiguriere Server-Header (CSP)
+5. Führe E2E Tests aus
+
+### 📞 Support
+Bei Problemen prüfe:
+1. Browser-Konsole auf Fehler
+2. CSP-Header Konfiguration
+3. iFrame-Sandbox Einstellungen
+4. Theme-Persistenz in localStorage
+
+© 2025 Raymond Demitrio Tel - TEL Portal System
+`;
+            
+            downloadText(documentation, 'tel-overlay-documentation.md');
+        }
+        
+        function downloadJSON(data, filename) {
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            console.log('📥 Download gestartet:', filename);
+        }
+        
+        function downloadText(text, filename) {
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            console.log('📥 Download gestartet:', filename);
+        }
+        
+        // Error-Handling
+        window.addEventListener('error', (event) => {
+            console.error('🚨 Hilfe-Overlay Fehler:', event.error);
+            
+            if (window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'overlay-error',
+                    overlay: 'hilfe',
+                    error: event.error.message,
+                    timestamp: new Date().toISOString()
+                }, '*');
+            }
+        });
+        
+        // Health-Check an Parent senden
+        setInterval(() => {
+            if (window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'health-check',
+                    overlay: 'hilfe',
+                    status: 'healthy',
+                    timestamp: new Date().toISOString()
+                }, '*');
+            }
+        }, 30000); // Alle 30 Sekunden
+    </script>
+</body>
+</html>
+
+
+

@@ -1,0 +1,15 @@
+open
+45.87.81.214
+u972026836
+Werner8/Werner8/
+cd
+public_html
+put
+backend-health-check.js
+put
+package.json
+put
+test-backend.js
+ls
+-la
+quit

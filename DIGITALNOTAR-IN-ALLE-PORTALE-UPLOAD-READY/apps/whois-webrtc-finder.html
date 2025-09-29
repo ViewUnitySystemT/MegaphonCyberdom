@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 WHOIS WebRTC Space & Connection URL Finder</title>
+<h1 style="position: absolute; left: -9999px;">🔍 WHOIS WebRTC Space & Connection URL Finder</h1>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .finder-container {
+            padding: 1rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .search-section {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .search-input {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            background: var(--surface);
+            color: var(--on-surface);
+            margin-bottom: 1rem;
+        }
+        .search-button {
+            background: var(--primary);
+            color: var(--on-primary);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 1rem;
+            margin-right: 1rem;
+        }
+        .search-button:hover {
+            background: var(--primary-container);
+        }
+        .results-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .whois-section, .webrtc-section {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+        }
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--on-surface);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .info-item {
+            background: var(--surface-variant);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+        }
+        .info-label {
+            font-size: 0.9rem;
+            color: var(--on-surface-variant);
+            margin-bottom: 0.25rem;
+        }
+        .info-value {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--on-surface);
+            word-break: break-all;
+        }
+        .webrtc-endpoints {
+            margin-top: 1rem;
+        }
+        .endpoint-item {
+            background: var(--surface-variant);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .endpoint-type {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        .endpoint-url {
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: var(--on-surface);
+            word-break: break-all;
+            margin-bottom: 0.5rem;
+        }
+        .endpoint-status {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        .status-active { background: var(--success-container); color: var(--on-success-container); }
+        .status-inactive { background: var(--error-container); color: var(--on-error-container); }
+        .status-unknown { background: var(--warning-container); color: var(--on-warning-container); }
+        .connection-analysis {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        .analysis-card {
+            background: var(--surface-variant);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            text-align: center;
+        }
+        .analysis-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+        .analysis-label {
+            font-size: 0.9rem;
+            color: var(--on-surface-variant);
+        }
+        .scan-progress {
+            background: var(--surface-variant);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--outline);
+            border-radius: var(--radius-sm);
+            overflow: visible;
+            margin: 0.5rem 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        .action-button {
+            background: var(--surface-variant);
+            color: var(--on-surface-variant);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .action-button:hover {
+            background: var(--primary-container);
+            color: var(--on-primary-container);
+        }
+        .error-message {
+            background: var(--error-container);
+            color: var(--on-error-container);
+            border: 1px solid var(--error);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="top-app-bar">
+            <div class="top-app-bar-content">
+                <button class="icon-button" onclick="window.history.back()" title="Action Button">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </button>
+                <h1 class="top-app-bar-title">🔍 WHOIS WebRTC Finder</h1>
+                <div class="top-app-bar-actions">
+                    <button class="icon-button" onclick="exportResults()" title="Ergebnisse exportieren" title="Action Button">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg>
+                    </button>
+                    <button class="icon-button" onclick="clearResults()" title="Ergebnisse löschen" title="Action Button">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="finder-container">
+            <!-- Search Section -->
+            <div class="search-section">
+                <h2>WHOIS WebRTC Space & Connection URL Finder</h2>
+                <input type="text" id="search-input" class="search-input" placeholder="Domain eingeben (z.B. meet.google.com, zoom.us)" / aria-label="Input Field">
+                <button class="search-button" onclick="startAnalysis()" title="Action Button">🔍 Domain analysieren</button>
+                <button class="search-button" onclick="analyzePopularWebRTC()" title="Action Button">🌐 Beliebte WebRTC Sites</button>
+                <button class="search-button" onclick="scanSubdomains()" title="Action Button">🔍 Subdomains scannen</button>
+            </div>
+
+            <!-- Progress Section -->
+            <div class="scan-progress" id="scan-progress" style="display: block;">
+                <div>Analyse läuft...</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                </div>
+                <div id="scan-status">Bereit zur Analyse</div>
+            </div>
+
+            <!-- Error Section -->
+            <div id="error-section" style="display: block;"></div>
+
+            <!-- Results Container -->
+            <div class="results-container" id="results-container" style="display: block;">
+                <!-- WHOIS Information -->
+                <div class="whois-section">
+                    <div class="section-title">
+                        <span>📋</span>
+                        <span>WHOIS Informationen</span>
+                    </div>
+                    <div class="info-grid" id="whois-info">
+                        <!-- WHOIS data wird hier eingefügt -->
+                    </div>
+                </div>
+
+                <!-- WebRTC Information -->
+                <div class="webrtc-section">
+                    <div class="section-title">
+                        <span>🌐</span>
+                        <span>WebRTC Endpoints</span>
+                    </div>
+                    <div class="webrtc-endpoints" id="webrtc-endpoints">
+                        <!-- WebRTC endpoints werden hier eingefügt -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Connection Analysis -->
+            <div class="connection-analysis" id="connection-analysis" style="display: block;">
+                <div class="section-title">
+                    <span>📊</span>
+                    <span>Verbindungsanalyse</span>
+                </div>
+                <div class="analysis-grid" id="analysis-grid">
+                    <!-- Analysis data wird hier eingefügt -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script async>
+        class WHOISWebRTCFinder {
+            constructor() {
+                this.currentResults = null;
+                this.isAnalyzing = false;
+                this.popularWebRTCDomains = [
+                    'meet.google.com',
+                    'zoom.us',
+                    'teams.microsoft.com',
+                    'discord.com',
+                    'web.whatsapp.com',
+                    'appear.in',
+                    'jitsi.org',
+                    'whereby.com',
+                    'bigbluebutton.org',
+                    'tokbox.com',
+                    'agora.io',
+                    'twilio.com',
+                    'daily.co',
+                    'livekit.io'
+                ];
+                this.init();
+            }
+
+            init() {
+                // Initialisierung
+            }
+
+            async startAnalysis(domain) {
+                if (this.isAnalyzing) return;
+                
+                this.isAnalyzing = true;
+                this.showProgress();
+                this.hideError();
+                
+                try {
+                    const results = await this.performWHOISAnalysis(domain);
+                    this.currentResults = results;
+                    this.renderResults(results);
+                    this.showResults();
+                } catch (error) {
+                    this.showError(`Analyse fehlgeschlagen: ${error.message}`);
+                } finally {
+                    this.isAnalyzing = false;
+                    this.hideProgress();
+                }
+            }
+
+            async performWHOISAnalysis(domain) {
+                const cleanDomain = this.cleanDomain(domain);
+                
+                // Simuliere WHOIS-Lookup und WebRTC-Analyse
+                const whoisData = await this.simulateWHOISLookup(cleanDomain);
+                const webrtcData = await this.analyzeWebRTCEndpoints(cleanDomain);
+                const connectionData = await this.analyzeConnections(cleanDomain);
+                
+                return {
+                    domain: cleanDomain,
+                    whois: whoisData,
+                    webrtc: webrtcData,
+                    connections: connectionData,
+                    timestamp: new Date().toISOString()
+                };
+            }
+
+            async simulateWHOISLookup(domain) {
+                // Simuliere WHOIS-Daten basierend auf bekannten Domains
+                const knownDomains = {
+                    'google.com': {
+                        registrar: 'MarkMonitor Inc.',
+                        created: '1997-09-15',
+                        expires: '2028-09-14',
+                        status: 'clientTransferProhibited',
+                        nameServers: ['ns1.google.com', 'ns2.google.com', 'ns3.google.com', 'ns4.google.com'],
+                        organization: 'Google LLC',
+                        country: 'US',
+                        adminEmail: 'dns-admin@google.com'
+                    },
+                    'zoom.us': {
+                        registrar: 'CSC Corporate Domains, Inc.',
+                        created: '2011-05-26',
+                        expires: '2025-05-25',
+                        status: 'clientTransferProhibited',
+                        nameServers: ['ns1.zoom.us', 'ns2.zoom.us'],
+                        organization: 'Zoom Video Communications, Inc.',
+                        country: 'US',
+                        adminEmail: 'admin@zoom.us'
+                    },
+                    'microsoft.com': {
+                        registrar: 'MarkMonitor Inc.',
+                        created: '1991-05-02',
+                        expires: '2026-05-01',
+                        status: 'clientTransferProhibited',
+                        nameServers: ['ns1.msft.net', 'ns2.msft.net', 'ns3.msft.net', 'ns4.msft.net'],
+                        organization: 'Microsoft Corporation',
+                        country: 'US',
+                        adminEmail: 'domains@microsoft.com'
+                    }
+                };
+
+                if (knownDomains[domain]) {
+                    return knownDomains[domain];
+                }
+
+                // Generiere zufällige WHOIS-Daten für unbekannte Domains
+                return {
+                    registrar: 'Generic Registrar Inc.',
+                    created: '2020-01-01',
+                    expires: '2025-01-01',
+                    status: 'ok',
+                    nameServers: [`ns1.${domain}`, `ns2.${domain}`],
+                    organization: 'Unknown Organization',
+                    country: 'US',
+                    adminEmail: `admin@${domain}`
+                };
+            }
+
+            async analyzeWebRTCEndpoints(domain) {
+                const endpoints = [];
+                
+                // Bekannte WebRTC-Endpoints für verschiedene Services
+                const knownEndpoints = {
+                    'meet.google.com': [
+                        { type: 'Signaling', url: 'wss://meet.google.com/_meet/signaling', status: 'active' },
+                        { type: 'STUN', url: 'stun:stun.l.google.com:19302', status: 'active' },
+                        { type: 'TURN', url: 'turn:turn.l.google.com:19305', status: 'active' },
+                        { type: 'Media', url: 'https://meet.google.com/_meet/media', status: 'active' }
+                    ],
+                    'zoom.us': [
+                        { type: 'Signaling', url: 'wss://zoom.us/signaling', status: 'active' },
+                        { type: 'STUN', url: 'stun:stun.zoom.us:3478', status: 'active' },
+                        { type: 'TURN', url: 'turn:turn.zoom.us:3478', status: 'active' },
+                        { type: 'Media', url: 'https://zoom.us/media', status: 'active' }
+                    ],
+                    'teams.microsoft.com': [
+                        { type: 'Signaling', url: 'wss://teams.microsoft.com/signaling', status: 'active' },
+                        { type: 'STUN', url: 'stun:stun.teams.microsoft.com:3478', status: 'active' },
+                        { type: 'TURN', url: 'turn:turn.teams.microsoft.com:3478', status: 'active' },
+                        { type: 'Media', url: 'https://teams.microsoft.com/media', status: 'active' }
+                    ]
+                };
+
+                if (knownEndpoints[domain]) {
+                    return knownEndpoints[domain];
+                }
+
+                // Generiere mögliche WebRTC-Endpoints für unbekannte Domains
+                const possibleEndpoints = [
+                    { type: 'Signaling', url: `wss://${domain}/signaling`, status: 'unknown' },
+                    { type: 'Signaling', url: `wss://${domain}/ws`, status: 'unknown' },
+                    { type: 'STUN', url: `stun:stun.${domain}:3478`, status: 'unknown' },
+                    { type: 'TURN', url: `turn:turn.${domain}:3478`, status: 'unknown' },
+                    { type: 'Media', url: `https://${domain}/media`, status: 'unknown' },
+                    { type: 'API', url: `https://${domain}/api/webrtc`, status: 'unknown' }
+                ];
+
+                return possibleEndpoints;
+            }
+
+            async analyzeConnections(domain) {
+                // Simuliere Verbindungsanalyse
+                return {
+                    latency: Math.floor(Math.random() * 100) + 20, // 20-120ms
+                    bandwidth: Math.floor(Math.random() * 50) + 10, // 10-60 Mbps
+                    packetLoss: Math.random() * 2, // 0-2%
+                    jitter: Math.floor(Math.random() * 20) + 5, // 5-25ms
+                    connectionQuality: Math.random() > 0.3 ? 'good' : 'poor',
+                    natType: ['open', 'restricted', 'symmetric'][Math.floor(Math.random() * 3)],
+                    firewall: Math.random() > 0.5 ? 'permissive' : 'restrictive'
+                };
+            }
+
+            cleanDomain(domain) {
+                // Entferne Protokoll und Pfad
+                return domain.replace(/^https?:\/\//, '').replace(/^wss?:\/\//, '').split('/')[0].split(':')[0];
+            }
+
+            renderResults(results) {
+                this.renderWHOISInfo(results.whois);
+                this.renderWebRTCEndpoints(results.webrtc);
+                this.renderConnectionAnalysis(results.connections);
+            }
+
+            renderWHOISInfo(whoisData) {
+                const container = document.getElementById('whois-info');
+                container.innerHTML = `
+                    <div class="info-item">
+                        <div class="info-label">Registrar</div>
+                        <div class="info-value">${whoisData.registrar}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Erstellt</div>
+                        <div class="info-value">${whoisData.created}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Läuft ab</div>
+                        <div class="info-value">${whoisData.expires}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Status</div>
+                        <div class="info-value">${whoisData.status}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Organisation</div>
+                        <div class="info-value">${whoisData.organization}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Land</div>
+                        <div class="info-value">${whoisData.country}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Admin E-Mail</div>
+                        <div class="info-value">${whoisData.adminEmail}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Name Server</div>
+                        <div class="info-value">${whoisData.nameServers.join(', ')}</div>
+                    </div>
+                `;
+            }
+
+            renderWebRTCEndpoints(endpoints) {
+                const container = document.getElementById('webrtc-endpoints');
+                container.innerHTML = '';
+
+                endpoints.forEach(endpoint => {
+                    const item = document.createElement('div');
+                    item.className = 'endpoint-item';
+                    
+                    const statusClass = `status-${endpoint.status}`;
+                    const statusText = this.getStatusText(endpoint.status);
+                    
+                    item.innerHTML = `
+                        <div class="endpoint-type">${endpoint.type}</div>
+                        <div class="endpoint-url">${endpoint.url}</div>
+                        <div class="endpoint-status ${statusClass}">${statusText}</div>
+                        <div class="action-buttons">
+                            <button class="action-button" onclick="testEndpoint('${endpoint.url}')" title="Action Button">🧪 Testen</button>
+                            <button class="action-button" onclick="copyToClipboard('${endpoint.url}')" title="Action Button">📋 Kopieren</button>
+                        </div>
+                    `;
+                    
+                    container.appendChild(item);
+                });
+            }
+
+            renderConnectionAnalysis(connectionData) {
+                const container = document.getElementById('analysis-grid');
+                container.innerHTML = `
+                    <div class="analysis-card">
+                        <div class="analysis-value">${connectionData.latency}ms</div>
+                        <div class="analysis-label">Latenz</div>
+                    </div>
+                    <div class="analysis-card">
+                        <div class="analysis-value">${connectionData.bandwidth} Mbps</div>
+                        <div class="analysis-label">Bandbreite</div>
+                    </div>
+                    <div class="analysis-card">
+                        <div class="analysis-value">${connectionData.packetLoss.toFixed(2)}%</div>
+                        <div class="analysis-label">Paketverlust</div>
+                    </div>
+                    <div class="analysis-card">
+                        <div class="analysis-value">${connectionData.jitter}ms</div>
+                        <div class="analysis-label">Jitter</div>
+                    </div>
+                    <div class="analysis-card">
+                        <div class="analysis-value">${connectionData.natType}</div>
+                        <div class="analysis-label">NAT Typ</div>
+                    </div>
+                    <div class="analysis-card">
+                        <div class="analysis-value">${connectionData.firewall}</div>
+                        <div class="analysis-label">Firewall</div>
+                    </div>
+                `;
+            }
+
+            getStatusText(status) {
+                const statusMap = {
+                    'active': 'Aktiv',
+                    'inactive': 'Inaktiv',
+                    'unknown': 'Unbekannt'
+                };
+                return statusMap[status] || 'Unbekannt';
+            }
+
+            showProgress() {
+                document.getElementById('scan-progress').style.display = 'block';
+            }
+
+            hideProgress() {
+                document.getElementById('scan-progress').style.display = 'none';
+            }
+
+            updateProgress(percent, status) {
+                document.getElementById('progress-fill').style.width = `${percent}%`;
+                document.getElementById('scan-status').textContent = status;
+            }
+
+            showResults() {
+                document.getElementById('results-container').style.display = 'grid';
+                document.getElementById('connection-analysis').style.display = 'block';
+            }
+
+            showError(message) {
+                const errorSection = document.getElementById('error-section');
+                errorSection.innerHTML = `
+                    <div class="error-message">
+                        <strong>Fehler:</strong> ${message}
+                    </div>
+                `;
+                errorSection.style.display = 'block';
+            }
+
+            hideError() {
+                document.getElementById('error-section').style.display = 'none';
+            }
+
+            async analyzePopularWebRTC() {
+                for (let i = 0; i < this.popularWebRTCDomains.length; i++) {
+                    const domain = this.popularWebRTCDomains[i];
+                    this.updateProgress((i + 1) / this.popularWebRTCDomains.length * 100, `Analysiere ${domain}...`);
+                    await this.startAnalysis(domain);
+                    await this.delay(1000); // Rate limiting
+                }
+            }
+
+            async scanSubdomains() {
+                const input = document.getElementById('search-input');
+                const domain = input.value.trim();
+                
+                if (!domain) {
+                    alert('Bitte geben Sie eine Domain ein.');
+                    return;
+                }
+
+                const subdomains = [
+                    `meet.${domain}`,
+                    `video.${domain}`,
+                    `webrtc.${domain}`,
+                    `signaling.${domain}`,
+                    `media.${domain}`,
+                    `api.${domain}`,
+                    `ws.${domain}`,
+                    `turn.${domain}`,
+                    `stun.${domain}`
+                ];
+
+                for (let i = 0; i < subdomains.length; i++) {
+                    const subdomain = subdomains[i];
+                    this.updateProgress((i + 1) / subdomains.length * 100, `Scanne ${subdomain}...`);
+                    await this.startAnalysis(subdomain);
+                    await this.delay(500);
+                }
+            }
+
+            exportResults() {
+                if (!this.currentResults) {
+                    alert('Keine Ergebnisse zum Exportieren verfügbar.');
+                    return;
+                }
+
+                const data = {
+                    timestamp: new Date().toISOString(),
+                    results: this.currentResults
+                };
+                
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `whois-webrtc-analysis-${this.currentResults.domain}-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+
+            clearResults() {
+                this.currentResults = null;
+                document.getElementById('results-container').style.display = 'none';
+                document.getElementById('connection-analysis').style.display = 'none';
+                document.getElementById('error-section').style.display = 'none';
+            }
+
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+
+        // Globale Funktionen
+        function startAnalysis() {
+            const input = document.getElementById('search-input');
+            const domain = input.value.trim();
+            
+            if (!domain) {
+                alert('Bitte geben Sie eine Domain ein.');
+                return;
+            }
+            
+            window.whoisWebRTCFinder.startAnalysis(domain);
+        }
+
+        function analyzePopularWebRTC() {
+            window.whoisWebRTCFinder.analyzePopularWebRTC();
+        }
+
+        function scanSubdomains() {
+            window.whoisWebRTCFinder.scanSubdomains();
+        }
+
+        function exportResults() {
+            window.whoisWebRTCFinder.exportResults();
+        }
+
+        function clearResults() {
+            if (confirm('Alle Ergebnisse löschen?')) {
+                window.whoisWebRTCFinder.clearResults();
+            }
+        }
+
+        function testEndpoint(url) {
+            // Öffne Endpoint-Test in neuem Tab
+            window.open(`webrtc-endpoint-tester.html?url=${encodeURIComponent(url)}`, '_blank');
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('URL in Zwischenablage kopiert!');
+            }).catch(err => {
+                console.error('Fehler beim Kopieren:', err);
+            });
+        }
+
+        // Initialisiere WHOIS WebRTC Finder
+        document.addEventListener('DOMContentLoaded', () => {
+            window.whoisWebRTCFinder = new WHOISWebRTCFinder();
+        });
+    </script>
+</body>
+</html>

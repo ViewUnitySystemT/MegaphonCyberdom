@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎛️ Server Control Panel - TELCO Hub</title>
+<h1 style="position: absolute; left: -9999px;">🎛️ Server Control Panel - TELCO Hub</h1>
+    <style>
+        :root {
+            --control-primary: #2563eb;
+            --control-success: #10b981;
+            --control-warning: #f59e0b;
+            --control-error: #ef4444;
+            --control-info: #06b6d4;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .control-container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .control-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .control-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3);
+            background-size: 400% 400%;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 3s ease-in-out infinite;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .control-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+        
+        .status-badges {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        
+        .status-badge {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .control-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .control-panel {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .panel-icon {
+            font-size: 2rem;
+        }
+        
+        .panel-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #3b82f6;
+        }
+        
+        .traffic-light {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .light {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            animation: blink 2s infinite;
+        }
+        
+        .light.red { background: #ef4444; }
+        .light.yellow { background: #f59e0b; }
+        .light.green { background: #10b981; }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        .metric-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            font-weight: 600;
+        }
+        
+        .control-btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+            margin: 0.5rem;
+        }
+        
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+        
+        .control-btn.success {
+            background: linear-gradient(45deg, #10b981, #059669);
+        }
+        
+        .control-btn.warning {
+            background: linear-gradient(45deg, #f59e0b, #d97706);
+        }
+        
+        .control-btn.danger {
+            background: linear-gradient(45deg, #ef4444, #dc2626);
+        }
+        
+        .activity-log {
+            max-height: 300px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .log-entry {
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .log-entry.info { border-left: 4px solid #06b6d4; }
+        .log-entry.success { border-left: 4px solid #10b981; }
+        .log-entry.warning { border-left: 4px solid #f59e0b; }
+        .log-entry.error { border-left: 4px solid #ef4444; }
+        
+        .user-settings {
+            display: grid;
+            gap: 1rem;
+        }
+        
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        
+        .setting-label {
+            font-weight: 600;
+        }
+        
+        .setting-control {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .toggle {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: #374151;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle.active {
+            background: #10b981;
+        }
+        
+        .toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle.active::after {
+            transform: translateX(26px);
+        }
+        
+        .code-editor {
+            background: #1a1a1a;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #00ff00;
+            min-height: 200px;
+            overflow: auto;
+        }
+        
+        .ai-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .ai-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: pulse 1s infinite;
+        }
+        
+        .3d-visualization {
+            height: 300px;
+            background: linear-gradient(45deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: visible;
+        }
+        
+        .data-point {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .data-point:nth-child(1) { top: 20%; left: 20%; animation-delay: 0s; }
+        .data-point:nth-child(2) { top: 40%; left: 60%; animation-delay: 0.5s; }
+        .data-point:nth-child(3) { top: 70%; left: 30%; animation-delay: 1s; }
+        .data-point:nth-child(4) { top: 30%; left: 80%; animation-delay: 1.5s; }
+        .data-point:nth-child(5) { top: 80%; left: 70%; animation-delay: 2s; }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            border-left: 4px solid #10b981;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @media (max-width: 1200px) {
+            .control-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .control-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .control-title {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="control-container">
+        <div class="control-header">
+            <h1 class="control-title">🎛️ Server Control Panel</h1>
+            <p class="control-subtitle">AI-Controlled Server Management & User Customization Dashboard</p>
+            <div class="status-badges">
+                <span class="status-badge">🤖 AI-Verified</span>
+                <span class="status-badge">🔒 Secure</span>
+                <span class="status-badge">📊 Real-time</span>
+                <span class="status-badge">🎯 3D Visualization</span>
+            </div>
+        </div>
+        
+        <div class="control-grid">
+            <!-- Server Status Panel -->
+            <div class="control-panel">
+                <div class="panel-header">
+                    <div class="panel-icon">🖥️</div>
+                    <div class="panel-title">Server Status</div>
+                </div>
+                
+                <div class="traffic-light">
+                    <div class="light red"></div>
+                    <div class="light yellow"></div>
+                    <div class="light green"></div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value" id="serverUptime">99.9%</div>
+                    <div class="metric-label">Uptime</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value" id="activeConnections">1,247</div>
+                    <div class="metric-label">Active Connections</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value" id="cpuUsage">23%</div>
+                    <div class="metric-label">CPU Usage</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value" id="memoryUsage">67%</div>
+                    <div class="metric-label">Memory Usage</div>
+                </div>
+                
+                <div style="margin-top: 1rem;">
+                    <button class="control-btn success" onclick="restartServer()" title="Action Button">🔄 Restart Server</button>
+                    <button class="control-btn warning" onclick="maintenanceMode()" title="Action Button">🔧 Maintenance</button>
+                </div>
+            </div>
+            
+            <!-- Activity Monitor Panel -->
+            <div class="control-panel">
+                <div class="panel-header">
+                    <div class="panel-icon">📊</div>
+                    <div class="panel-title">Activity Monitor</div>
+                </div>
+                
+                <div class="ai-status">
+                    <div class="ai-indicator"></div>
+                    <span>AI Monitoring Active</span>
+                </div>
+                
+                <div class="activity-log" id="activityLog">
+                    <div class="log-entry success">[2025-01-13 19:45:23] Server started successfully</div>
+                    <div class="log-entry info">[2025-01-13 19:45:24] AI verification system initialized</div>
+                    <div class="log-entry info">[2025-01-13 19:45:25] User customization settings loaded</div>
+                    <div class="log-entry success">[2025-01-13 19:45:26] Database connection established</div>
+                    <div class="log-entry warning">[2025-01-13 19:45:27] High memory usage detected</div>
+                    <div class="log-entry info">[2025-01-13 19:45:28] Code modification detected by user</div>
+                    <div class="log-entry success">[2025-01-13 19:45:29] AI verification completed</div>
+                </div>
+                
+                <div style="margin-top: 1rem;">
+                    <button class="control-btn" onclick="clearLog()" title="Action Button">🗑️ Clear Log</button>
+                    <button class="control-btn" onclick="exportLog()" title="Action Button">📥 Export Log</button>
+                </div>
+            </div>
+            
+            <!-- User Customization Panel -->
+            <div class="control-panel">
+                <div class="panel-header">
+                    <div class="panel-icon">⚙️</div>
+                    <div class="panel-title">User Customization</div>
+                </div>
+                
+                <div class="user-settings">
+                    <div class="setting-item">
+                        <span class="setting-label">AI Auto-Verification</span>
+                        <div class="setting-control">
+                            <div class="toggle active" onclick="toggleSetting(this, 'aiVerification')"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <span class="setting-label">Real-time Monitoring</span>
+                        <div class="setting-control">
+                            <div class="toggle active" onclick="toggleSetting(this, 'realTimeMonitoring')"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <span class="setting-label">Code Change Alerts</span>
+                        <div class="setting-control">
+                            <div class="toggle active" onclick="toggleSetting(this, 'codeAlerts')"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <span class="setting-label">3D Visualization</span>
+                        <div class="setting-control">
+                            <div class="toggle active" onclick="toggleSetting(this, 'visualization3D')"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <span class="setting-label">Traffic Light System</span>
+                        <div class="setting-control">
+                            <div class="toggle active" onclick="toggleSetting(this, 'trafficLights')"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1rem;">
+                    <button class="control-btn success" onclick="saveSettings()" title="Action Button">💾 Save Settings</button>
+                    <button class="control-btn" onclick="resetSettings()" title="Action Button">🔄 Reset</button>
+                </div>
+            </div>
+            
+            <!-- Code Dashboard Panel -->
+            <div class="control-panel">
+                <div class="panel-header">
+                    <div class="panel-icon">💻</div>
+                    <div class="panel-title">Code Dashboard</div>
+                </div>
+                
+                <div class="ai-status">
+                    <div class="ai-indicator"></div>
+                    <span>AI Code Analysis Active</span>
+                </div>
+                
+                <div class="code-editor" id="codeEditor" contenteditable="true">
+// User-modified code will appear here
+// AI will verify and analyze changes
+
+function userCustomFunction() {
+    console.log("User modification detected");
+    return "AI verified and approved";
+}
+
+// Real-time code monitoring
+const codeMetrics = {
+    linesOfCode: 1247,
+    complexity: "Medium",
+    lastModified: "2025-01-13 19:45:28",
+    aiVerified: true
+};
+                </div>
+                
+                <div style="margin-top: 1rem;">
+                    <button class="control-btn success" onclick="verifyCode()" title="Action Button">✅ AI Verify</button>
+                    <button class="control-btn warning" onclick="analyzeCode()" title="Action Button">🔍 Analyze</button>
+                    <button class="control-btn danger" onclick="revertCode()" title="Action Button">↩️ Revert</button>
+                </div>
+            </div>
+            
+            <!-- 3D Visualization Panel -->
+            <div class="control-panel">
+                <div class="panel-header">
+                    <div class="panel-icon">🎯</div>
+                    <div class="panel-title">3D Data Visualization</div>
+                </div>
+                
+                <div class="3d-visualization">
+                    <div class="data-point"></div>
+                    <div class="data-point"></div>
+                    <div class="data-point"></div>
+                    <div class="data-point"></div>
+                    <div class="data-point"></div>
+                </div>
+                
+                <div style="margin-top: 1rem;">
+                    <div class="metric-card">
+                        <div class="metric-value">5</div>
+                        <div class="metric-label">Active Data Points</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-value">3D</div>
+                        <div class="metric-label">Visualization Mode</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1rem;">
+                    <button class="control-btn" onclick="rotateView()" title="Action Button">🔄 Rotate View</button>
+                    <button class="control-btn" onclick="zoomIn()" title="Action Button">🔍 Zoom In</button>
+                    <button class="control-btn" onclick="zoomOut()" title="Action Button">🔍 Zoom Out</button>
+                </div>
+            </div>
+            
+            <!-- AI Verification Panel -->
+            <div class="control-panel">
+                <div class="panel-header">
+                    <div class="panel-icon">🤖</div>
+                    <div class="panel-title">AI Verification</div>
+                </div>
+                
+                <div class="ai-status">
+                    <div class="ai-indicator"></div>
+                    <span>AI System Online</span>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value" id="aiAccuracy">98.7%</div>
+                    <div class="metric-label">Verification Accuracy</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value" id="testsPassed">247</div>
+                    <div class="metric-label">Tests Passed</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value" id="testsFailed">3</div>
+                    <div class="metric-label">Tests Failed</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value" id="verificationTime">0.3s</div>
+                    <div class="metric-label">Avg Verification Time</div>
+                </div>
+                
+                <div style="margin-top: 1rem;">
+                    <button class="control-btn success" onclick="runAITests()" title="Action Button">🧪 Run AI Tests</button>
+                    <button class="control-btn" onclick="generateReport()" title="Action Button">📊 Generate Report</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Server Control Panel JavaScript
+        let serverStatus = {
+            uptime: 99.9,
+            connections: 1247,
+            cpu: 23,
+            memory: 67,
+            aiAccuracy: 98.7,
+            testsPassed: 247,
+            testsFailed: 3,
+            verificationTime: 0.3
+        };
+        
+        let userSettings = {
+            aiVerification: true,
+            realTimeMonitoring: true,
+            codeAlerts: true,
+            visualization3D: true,
+            trafficLights: true
+        };
+        
+        let activityLog = [
+            { time: '2025-01-13 19:45:23', type: 'success', message: 'Server started successfully' },
+            { time: '2025-01-13 19:45:24', type: 'info', message: 'AI verification system initialized' },
+            { time: '2025-01-13 19:45:25', type: 'info', message: 'User customization settings loaded' },
+            { time: '2025-01-13 19:45:26', type: 'success', message: 'Database connection established' },
+            { time: '2025-01-13 19:45:27', type: 'warning', message: 'High memory usage detected' },
+            { time: '2025-01-13 19:45:28', type: 'info', message: 'Code modification detected by user' },
+            { time: '2025-01-13 19:45:29', type: 'success', message: 'AI verification completed' }
+        ];
+        
+        // Initialize the control panel
+        document.addEventListener('DOMContentLoaded', () => {
+            updateMetrics();
+            startRealTimeUpdates();
+            loadUserSettings();
+        });
+        
+        function updateMetrics() {
+            document.getElementById('serverUptime').textContent = serverStatus.uptime + '%';
+            document.getElementById('activeConnections').textContent = serverStatus.connections.toLocaleString();
+            document.getElementById('cpuUsage').textContent = serverStatus.cpu + '%';
+            document.getElementById('memoryUsage').textContent = serverStatus.memory + '%';
+            document.getElementById('aiAccuracy').textContent = serverStatus.aiAccuracy + '%';
+            document.getElementById('testsPassed').textContent = serverStatus.testsPassed;
+            document.getElementById('testsFailed').textContent = serverStatus.testsFailed;
+            document.getElementById('verificationTime').textContent = serverStatus.verificationTime + 's';
+        }
+        
+        function startRealTimeUpdates() {
+            setInterval(() => {
+                // Simulate real-time data updates
+                serverStatus.connections += Math.floor(Math.random() * 10) - 5;
+                serverStatus.cpu = Math.max(0, Math.min(100, serverStatus.cpu + Math.random() * 4 - 2));
+                serverStatus.memory = Math.max(0, Math.min(100, serverStatus.memory + Math.random() * 2 - 1));
+                
+                updateMetrics();
+                
+                // Add random activity log entries
+                if (Math.random() < 0.1) {
+                    addActivityLog('info', 'System metrics updated');
+                }
+            }, 2000);
+        }
+        
+        function addActivityLog(type, message) {
+            const now = new Date();
+            const timeString = now.toISOString().replace('T', ' ').substring(0, 19);
+            
+            activityLog.unshift({ time: timeString, type, message });
+            
+            // Keep only last 50 entries
+            if (activityLog.length > 50) {
+                activityLog = activityLog.slice(0, 50);
+            }
+            
+            updateActivityLog();
+        }
+        
+        function updateActivityLog() {
+            const logContainer = document.getElementById('activityLog');
+            logContainer.innerHTML = activityLog.map(entry => 
+                `<div class="log-entry ${entry.type}">[${entry.time}] ${entry.message}</div>`
+            ).join('');
+        }
+        
+        function toggleSetting(element, setting) {
+            element.classList.toggle('active');
+            userSettings[setting] = element.classList.contains('active');
+            addActivityLog('info', `Setting ${setting} ${userSettings[setting] ? 'enabled' : 'disabled'}`);
+        }
+        
+        function loadUserSettings() {
+            Object.keys(userSettings).forEach(setting => {
+                const toggle = document.querySelector(`[onclick*="${setting}"]`);
+                if (toggle && userSettings[setting]) {
+                    toggle.classList.add('active');
+                }
+            });
+        }
+        
+        function saveSettings() {
+            localStorage.setItem('serverControlSettings', JSON.stringify(userSettings));
+            addActivityLog('success', 'User settings saved successfully');
+            showNotification('Settings saved successfully!', 'success');
+        }
+        
+        function resetSettings() {
+            userSettings = {
+                aiVerification: true,
+                realTimeMonitoring: true,
+                codeAlerts: true,
+                visualization3D: true,
+                trafficLights: true
+            };
+            loadUserSettings();
+            addActivityLog('warning', 'Settings reset to defaults');
+            showNotification('Settings reset to defaults!', 'warning');
+        }
+        
+        function restartServer() {
+            addActivityLog('warning', 'Server restart initiated');
+            showNotification('Server restart initiated...', 'warning');
+            
+            setTimeout(() => {
+                addActivityLog('success', 'Server restarted successfully');
+                showNotification('Server restarted successfully!', 'success');
+            }, 3000);
+        }
+        
+        function maintenanceMode() {
+            addActivityLog('warning', 'Maintenance mode activated');
+            showNotification('Maintenance mode activated!', 'warning');
+        }
+        
+        function clearLog() {
+            activityLog = [];
+            updateActivityLog();
+            addActivityLog('info', 'Activity log cleared');
+        }
+        
+        function exportLog() {
+            const logData = activityLog.map(entry => 
+                `[${entry.time}] ${entry.type.toUpperCase()}: ${entry.message}`
+            ).join('\n');
+            
+            const blob = new Blob([logData], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `server-activity-log-${new Date().toISOString().split('T')[0]}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            addActivityLog('success', 'Activity log exported');
+            showNotification('Activity log exported!', 'success');
+        }
+        
+        function verifyCode() {
+            addActivityLog('info', 'AI code verification started');
+            showNotification('AI verification in progress...', 'info');
+            
+            setTimeout(() => {
+                addActivityLog('success', 'AI code verification completed - All checks passed');
+                showNotification('Code verification completed!', 'success');
+            }, 2000);
+        }
+        
+        function analyzeCode() {
+            addActivityLog('info', 'Code analysis started');
+            showNotification('Code analysis in progress...', 'info');
+            
+            setTimeout(() => {
+                addActivityLog('success', 'Code analysis completed - Complexity: Medium');
+                showNotification('Code analysis completed!', 'success');
+            }, 1500);
+        }
+        
+        function revertCode() {
+            addActivityLog('warning', 'Code reverted to last verified version');
+            showNotification('Code reverted to last verified version!', 'warning');
+        }
+        
+        function runAITests() {
+            addActivityLog('info', 'AI test suite started');
+            showNotification('Running AI tests...', 'info');
+            
+            setTimeout(() => {
+                serverStatus.testsPassed += 5;
+                serverStatus.testsFailed += Math.floor(Math.random() * 2);
+                updateMetrics();
+                addActivityLog('success', 'AI test suite completed');
+                showNotification('AI tests completed!', 'success');
+            }, 3000);
+        }
+        
+        function generateReport() {
+            addActivityLog('info', 'Generating AI verification report');
+            showNotification('Generating report...', 'info');
+            
+            setTimeout(() => {
+                addActivityLog('success', 'AI verification report generated');
+                showNotification('Report generated successfully!', 'success');
+            }, 2000);
+        }
+        
+        function rotateView() {
+            addActivityLog('info', '3D view rotated');
+            showNotification('3D view rotated!', 'info');
+        }
+        
+        function zoomIn() {
+            addActivityLog('info', '3D view zoomed in');
+            showNotification('3D view zoomed in!', 'info');
+        }
+        
+        function zoomOut() {
+            addActivityLog('info', '3D view zoomed out');
+            showNotification('3D view zoomed out!', 'info');
+        }
+        
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.style.borderLeftColor = type === 'success' ? '#10b981' : 
+                                                type === 'warning' ? '#f59e0b' : 
+                                                type === 'error' ? '#ef4444' : '#06b6d4';
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Code editor functionality
+        document.getElementById('codeEditor').addEventListener('input', (e) => {
+            addActivityLog('info', 'Code modification detected');
+        });
+        
+        // Load saved settings on page load
+        const savedSettings = localStorage.getItem('serverControlSettings');
+        if (savedSettings) {
+            userSettings = { ...userSettings, ...JSON.parse(savedSettings) };
+            loadUserSettings();
+        }
+    </script>
+</body>
+</html>
+

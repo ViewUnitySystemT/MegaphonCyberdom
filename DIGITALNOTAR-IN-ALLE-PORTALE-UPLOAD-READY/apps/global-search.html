@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Globale Suche - Digitalnotar.in</title>
+    <meta name="description" content="Globale Suche über alle Portale und Anwendungen">
+    <meta name="author" content="Raymond Demitrio Tel">
+    
+    <style>
+        :root {
+            --primary: #FF6B35;
+            --accent: #8B5CF6;
+            --success: #10B981;
+            --background: #0F172A;
+            --surface: #1E293B;
+            --on-background: #F8FAFC;
+            --on-primary: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--background);
+            color: var(--on-background);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            font-size: 1.2rem;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            background: var(--surface);
+            color: var(--on-background);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        .search-input::placeholder {
+            color: rgba(248, 250, 252, 0.5);
+        }
+
+        .search-tip {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--accent);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .results-container {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .result-card {
+            background: var(--surface);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .result-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .result-title {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .result-description {
+            color: rgba(248, 250, 252, 0.8);
+            margin-bottom: 0.5rem;
+        }
+
+        .result-path {
+            font-size: 0.9rem;
+            color: var(--accent);
+            font-family: 'Courier New', monospace;
+        }
+
+        .result-category {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: rgba(248, 250, 252, 0.6);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 2rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .stats {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: var(--surface);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stats span {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .keyboard-shortcut {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--surface);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .keyboard-shortcut kbd {
+            background: var(--accent);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-link" id="homeLink">🏠 Zurück zur Hauptseite</a>
+        
+        <div class="header">
+            <h1>🔍 Globale Suche</h1>
+            <p>Durchsuchen Sie alle Portale und Anwendungen von Digitalnotar.in</p>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="Suchen Sie nach Apps, Funktionen oder Kategorien..." autofocus>
+            <div class="search-tip">Drücke "/" zum Fokussieren</div>
+        </div>
+
+        <div class="stats">
+            <span id="resultsCount">0</span> Ergebnisse gefunden von <span id="totalItems">87+</span> verfügbaren Anwendungen
+        </div>
+
+        <div id="results" class="results-container">
+            <!-- Ergebnisse werden hier dynamisch eingefügt -->
+        </div>
+
+        <div id="noResults" class="no-results" style="display: none;">
+            <h3>Keine Ergebnisse gefunden</h3>
+            <p>Versuchen Sie andere Suchbegriffe oder durchsuchen Sie die Kategorien.</p>
+        </div>
+    </div>
+
+    <div class="keyboard-shortcut">
+        <strong>Tastatur-Shortcuts:</strong><br>
+        <kbd>/</kbd> Suche fokussieren<br>
+        <kbd>Esc</kbd> Suche leeren
+    </div>
+
+    <script>
+        // Alle verfügbaren Anwendungen und Portale
+        const allItems = [
+            // Hauptportale
+            { title: "Digitalnotar.in Hauptportal", description: "Zentrale Übersicht aller Portale", path: "../index.html", category: "Hauptportal" },
+            
+            // Apps Kategorien
+            { title: "Admin Dashboard", description: "Zentrale Verwaltung aller Tools", path: "admin-dashboard.html", category: "Admin" },
+            { title: "AI Terminal Manager", description: "KI-gestützte Terminal-Verwaltung", path: "ai-terminal-manager.html", category: "AI" },
+            { title: "API Discovery Dashboard", description: "Entdeckung und Verwaltung von APIs", path: "api-discovery-dashboard.html", category: "API" },
+            { title: "Banking API Explorer", description: "Banking-API Integration und Tests", path: "banking-api-explorer.html", category: "Banking" },
+            { title: "Conference Full", description: "Vollständige Videokonferenz-Lösung", path: "conference-full.html", category: "Kommunikation" },
+            { title: "Connection Hub", description: "Zentrale Verbindungsverwaltung", path: "connection-hub.html", category: "Verbindung" },
+            { title: "Device Manager", description: "Geräteverwaltung und Monitoring", path: "device-manager.html", category: "System" },
+            { title: "Digitalnotariat", description: "Digitales Notariat mit Gesetzeskonformität", path: "digitalnotariat.html", category: "Notariat" },
+            { title: "Files", description: "Dateimanager und Cloud-Speicher", path: "files.html", category: "Dateien" },
+            { title: "Guitar HTML Notariat", description: "Musik-Notariat für Gitarristen", path: "guitar-html-notariat.html", category: "Musik" },
+            { title: "Jam Session", description: "Online-Musik-Jam-Sessions", path: "jamssession.html", category: "Musik" },
+            { title: "Media Gallery", description: "Medien-Galerie und Player", path: "media-gallery.html", category: "Medien" },
+            { title: "Network Diagnostics", description: "Netzwerk-Diagnose und Monitoring", path: "network-diagnostics.html", category: "Netzwerk" },
+            { title: "PeerLink Ultra Secure", description: "Hochsichere Peer-to-Peer Verbindungen", path: "peerlink-ultra-secure.html", category: "Sicherheit" },
+            { title: "QR Generator", description: "QR-Code Generator und Scanner", path: "qr-generator.html", category: "Tools" },
+            { title: "QR Scanner", description: "QR-Code Scanner und Decoder", path: "qr-scanner.html", category: "Tools" },
+            { title: "Real Email System", description: "Echtes E-Mail-System", path: "real-email-system.html", category: "Kommunikation" },
+            { title: "Real Phone System", description: "Echtes Telefon-System", path: "real-phone-system.html", category: "Kommunikation" },
+            { title: "Real WebRTC System", description: "Echtes WebRTC Kommunikations-System", path: "real-webrtc-system.html", category: "Kommunikation" },
+            { title: "Server Dashboard", description: "Server-Monitoring und Verwaltung", path: "server-dashboard.html", category: "Server" },
+            { title: "Space API Watcher", description: "Space-API Überwachung", path: "space-api-watcher.html", category: "Space" },
+            { title: "WebRTC Connection Analyzer", description: "WebRTC-Verbindungsanalyse", path: "webrtc-connection-analyzer.html", category: "WebRTC" },
+            
+            // Serverfarm Module
+            { title: "Serverfarm AI", description: "KI-Module und AI-Services", path: "../serverfarm/ai/index.html", category: "Serverfarm" },
+            { title: "Serverfarm Business", description: "Business-Anwendungen und Services", path: "../serverfarm/business/index.html", category: "Serverfarm" },
+            { title: "Serverfarm Kommunikation", description: "Kommunikations-Module", path: "../serverfarm/kommunikation/index.html", category: "Serverfarm" },
+            { title: "Serverfarm Producer", description: "Producer-Medien und Content", path: "../serverfarm/producer/index.html", category: "Serverfarm" },
+            { title: "Serverfarm Space", description: "Space-Research und APIs", path: "../serverfarm/space/index.html", category: "Serverfarm" },
+            
+            // Weitere Apps (vereinfacht)
+            { title: "API Status Checker", description: "API-Status Überwachung", path: "api-status-checker.html", category: "API" },
+            { title: "Build Suite", description: "Build und Deployment Tools", path: "build-suite.html", category: "Entwicklung" },
+            { title: "Comprehensive Dev Suite", description: "Umfassende Entwicklungsumgebung", path: "comprehensive-dev-suite.html", category: "Entwicklung" },
+            { title: "GeoIP Tracker", description: "Geografische IP-Verfolgung", path: "geoip-tracker.html", category: "Netzwerk" },
+            { title: "Live Test Suite", description: "Live-Testing und Monitoring", path: "live-test-suite.html", category: "Testing" },
+            { title: "Media Sharing", description: "Medien-Sharing und Kollaboration", path: "media-sharing.html", category: "Medien" },
+            { title: "Navigation", description: "Navigations- und Routing-Tools", path: "navigation.html", category: "Navigation" },
+            { title: "NFC Hub", description: "NFC-Verbindungen und Services", path: "nfc-hub.html", category: "Verbindung" },
+            { title: "Persistent Connections Demo", description: "Persistente Verbindungs-Demo", path: "persistent-connections-demo.html", category: "Verbindung" },
+            { title: "Provider Management", description: "Provider-Verwaltung", path: "provider-management.html", category: "Management" },
+            { title: "Redis Viewer", description: "Redis-Datenbank Browser", path: "redis-viewer.html", category: "Datenbank" },
+            { title: "Signaling Detector", description: "Signaling-Protokoll Erkennung", path: "signaling-detector.html", category: "Netzwerk" },
+            { title: "Space Network Connector", description: "Space-Netzwerk Verbindung", path: "space-network-connector.html", category: "Space" },
+            { title: "Stage Toolbox", description: "Stage-Management Tools", path: "stage-toolbox.html", category: "Management" },
+            { title: "Stakeholder Management", description: "Stakeholder-Verwaltung", path: "stakeholder-management.html", category: "Management" },
+            { title: "Tunnel Setup", description: "Tunnel-Konfiguration", path: "tunnel-setup.html", category: "Netzwerk" },
+            { title: "Universal Connection Scanner", description: "Universeller Verbindungs-Scanner", path: "universal-connection-scanner.html", category: "Scanner" },
+            { title: "Visual Scientific Monitor", description: "Wissenschaftliches Monitoring", path: "visual-scientific-monitor.html", category: "Monitoring" },
+            { title: "WebRTC Endpoint Scanner", description: "WebRTC-Endpoint Scanner", path: "webrtc-endpoint-scanner.html", category: "WebRTC" },
+            { title: "WebRTC Test Harness", description: "WebRTC-Test-Framework", path: "webrtc-test-harness.html", category: "WebRTC" },
+            { title: "Whois WebRTC Finder", description: "Whois WebRTC Finder", path: "whois-webrtc-finder.html", category: "WebRTC" }
+        ];
+
+        const searchInput = document.getElementById('searchInput');
+        const resultsContainer = document.getElementById('results');
+        const noResults = document.getElementById('noResults');
+        const resultsCount = document.getElementById('resultsCount');
+        const totalItems = document.getElementById('totalItems');
+
+        // Initialisierung
+        totalItems.textContent = allItems.length;
+        displayResults(allItems);
+
+        // Suchfunktion
+        searchInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+            
+            if (query === '') {
+                displayResults(allItems);
+                return;
+            }
+
+            const filteredResults = allItems.filter(item => {
+                return item.title.toLowerCase().includes(query) ||
+                       item.description.toLowerCase().includes(query) ||
+                       item.category.toLowerCase().includes(query) ||
+                       item.path.toLowerCase().includes(query);
+            });
+
+            displayResults(filteredResults);
+        });
+
+        // Tastatur-Shortcuts
+        document.addEventListener('keydown', function(e) {
+            // "/" zum Fokussieren der Suche
+            if (e.key === '/' && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                if (document.activeElement !== searchInput) {
+                    e.preventDefault();
+                    searchInput.focus();
+                }
+            }
+            
+            // "Esc" zum Leeren der Suche
+            if (e.key === 'Escape') {
+                searchInput.value = '';
+                searchInput.blur();
+                displayResults(allItems);
+            }
+        });
+
+        function displayResults(results) {
+            resultsCount.textContent = results.length;
+            
+            if (results.length === 0) {
+                resultsContainer.style.display = 'none';
+                noResults.style.display = 'block';
+                return;
+            }
+
+            resultsContainer.style.display = 'grid';
+            noResults.style.display = 'none';
+
+            resultsContainer.innerHTML = results.map(item => `
+                <div class="result-card" onclick="window.location.href='${item.path}'">
+                    <div class="result-title">${item.title}</div>
+                    <div class="result-description">${item.description}</div>
+                    <div class="result-path">${item.path}</div>
+                    <div class="result-category">${item.category}</div>
+                </div>
+            `).join('');
+        }
+
+        // Focus auf Suche bei Seitenladung
+        searchInput.focus();
+
+        // Home-Link mit Cache-Busting für korrekte Navigation
+        const homeLink = document.getElementById('homeLink');
+        if (homeLink) {
+            homeLink.addEventListener('click', function(e) {
+                // Cache-Busting um sicherzustellen, dass die neueste Version geladen wird
+                const url = new URL('../index.html', window.location.href);
+                url.searchParams.set('t', Date.now()); // Timestamp für Cache-Busting
+                this.href = url.toString();
+                console.log('🏠 Navigiere zur Hauptseite mit Cache-Busting');
+            });
+        }
+
+        // Sicherstellen, dass Suche nach Navigation funktioniert
+        window.addEventListener('pageshow', function() {
+            console.log('🔄 Seite geladen - Suche initialisiert');
+            searchInput.focus();
+        });
+    </script>
+</body>
+</html>

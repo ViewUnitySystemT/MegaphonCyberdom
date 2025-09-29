@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 MegaAI Dashboard Demo</title>
+<h1 style="position: absolute; left: -9999px;">🤖 MegaAI Dashboard Demo</h1>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .demo-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .demo-title {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+        
+        .demo-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+        
+        .demo-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+        
+        .demo-btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+        
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+        
+        .demo-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .demo-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .demo-info {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            margin-bottom: 2rem;
+        }
+        
+        .demo-info h3 {
+            margin-top: 0;
+            color: #3b82f6;
+        }
+        
+        .demo-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #3b82f6;
+        }
+        
+        .feature-description {
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 10000;
+            max-width: 300px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1 class="demo-title">🤖 MegaAI Dashboard</h1>
+            <p class="demo-subtitle">Dock-Ansicht mit erweiterten Features • SVG-Gauges • WebRTC-Previews • DICOM-Thumbnails</p>
+        </div>
+        
+        <div class="demo-controls">
+            <button class="demo-btn" onclick="startMegaAIDashboard()" title="Action Button">
+                🚀 MegaAI Dashboard starten
+            </button>
+            <button class="demo-btn secondary" onclick="toggleDockPosition()" title="Action Button">
+                ↔️ Dock-Position ändern
+            </button>
+            <button class="demo-btn secondary" onclick="updateSystemStatus()" title="Action Button">
+                📊 Status aktualisieren
+            </button>
+            <button class="demo-btn secondary" onclick="simulateWebRTC()" title="Action Button">
+                📹 WebRTC simulieren
+            </button>
+            <button class="demo-btn secondary" onclick="simulateMRI()" title="Action Button">
+                🧠 MRI simulieren
+            </button>
+        </div>
+        
+        <div class="demo-info">
+            <h3>🎯 Features des MegaAI Dashboards</h3>
+            <p>Das MegaAI Dashboard bietet eine moderne Dock-Ansicht mit erweiterten Features:</p>
+            <ul>
+                <li><strong>Dock-Positionierung:</strong> Top, Bottom, Left, Right mit Drag & Drop</li>
+                <li><strong>SVG-Gauge-Ringe:</strong> Animierte Messgeräte für CPU, Coverage, etc.</li>
+                <li><strong>Funken-Animationen:</strong> Sparkle-Effekte bei grünem Status</li>
+                <li><strong>WebRTC-Preview:</strong> Mini-Video-Tiles für Live-Streams</li>
+                <li><strong>DICOM-Thumbnails:</strong> MRI und Ultraschall-Vorschauen</li>
+                <li><strong>Responsive Design:</strong> Anpassung an verschiedene Bildschirmgrößen</li>
+                <li><strong>Dark/Light Mode:</strong> Automatische Anpassung an System-Präferenzen</li>
+            </ul>
+        </div>
+        
+        <div class="demo-features">
+            <div class="feature-card">
+                <div class="feature-icon">🎛️</div>
+                <div class="feature-title">Dock-Ansicht</div>
+                <div class="feature-description">
+                    Moderne Dock-Ansicht mit 4 Positionen (Top, Bottom, Left, Right). 
+                    Drag & Drop zum Verschieben, responsive Design für alle Geräte.
+                </div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <div class="feature-title">SVG-Gauge-Ringe</div>
+                <div class="feature-description">
+                    Animierte SVG-Gauge-Ringe für CPU, Coverage, Peers, etc. 
+                    Smooth-Animationen und Farbverläufe für bessere Visualisierung.
+                </div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">✨</div>
+                <div class="feature-title">Funken-Animationen</div>
+                <div class="feature-description">
+                    Sparkle-Effekte bei grünem Status. Kontinuierliche Funken-Animationen 
+                    für visuelles Feedback und moderne Optik.
+                </div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📹</div>
+                <div class="feature-title">WebRTC-Preview</div>
+                <div class="feature-description">
+                    Mini-Video-Tiles für WebRTC-Streams. Live-Vorschau von 
+                    Echtzeit-Streams direkt im Dashboard.
+                </div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🧠</div>
+                <div class="feature-title">DICOM-Thumbnails</div>
+                <div class="feature-description">
+                    MRI und Ultraschall-Vorschauen. Thumbnail-Anzeige für 
+                    medizinische Bilddaten (DICOM-Format).
+                </div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <div class="feature-title">Responsive Design</div>
+                <div class="feature-description">
+                    Anpassung an verschiedene Bildschirmgrößen. Mobile-optimiert 
+                    mit Touch-Unterstützung und adaptiven Layouts.
+                </div>
+            </div>
+        </div>
+        
+        <div class="demo-info">
+            <h3>⌨️ Tastaturkürzel</h3>
+            <ul>
+                <li><strong>Shift + K:</strong> Schnellpalette öffnen</li>
+                <li><strong>Escape:</strong> Alle Popups schließen</li>
+                <li><strong>Rechtsklick:</strong> Aktionen-Menü öffnen</li>
+                <li><strong>Hover:</strong> Details und Erklärungen anzeigen</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="/web/shared/megaai-dashboard.js"></script>
+    <script>
+        let megaAIDashboard = null;
+        let currentDockPosition = 'bottom';
+        let systemStatus = 'green';
+        
+        async function startMegaAIDashboard() {
+            try {
+                if (megaAIDashboard) {
+                    showNotification('Dashboard bereits aktiv', 'MegaAI Dashboard läuft bereits', 'info');
+                    return;
+                }
+                
+                console.log('🚀 Starting MegaAI Dashboard...');
+                
+                megaAIDashboard = window.MegaAIDashboard.mount(null, {
+                    title: 'MegaphonCyberdom AI Control',
+                    subtitle: 'Demo Mode • Advanced Features • Live Updates',
+                    dockPosition: currentDockPosition,
+                    systems: {
+                        orchestrator: { 
+                            status: 'green', 
+                            metrics: { cpu: 25, mem: 45, tasks: 3 },
+                            gauge: { type: 'cpu', value: 25, max: 100, unit: '%' }
+                        },
+                        tests: { 
+                            status: 'yellow', 
+                            metrics: { coverage: 22, total: 2050, passed: 1890 },
+                            gauge: { type: 'coverage', value: 22, max: 100, unit: '%' }
+                        },
+                        docs: { 
+                            status: 'green', 
+                            metrics: { pages: 3, generated: true },
+                            gauge: { type: 'pages', value: 3, max: 10, unit: '' }
+                        },
+                        webrtc: { 
+                            status: 'yellow', 
+                            metrics: { peers: 1, streams: 2, latency: 45 },
+                            gauge: { type: 'peers', value: 1, max: 10, unit: '' },
+                            preview: { type: 'video', src: '/api/webrtc/preview', active: true }
+                        },
+                        sonar: { 
+                            status: 'red', 
+                            metrics: { fps: 0, frequency: 0 },
+                            gauge: { type: 'fps', value: 0, max: 60, unit: 'fps' }
+                        },
+                        mri: { 
+                            status: 'red', 
+                            metrics: { scans: 0, slices: 0 },
+                            gauge: { type: 'scans', value: 0, max: 100, unit: '' },
+                            preview: { type: 'dicom', src: '/api/mri/preview', active: false }
+                        },
+                        us: { 
+                            status: 'red', 
+                            metrics: { frames: 0, depth: 0 },
+                            gauge: { type: 'frames', value: 0, max: 30, unit: 'fps' },
+                            preview: { type: 'ultrasound', src: '/api/us/preview', active: false }
+                        },
+                        bci: { 
+                            status: 'yellow', 
+                            metrics: { signal: 12, channels: 8 },
+                            gauge: { type: 'signal', value: 12, max: 100, unit: '%' }
+                        }
+                    },
+                    animations: {
+                        sparks: true,
+                        gauges: true,
+                        previews: true
+                    }
+                });
+                
+                showNotification('MegaAI Dashboard gestartet', 'Dock-Ansicht ist jetzt aktiv', 'success');
+                
+                // Start periodic updates
+                startPeriodicUpdates();
+                
+            } catch (error) {
+                console.error('❌ Failed to start MegaAI Dashboard:', error);
+                showNotification('Fehler beim Starten', error.message, 'error');
+            }
+        }
+        
+        function toggleDockPosition() {
+            if (!megaAIDashboard) {
+                showNotification('Dashboard nicht aktiv', 'Starten Sie zuerst das Dashboard', 'error');
+                return;
+            }
+            
+            const positions = ['bottom', 'top', 'left', 'right'];
+            const currentIndex = positions.indexOf(currentDockPosition);
+            const nextIndex = (currentIndex + 1) % positions.length;
+            currentDockPosition = positions[nextIndex];
+            
+            window.MegaAIDashboard.update({ dockPosition: currentDockPosition });
+            showNotification('Dock-Position geändert', `Neue Position: ${currentDockPosition}`, 'info');
+        }
+        
+        function updateSystemStatus() {
+            if (!megaAIDashboard) {
+                showNotification('Dashboard nicht aktiv', 'Starten Sie zuerst das Dashboard', 'error');
+                return;
+            }
+            
+            // Simulate status changes
+            const statuses = ['green', 'yellow', 'red'];
+            const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+            
+            window.MegaAIDashboard.update({
+                systems: {
+                    orchestrator: { 
+                        status: randomStatus, 
+                        metrics: { 
+                            cpu: Math.floor(Math.random() * 50) + 10, 
+                            mem: Math.floor(Math.random() * 60) + 20, 
+                            tasks: Math.floor(Math.random() * 5) + 1 
+                        },
+                        gauge: { type: 'cpu', value: Math.floor(Math.random() * 50) + 10, max: 100, unit: '%' }
+                    },
+                    tests: { 
+                        status: randomStatus, 
+                        metrics: { 
+                            coverage: Math.floor(Math.random() * 40) + 15, 
+                            total: 2050, 
+                            passed: Math.floor(2050 * (Math.random() * 0.4 + 0.15)) 
+                        },
+                        gauge: { type: 'coverage', value: Math.floor(Math.random() * 40) + 15, max: 100, unit: '%' }
+                    }
+                }
+            });
+            
+            showNotification('Status aktualisiert', `Neuer Status: ${randomStatus.toUpperCase()}`, 'success');
+        }
+        
+        function simulateWebRTC() {
+            if (!megaAIDashboard) {
+                showNotification('Dashboard nicht aktiv', 'Starten Sie zuerst das Dashboard', 'error');
+                return;
+            }
+            
+            window.MegaAIDashboard.update({
+                systems: {
+                    webrtc: { 
+                        status: 'green', 
+                        metrics: { 
+                            peers: Math.floor(Math.random() * 5) + 1, 
+                            streams: Math.floor(Math.random() * 8) + 2, 
+                            latency: Math.floor(Math.random() * 50) + 20 
+                        },
+                        gauge: { type: 'peers', value: Math.floor(Math.random() * 5) + 1, max: 10, unit: '' },
+                        preview: { type: 'video', src: '/api/webrtc/preview', active: true }
+                    }
+                }
+            });
+            
+            showNotification('WebRTC simuliert', 'Live-Stream aktiviert', 'success');
+        }
+        
+        function simulateMRI() {
+            if (!megaAIDashboard) {
+                showNotification('Dashboard nicht aktiv', 'Starten Sie zuerst das Dashboard', 'error');
+                return;
+            }
+            
+            window.MegaAIDashboard.update({
+                systems: {
+                    mri: { 
+                        status: 'green', 
+                        metrics: { 
+                            scans: Math.floor(Math.random() * 20) + 5, 
+                            slices: Math.floor(Math.random() * 100) + 50 
+                        },
+                        gauge: { type: 'scans', value: Math.floor(Math.random() * 20) + 5, max: 100, unit: '' },
+                        preview: { type: 'dicom', src: '/api/mri/preview', active: true }
+                    },
+                    us: { 
+                        status: 'green', 
+                        metrics: { 
+                            frames: Math.floor(Math.random() * 25) + 5, 
+                            depth: Math.floor(Math.random() * 20) + 10 
+                        },
+                        gauge: { type: 'frames', value: Math.floor(Math.random() * 25) + 5, max: 30, unit: 'fps' },
+                        preview: { type: 'ultrasound', src: '/api/us/preview', active: true }
+                    }
+                }
+            });
+            
+            showNotification('MRI/Ultraschall simuliert', 'Medizinische Bildgebung aktiviert', 'success');
+        }
+        
+        function startPeriodicUpdates() {
+            setInterval(() => {
+                if (megaAIDashboard) {
+                    // Simulate real-time updates
+                    const randomUpdates = {
+                        orchestrator: { 
+                            metrics: { 
+                                cpu: Math.floor(Math.random() * 30) + 10, 
+                                mem: Math.floor(Math.random() * 40) + 20, 
+                                tasks: Math.floor(Math.random() * 4) + 1 
+                            }
+                        },
+                        bci: { 
+                            metrics: { 
+                                signal: Math.floor(Math.random() * 30) + 5, 
+                                channels: 8 
+                            },
+                            gauge: { type: 'signal', value: Math.floor(Math.random() * 30) + 5, max: 100, unit: '%' }
+                        }
+                    };
+                    
+                    window.MegaAIDashboard.update({ systems: randomUpdates });
+                }
+            }, 3000); // Update every 3 seconds
+        }
+        
+        function showNotification(title, message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.innerHTML = `
+                <div style="font-weight: 600; margin-bottom: 4px;">${title}</div>
+                <div style="opacity: 0.9; font-size: 0.9rem;">${message}</div>
+            `;
+            
+            notification.style.background = type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6';
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Auto-start dashboard after 2 seconds
+        setTimeout(() => {
+            startMegaAIDashboard();
+        }, 2000);
+    </script>
+</body>
+</html>

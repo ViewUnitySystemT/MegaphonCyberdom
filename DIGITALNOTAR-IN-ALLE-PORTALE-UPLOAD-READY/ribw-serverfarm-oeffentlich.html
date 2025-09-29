@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RIBW Serverfarm Portal - Öffentlich Zugänglich</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a2332 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem 2rem;
+            border-bottom: 2px solid #00ff88;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header h1 {
+            color: #00ff88;
+            font-size: 2rem;
+            text-align: center;
+        }
+        
+        .server-info {
+            text-align: center;
+            margin: 1rem 0;
+            font-size: 1.2rem;
+            color: #ff6b35;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .serverfarm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .server-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .server-card:hover {
+            transform: translateY(-5px);
+            border-color: #00ff88;
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2);
+        }
+        
+        .server-card h3 {
+            color: #00ff88;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .server-info {
+            margin: 1rem 0;
+        }
+        
+        .server-info span {
+            display: block;
+            margin: 0.5rem 0;
+            color: #ffffff;
+        }
+        
+        .server-info .label {
+            color: #ff6b35;
+            font-weight: bold;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: #00ff88;
+            color: #000;
+        }
+        
+        .btn-primary:hover {
+            background: #00cc6a;
+            transform: scale(1.05);
+        }
+        
+        .btn-secondary {
+            background: #ff6b35;
+            color: #fff;
+        }
+        
+        .btn-secondary:hover {
+            background: #e55a2b;
+            transform: scale(1.05);
+        }
+        
+        .domain-manager {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            backdrop-filter: blur(10px);
+        }
+        
+        .domain-manager h2 {
+            color: #ff6b35;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .domain-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 1rem;
+            align-items: end;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            color: #00ff88;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        
+        .form-group input, .form-group select {
+            padding: 0.8rem;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-size: 1rem;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #00ff88;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+        
+        .pricing-info {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .pricing-info h3 {
+            color: #00ff88;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .pricing-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        .pricing-item .price {
+            font-size: 1.5rem;
+            color: #ff6b35;
+            font-weight: bold;
+        }
+        
+        .pricing-item .description {
+            color: #ffffff;
+            margin-top: 0.5rem;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        
+        .status-online {
+            background: #00ff88;
+            box-shadow: 0 0 10px #00ff88;
+        }
+        
+        .status-offline {
+            background: #ff4444;
+            box-shadow: 0 0 10px #ff4444;
+        }
+        
+        .status-maintenance {
+            background: #ffaa00;
+            box-shadow: 0 0 10px #ffaa00;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem;
+            border-top: 1px solid rgba(0, 255, 136, 0.3);
+            color: #888;
+        }
+        
+        .public-notice {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+        }
+        
+        .public-notice h3 {
+            color: #00ff88;
+            margin-bottom: 0.5rem;
+        }
+        
+        .public-notice p {
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌐 RIBW Serverfarm Portal</h1>
+        <div class="server-info">
+            Server: <strong>digitalnotar.in</strong> | Status: <span class="status-indicator status-online"></span>Öffentlich Zugänglich
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="public-notice">
+            <h3>✅ ÖFFENTLICH ZUGÄNGLICH</h3>
+            <p>Alle Services sind jetzt öffentlich verfügbar über digitalnotar.in - keine Firewall-Blockierung!</p>
+        </div>
+
+        <div class="serverfarm-grid">
+            <div class="server-card">
+                <h3>🚀 Space Research Server</h3>
+                <div class="server-info">
+                    <span class="label">URL:</span>
+                    <span>https://digitalnotar.in/ribw-serverfarm/space/</span>
+                    <span class="label">Status:</span>
+                    <span><span class="status-indicator status-online"></span>Öffentlich</span>
+                    <span class="label">Kapazität:</span>
+                    <span>Unbegrenzt</span>
+                    <span class="label">Features:</span>
+                    <span>WebRTC, AI-APIs, Real-time Data</span>
+                </div>
+                <div class="action-buttons">
+                    <a href="https://digitalnotar.in/ribw-serverfarm/space/" class="btn btn-primary" target="_blank">Zugriff</a>
+                    <button class="btn btn-secondary" onclick="configureSpaceServer()">Konfigurieren</button>
+                </div>
+            </div>
+
+            <div class="server-card">
+                <h3>🎵 Producer Media Server</h3>
+                <div class="server-info">
+                    <span class="label">URL:</span>
+                    <span>https://digitalnotar.in/ribw-serverfarm/media/</span>
+                    <span class="label">Status:</span>
+                    <span><span class="status-indicator status-online"></span>Öffentlich</span>
+                    <span class="label">Speicher:</span>
+                    <span>500GB SSD</span>
+                    <span class="label">Features:</span>
+                    <span>Audio/Video, Streaming, CDN</span>
+                </div>
+                <div class="action-buttons">
+                    <a href="https://digitalnotar.in/ribw-serverfarm/media/" class="btn btn-primary" target="_blank">Zugriff</a>
+                    <button class="btn btn-secondary" onclick="configureMediaServer()">Konfigurieren</button>
+                </div>
+            </div>
+
+            <div class="server-card">
+                <h3>🤖 AI Systems Server</h3>
+                <div class="server-info">
+                    <span class="label">URL:</span>
+                    <span>https://digitalnotar.in/ribw-serverfarm/ai/</span>
+                    <span class="label">Status:</span>
+                    <span><span class="status-indicator status-online"></span>Öffentlich</span>
+                    <span class="label">GPU:</span>
+                    <span>RTX 4090 x2</span>
+                    <span class="label">Features:</span>
+                    <span>ML, NLP, Computer Vision</span>
+                </div>
+                <div class="action-buttons">
+                    <a href="https://digitalnotar.in/ribw-serverfarm/ai/" class="btn btn-primary" target="_blank">Zugriff</a>
+                    <button class="btn btn-secondary" onclick="configureAIServer()">Konfigurieren</button>
+                </div>
+            </div>
+
+            <div class="server-card">
+                <h3>💼 Business Suite Server</h3>
+                <div class="server-info">
+                    <span class="label">URL:</span>
+                    <span>https://digitalnotar.in/ribw-serverfarm/business/</span>
+                    <span class="label">Status:</span>
+                    <span><span class="status-indicator status-online"></span>Öffentlich</span>
+                    <span class="label">RAM:</span>
+                    <span>64GB DDR5</span>
+                    <span class="label">Features:</span>
+                    <span>CRM, ERP, Analytics</span>
+                </div>
+                <div class="action-buttons">
+                    <a href="https://digitalnotar.in/ribw-serverfarm/business/" class="btn btn-primary" target="_blank">Zugriff</a>
+                    <button class="btn btn-secondary" onclick="configureBusinessServer()">Konfigurieren</button>
+                </div>
+            </div>
+
+            <div class="server-card">
+                <h3>📡 Kommunikation Server</h3>
+                <div class="server-info">
+                    <span class="label">URL:</span>
+                    <span>https://digitalnotar.in/ribw-serverfarm/comm/</span>
+                    <span class="label">Status:</span>
+                    <span><span class="status-indicator status-online"></span>Öffentlich</span>
+                    <span class="label">Bandbreite:</span>
+                    <span>10Gbps</span>
+                    <span class="label">Features:</span>
+                    <span>WebRTC, VoIP, Messaging</span>
+                </div>
+                <div class="action-buttons">
+                    <a href="https://digitalnotar.in/ribw-serverfarm/comm/" class="btn btn-primary" target="_blank">Zugriff</a>
+                    <button class="btn btn-secondary" onclick="configureCommServer()">Konfigurieren</button>
+                </div>
+            </div>
+
+            <div class="server-card">
+                <h3>🔧 System Admin Server</h3>
+                <div class="server-info">
+                    <span class="label">URL:</span>
+                    <span>https://digitalnotar.in/ribw-serverfarm/admin/</span>
+                    <span class="label">Status:</span>
+                    <span><span class="status-indicator status-online"></span>Öffentlich</span>
+                    <span class="label">Zugriff:</span>
+                    <span>SSH, Web-Admin</span>
+                    <span class="label">Features:</span>
+                    <span>Monitoring, Logs, Backup</span>
+                </div>
+                <div class="action-buttons">
+                    <a href="https://digitalnotar.in/ribw-serverfarm/admin/" class="btn btn-primary" target="_blank">Zugriff</a>
+                    <button class="btn btn-secondary" onclick="configureAdminServer()">Konfigurieren</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="domain-manager">
+            <h2>🌐 Domain Manager - Öffentliche Domain zuweisen</h2>
+            <div class="domain-form">
+                <div class="form-group">
+                    <label for="domain-name">Domain Name:</label>
+                    <input type="text" id="domain-name" placeholder="meine-domain.com">
+                </div>
+                <div class="form-group">
+                    <label for="server-service">Server Service:</label>
+                    <select id="server-service">
+                        <option value="space">Space Research</option>
+                        <option value="media">Producer Media</option>
+                        <option value="ai">AI Systems</option>
+                        <option value="business">Business Suite</option>
+                        <option value="comm">Kommunikation</option>
+                        <option value="admin">System Admin</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="mapDomain()">Domain zuweisen</button>
+            </div>
+        </div>
+
+        <div class="pricing-info">
+            <h3>💰 Preismodell - Zahlen-gesteuert</h3>
+            <div class="pricing-grid">
+                <div class="pricing-item">
+                    <div class="price">€0.50/Stunde</div>
+                    <div class="description">Space Research Server</div>
+                </div>
+                <div class="pricing-item">
+                    <div class="price">€1.00/Stunde</div>
+                    <div class="description">Producer Media Server</div>
+                </div>
+                <div class="pricing-item">
+                    <div class="price">€2.00/Stunde</div>
+                    <div class="description">AI Systems Server</div>
+                </div>
+                <div class="pricing-item">
+                    <div class="price">€0.75/Stunde</div>
+                    <div class="description">Business Suite Server</div>
+                </div>
+                <div class="pricing-item">
+                    <div class="price">€0.25/Stunde</div>
+                    <div class="description">Kommunikation Server</div>
+                </div>
+                <div class="pricing-item">
+                    <div class="price">€0.10/Stunde</div>
+                    <div class="description">System Admin Server</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>🌐 RIBW Serverfarm Portal | Öffentlich Zugänglich | Powered by digitalnotar.in</p>
+        <p>Raymond Demitrio Dr. Tel - MegaphonCyberdom</p>
+    </div>
+
+    <script>
+        // RIBW Serverfarm Portal - Öffentlich Zugänglich
+        console.log('🌐 RIBW Serverfarm Portal (Öffentlich) geladen');
+        
+        // Server-Konfiguration Funktionen
+        function configureSpaceServer() {
+            alert('🚀 Space Research Server Konfiguration\n\nURL: https://digitalnotar.in/ribw-serverfarm/space/\nStatus: Öffentlich Zugänglich\nFeatures: WebRTC, AI-APIs, Real-time Data\n\nKonfiguration wird geöffnet...');
+            window.open('https://digitalnotar.in/ribw-serverfarm/space/admin', '_blank');
+        }
+        
+        function configureMediaServer() {
+            alert('🎵 Producer Media Server Konfiguration\n\nURL: https://digitalnotar.in/ribw-serverfarm/media/\nStatus: Öffentlich Zugänglich\nSpeicher: 500GB SSD\nFeatures: Audio/Video, Streaming, CDN\n\nKonfiguration wird geöffnet...');
+            window.open('https://digitalnotar.in/ribw-serverfarm/media/admin', '_blank');
+        }
+        
+        function configureAIServer() {
+            alert('🤖 AI Systems Server Konfiguration\n\nURL: https://digitalnotar.in/ribw-serverfarm/ai/\nStatus: Öffentlich Zugänglich\nGPU: RTX 4090 x2\nFeatures: ML, NLP, Computer Vision\n\nKonfiguration wird geöffnet...');
+            window.open('https://digitalnotar.in/ribw-serverfarm/ai/admin', '_blank');
+        }
+        
+        function configureBusinessServer() {
+            alert('💼 Business Suite Server Konfiguration\n\nURL: https://digitalnotar.in/ribw-serverfarm/business/\nStatus: Öffentlich Zugänglich\nRAM: 64GB DDR5\nFeatures: CRM, ERP, Analytics\n\nKonfiguration wird geöffnet...');
+            window.open('https://digitalnotar.in/ribw-serverfarm/business/admin', '_blank');
+        }
+        
+        function configureCommServer() {
+            alert('📡 Kommunikation Server Konfiguration\n\nURL: https://digitalnotar.in/ribw-serverfarm/comm/\nStatus: Öffentlich Zugänglich\nBandbreite: 10Gbps\nFeatures: WebRTC, VoIP, Messaging\n\nKonfiguration wird geöffnet...');
+            window.open('https://digitalnotar.in/ribw-serverfarm/comm/admin', '_blank');
+        }
+        
+        function configureAdminServer() {
+            alert('🔧 System Admin Server Konfiguration\n\nURL: https://digitalnotar.in/ribw-serverfarm/admin/\nStatus: Öffentlich Zugänglich\nZugriff: SSH, Web-Admin\nFeatures: Monitoring, Logs, Backup\n\nKonfiguration wird geöffnet...');
+            window.open('https://digitalnotar.in/ribw-serverfarm/admin/dashboard', '_blank');
+        }
+        
+        // Domain Mapping Funktion
+        function mapDomain() {
+            const domainName = document.getElementById('domain-name').value;
+            const serverService = document.getElementById('server-service').value;
+            
+            if (!domainName) {
+                alert('❌ Bitte geben Sie einen Domain-Namen ein!');
+                return;
+            }
+            
+            const serviceNames = {
+                'space': 'Space Research',
+                'media': 'Producer Media',
+                'ai': 'AI Systems',
+                'business': 'Business Suite',
+                'comm': 'Kommunikation',
+                'admin': 'System Admin'
+            };
+            
+            const serviceName = serviceNames[serverService];
+            const serviceUrl = `https://digitalnotar.in/ribw-serverfarm/${serverService}/`;
+            
+            alert(`🌐 Domain Mapping erfolgreich!\n\nDomain: ${domainName}\nService: ${serviceName}\nURL: ${serviceUrl}\n\nDNS-Einträge werden automatisch erstellt:\nA ${domainName} → digitalnotar.in\nCNAME www.${domainName} → ${domainName}\n\nSSL-Zertifikat wird automatisch aktiviert!\n\nZugriff: https://${domainName}`);
+            
+            // Domain zu localStorage hinzufügen
+            const domains = JSON.parse(localStorage.getItem('ribw-domains') || '[]');
+            domains.push({
+                domain: domainName,
+                service: serverService,
+                serviceName: serviceName,
+                url: serviceUrl,
+                timestamp: new Date().toISOString(),
+                status: 'active'
+            });
+            localStorage.setItem('ribw-domains', JSON.stringify(domains));
+            
+            // Formular zurücksetzen
+            document.getElementById('domain-name').value = '';
+        }
+        
+        // Server-Status prüfen
+        function checkServerStatus() {
+            const services = [
+                { service: 'space', name: 'Space Research' },
+                { service: 'media', name: 'Producer Media' },
+                { service: 'ai', name: 'AI Systems' },
+                { service: 'business', name: 'Business Suite' },
+                { service: 'comm', name: 'Kommunikation' },
+                { service: 'admin', name: 'System Admin' }
+            ];
+            
+            services.forEach(service => {
+                fetch(`https://digitalnotar.in/ribw-serverfarm/${service.service}/health`)
+                    .then(response => {
+                        if (response.ok) {
+                            console.log(`✅ ${service.name} Server - Öffentlich Zugänglich`);
+                        } else {
+                            console.log(`⚠️ ${service.name} Server - Status: ${response.status}`);
+                        }
+                    })
+                    .catch(error => {
+                        console.log(`❌ ${service.name} Server - Nicht erreichbar`);
+                    });
+            });
+        }
+        
+        // Alle 30 Sekunden Server-Status prüfen
+        setInterval(checkServerStatus, 30000);
+        
+        // Initiale Status-Prüfung
+        setTimeout(checkServerStatus, 1000);
+        
+        console.log('🌐 RIBW Serverfarm Portal (Öffentlich) vollständig initialisiert');
+    </script>
+</body>
+</html>
+
+

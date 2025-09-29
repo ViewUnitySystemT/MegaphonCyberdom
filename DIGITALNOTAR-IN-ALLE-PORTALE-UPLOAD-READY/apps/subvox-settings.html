@@ -1,0 +1,482 @@
+<!-- TODO: Replacement character detected () - verify source encoding -->
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+  <title>SUBVOX Settings - Language & Accessibility</title>
+<h1 style="position: absolute; left: -9999px;">SUBVOX Settings - Language & Accessibility</h1>
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#FF6B35">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SUBVOX Settings">
+  <link rel="apple-touch-icon" href="../icon.png">
+  <style>
+    .settings-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .settings-header {
+      background: linear-gradient(135deg, #FF6F00, #FF8A33);
+      color: white;
+      padding: 2rem;
+      border-radius: var(--radius-lg);
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .settings-section {
+      background: var(--surface);
+      border: 1px solid var(--outline);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .settings-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
+    
+    .setting-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--outline);
+    }
+    
+    .setting-item:last-child {
+      border-bottom: none;
+    }
+    
+    .setting-label {
+      font-weight: 500;
+    }
+    
+    .setting-control {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .language-selector {
+      padding: 0.5rem;
+      border: 1px solid var(--outline);
+      border-radius: var(--radius-md);
+      background: var(--background);
+      color: var(--on-background);
+      font-size: 1rem;
+    }
+    
+    .toggle-switch {
+      position: relative;
+      width: 50px;
+      height: 24px;
+      background: var(--outline);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    
+    .toggle-switch.active {
+      background: var(--primary);
+    }
+    
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s ease;
+    }
+    
+    .toggle-switch.active::after {
+      transform: translateX(26px);
+    }
+    
+    .accessibility-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    
+    .accessibility-card {
+      background: var(--surface-variant);
+      border: 1px solid var(--outline);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      text-align: center;
+    }
+    
+    .accessibility-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .rtl .settings-container {
+      direction: rtl;
+    }
+    
+    .rtl .setting-item {
+      flex-direction: row-reverse;
+    }
+    
+    .rtl .setting-control {
+      flex-direction: row-reverse;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="settings-container">
+      <div class="settings-header">
+        <h1 data-i18n="settings.title">Settings</h1>
+        <p data-i18n="app.description">Language and accessibility settings</p>
+      </div>
+
+      <!-- Language Settings -->
+      <div class="settings-section">
+        <h2 class="settings-title" data-i18n="settings.language">Language</h2>
+        
+        <div class="setting-item">
+          <div class="setting-label">
+            <label for="language-select" data-i18n="settings.language">Language</label>
+          </div>
+          <div class="setting-control">
+            <select id="language-select" class="language-selector" onchange="changeLanguage(this.value)">
+              <option value="auto" data-i18n="settings.auto">Auto</option>
+              <option value="en">English</option>
+              <option value="de">Deutsch</option>
+              <option value="nl">Nederlands</option>
+              <option value="ar">العربية</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="setting-item">
+          <div class="setting-label">
+            <span data-i18n="settings.auto">Auto-detect from browser</span>
+          </div>
+          <div class="setting-control">
+            <div class="toggle-switch" id="auto-detect-toggle" onclick="toggleAutoDetect()">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Accessibility Settings -->
+      <div class="settings-section">
+        <h2 class="settings-title" data-i18n="settings.accessibility">Accessibility</h2>
+        
+        <div class="accessibility-grid">
+          <div class="accessibility-card">
+            <div class="accessibility-icon">🔍</div>
+            <h3 data-i18n="accessibility.scanning_keyboard">Scanning Keyboard</h3>
+            <div class="toggle-switch" id="scanning-toggle" onclick="toggleScanningKeyboard()">
+            </div>
+          </div>
+          
+          <div class="accessibility-card">
+            <div class="accessibility-icon">🎤</div>
+            <h3 data-i18n="accessibility.voice_commands">Voice Commands</h3>
+            <div class="toggle-switch" id="voice-toggle" onclick="toggleVoiceCommands()">
+            </div>
+          </div>
+          
+          <div class="accessibility-card">
+            <div class="accessibility-icon">👆</div>
+            <h3 data-i18n="accessibility.gesture_control">Gesture Control</h3>
+            <div class="toggle-switch" id="gesture-toggle" onclick="toggleGestureControl()">
+            </div>
+          </div>
+          
+          <div class="accessibility-card">
+            <div class="accessibility-icon">👁️</div>
+            <h3 data-i18n="accessibility.eye_tracking">Eye Tracking</h3>
+            <div class="toggle-switch" id="eye-toggle" onclick="toggleEyeTracking()">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Display Settings -->
+      <div class="settings-section">
+        <h2 class="settings-title">Display Settings</h2>
+        
+        <div class="setting-item">
+          <div class="setting-label">
+            <span data-i18n="settings.high_contrast">High Contrast</span>
+          </div>
+          <div class="setting-control">
+            <div class="toggle-switch" id="contrast-toggle" onclick="toggleHighContrast()">
+            </div>
+          </div>
+        </div>
+        
+        <div class="setting-item">
+          <div class="setting-label">
+            <span data-i18n="settings.large_text">Large Text</span>
+          </div>
+          <div class="setting-control">
+            <div class="toggle-switch" id="text-toggle" onclick="toggleLargeText()">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feedback Settings -->
+      <div class="settings-section">
+        <h2 class="settings-title">Feedback Settings</h2>
+        
+        <div class="setting-item">
+          <div class="setting-label">
+            <span data-i18n="settings.haptic_feedback">Haptic Feedback</span>
+          </div>
+          <div class="setting-control">
+            <div class="toggle-switch" id="haptic-toggle" onclick="toggleHapticFeedback()">
+            </div>
+          </div>
+        </div>
+        
+        <div class="setting-item">
+          <div class="setting-label">
+            <span data-i18n="settings.sound_feedback">Sound Feedback</span>
+          </div>
+          <div class="setting-control">
+            <div class="toggle-switch" id="sound-toggle" onclick="toggleSoundFeedback()">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Test Section -->
+      <div class="settings-section">
+        <h2 class="settings-title">Test Settings</h2>
+        
+        <div class="setting-item">
+          <div class="setting-label">
+            <span data-i18n="haptics.test">Test Haptic Feedback</span>
+          </div>
+          <div class="setting-control">
+            <button onclick="testHapticFeedback()" class="btn btn-primary" title="Action Button">
+              <span data-i18n="haptics.test">Test</span>
+            </button>
+          </div>
+        </div>
+        
+        <div class="setting-item">
+          <div class="setting-label">
+            <span data-i18n="accessibility.screen_reader">Test Screen Reader</span>
+          </div>
+          <div class="setting-control">
+            <button onclick="testScreenReader()" class="btn btn-secondary" title="Action Button">
+              <span data-i18n="accessibility.screen_reader">Test</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- i18n Script -->
+  <script async type="module" src="../i18n/i18n.js"></script>
+  
+  <!-- Settings Script -->
+  <script async type="module">
+    // Settings Management
+    class SubvoxSettings {
+      constructor() {
+        this.settings = this.loadSettings();
+        this.initializeUI();
+        this.setupEventListeners();
+      }
+      
+      loadSettings() {
+        const defaultSettings = {
+          language: 'auto',
+          autoDetect: true,
+          scanningKeyboard: false,
+          voiceCommands: false,
+          gestureControl: false,
+          eyeTracking: false,
+          highContrast: false,
+          largeText: false,
+          hapticFeedback: true,
+          soundFeedback: true
+        };
+        
+        const stored = localStorage.getItem('subvox.settings');
+        return stored ? { ...defaultSettings, ...JSON.parse(stored) } : defaultSettings;
+      }
+      
+      saveSettings() {
+        localStorage.setItem('subvox.settings', JSON.stringify(this.settings));
+        this.applySettings();
+      }
+      
+      initializeUI() {
+        // Language selector
+        const langSelect = document.getElementById('language-select');
+        langSelect.value = this.settings.language;
+        
+        // Auto-detect toggle
+        const autoToggle = document.getElementById('auto-detect-toggle');
+        autoToggle.classList.toggle('active', this.settings.autoDetect);
+        
+        // Accessibility toggles
+        document.getElementById('scanning-toggle').classList.toggle('active', this.settings.scanningKeyboard);
+        document.getElementById('voice-toggle').classList.toggle('active', this.settings.voiceCommands);
+        document.getElementById('gesture-toggle').classList.toggle('active', this.settings.gestureControl);
+        document.getElementById('eye-toggle').classList.toggle('active', this.settings.eyeTracking);
+        
+        // Display toggles
+        document.getElementById('contrast-toggle').classList.toggle('active', this.settings.highContrast);
+        document.getElementById('text-toggle').classList.toggle('active', this.settings.largeText);
+        
+        // Feedback toggles
+        document.getElementById('haptic-toggle').classList.toggle('active', this.settings.hapticFeedback);
+        document.getElementById('sound-toggle').classList.toggle('active', this.settings.soundFeedback);
+      }
+      
+      setupEventListeners() {
+        // Language change event
+        window.addEventListener('languageChanged', (event) => {
+          this.settings.language = event.detail.language;
+          this.saveSettings();
+        });
+      }
+      
+      applySettings() {
+        // Apply high contrast
+        document.body.classList.toggle('high-contrast', this.settings.highContrast);
+        
+        // Apply large text
+        document.body.classList.toggle('large-text', this.settings.largeText);
+        
+        // Apply RTL
+        if (window.i18n && window.i18n.isRTL) {
+          document.documentElement.classList.add('rtl');
+        } else {
+          document.documentElement.classList.remove('rtl');
+        }
+        
+        // Dispatch settings change event
+        window.dispatchEvent(new CustomEvent('settingsChanged', {
+          detail: this.settings
+        }));
+      }
+      
+      toggleSetting(setting) {
+        this.settings[setting] = !this.settings[setting];
+        this.saveSettings();
+      }
+    }
+    
+    // Global functions
+    function changeLanguage(lang) {
+      if (lang === 'auto') {
+        window.i18n.lang = navigator.language.split('-')[0];
+      } else {
+        window.i18n.lang = lang;
+      }
+    }
+    
+    function toggleAutoDetect() {
+      settings.toggleSetting('autoDetect');
+      const toggle = document.getElementById('auto-detect-toggle');
+      toggle.classList.toggle('active', settings.settings.autoDetect);
+    }
+    
+    function toggleScanningKeyboard() {
+      settings.toggleSetting('scanningKeyboard');
+      const toggle = document.getElementById('scanning-toggle');
+      toggle.classList.toggle('active', settings.settings.scanningKeyboard);
+    }
+    
+    function toggleVoiceCommands() {
+      settings.toggleSetting('voiceCommands');
+      const toggle = document.getElementById('voice-toggle');
+      toggle.classList.toggle('active', settings.settings.voiceCommands);
+    }
+    
+    function toggleGestureControl() {
+      settings.toggleSetting('gestureControl');
+      const toggle = document.getElementById('gesture-toggle');
+      toggle.classList.toggle('active', settings.settings.gestureControl);
+    }
+    
+    function toggleEyeTracking() {
+      settings.toggleSetting('eyeTracking');
+      const toggle = document.getElementById('eye-toggle');
+      toggle.classList.toggle('active', settings.settings.eyeTracking);
+    }
+    
+    function toggleHighContrast() {
+      settings.toggleSetting('highContrast');
+      const toggle = document.getElementById('contrast-toggle');
+      toggle.classList.toggle('active', settings.settings.highContrast);
+    }
+    
+    function toggleLargeText() {
+      settings.toggleSetting('largeText');
+      const toggle = document.getElementById('text-toggle');
+      toggle.classList.toggle('active', settings.settings.largeText);
+    }
+    
+    function toggleHapticFeedback() {
+      settings.toggleSetting('hapticFeedback');
+      const toggle = document.getElementById('haptic-toggle');
+      toggle.classList.toggle('active', settings.settings.hapticFeedback);
+    }
+    
+    function toggleSoundFeedback() {
+      settings.toggleSetting('soundFeedback');
+      const toggle = document.getElementById('sound-toggle');
+      toggle.classList.toggle('active', settings.settings.soundFeedback);
+    }
+    
+    function testHapticFeedback() {
+      if (navigator.vibrate) {
+        navigator.vibrate([100, 50, 100]);
+      }
+    }
+    
+    function testScreenReader() {
+      const message = window.i18n ? window.i18n.t('messages.welcome') : 'Welcome to SUBVOX Bridge';
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(message);
+        utterance.lang = window.i18n ? window.i18n.lang : 'en';
+        speechSynthesis.speak(utterance);
+      }
+    }
+    
+    // Initialize settings
+    const settings = new SubvoxSettings();
+    
+    // Make functions globally available
+    window.changeLanguage = changeLanguage;
+    window.toggleAutoDetect = toggleAutoDetect;
+    window.toggleScanningKeyboard = toggleScanningKeyboard;
+    window.toggleVoiceCommands = toggleVoiceCommands;
+    window.toggleGestureControl = toggleGestureControl;
+    window.toggleEyeTracking = toggleEyeTracking;
+    window.toggleHighContrast = toggleHighContrast;
+    window.toggleLargeText = toggleLargeText;
+    window.toggleHapticFeedback = toggleHapticFeedback;
+    window.toggleSoundFeedback = toggleSoundFeedback;
+    window.testHapticFeedback = testHapticFeedback;
+    window.testScreenReader = testScreenReader;
+  </script>
+</body>
+</html>

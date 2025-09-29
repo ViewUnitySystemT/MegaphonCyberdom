@@ -1,0 +1,32 @@
+AddType application/javascript .js
+AddType text/css .css
+AddType application/json .json
+AddType text/html .html
+AddType image/svg+xml .svg
+AddType application/pdf .pdf
+AddType audio/webm .webm
+AddType audio/mpeg .mp3
+AddType video/mp4 .mp4
+
+# Cache-Control für bessere Performance
+<FilesMatch "\.(js|css|png|jpg|jpeg|gif|ico|svg)$">
+    ExpiresActive On
+    ExpiresDefault "access plus 1 month"
+</FilesMatch>
+
+# Sicherheit
+Header always set X-Content-Type-Options nosniff
+Header always set X-Frame-Options DENY
+Header always set X-XSS-Protection "1; mode=block"
+
+# CORS für API-Zugriffe
+Header always set Access-Control-Allow-Origin "*"
+Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
+
+# Rewrite für SPA
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ /index.html [QSA,L]
+

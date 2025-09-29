@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>🔍 WebRTC Signaling Server Detector</title>
+<h1 style="position: absolute; left: -9999px;">🔍 WebRTC Signaling Server Detector</h1>
+  <style>
+    :root { 
+      color-scheme: light dark; 
+      --primary: #7aa2ff;
+      --success: #27e86b;
+      --warning: #ffd166;
+      --error: #ef476f;
+      --bg-dark: #0a0f1f;
+      --bg-panel: rgba(13,19,35,.5);
+      --border: rgba(122,162,255,.25);
+    }
+    
+    body { 
+      margin:0; 
+      font:14px/1.45 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto; 
+      background: var(--bg-dark); 
+      color:#e8ecff; 
+    }
+    
+    header { 
+      padding:12px 16px; 
+      border-bottom:1px solid var(--border); 
+      display:flex; 
+      align-items:center; 
+      gap:8px; 
+      background: var(--bg-panel);
+      backdrop-filter: blur(10px);
+    }
+    
+    .container { padding:12px 16px; }
+    
+    .detector-panel { 
+      margin: 12px 0; 
+      padding: 12px; 
+      border:1px solid var(--border); 
+      border-radius: 12px; 
+      background: var(--bg-panel); 
+      backdrop-filter: blur(10px);
+    }
+    
+    .row { 
+      display:flex; 
+      gap:8px; 
+      flex-wrap:wrap; 
+      align-items:center; 
+    }
+    
+    .btn { 
+      background: linear-gradient(135deg,var(--primary),#a87dff); 
+      border:none; 
+      color:#fff; 
+      border-radius:10px; 
+      padding:8px 12px; 
+      cursor:pointer; 
+      transition: all 0.3s ease;
+      font-weight: 600;
+    }
+    
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(122,162,255,0.3);
+    }
+    
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .btn.success { background: linear-gradient(135deg, var(--success), #20c997); }
+    .btn.warning { background: linear-gradient(135deg, var(--warning), #fd7e14); }
+    .btn.error { background: linear-gradient(135deg, var(--error), #dc3545); }
+    
+    input, textarea, select { 
+      background:#0f1730; 
+      color:#e8ecff; 
+      border:1px solid var(--border); 
+      border-radius:8px; 
+      padding:8px; 
+      width: 100%;
+      box-sizing: border-box;
+    }
+    
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin: 12px 0;
+    }
+    
+    .status-item {
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-panel);
+    }
+    
+    .detection-result {
+      background: rgba(122,162,255,0.1);
+      border: 1px solid var(--primary);
+      padding: 12px;
+      border-radius: 8px;
+      margin: 8px 0;
+    }
+    
+    .detection-result.found {
+      background: rgba(39,232,107,0.1);
+      border-color: var(--success);
+    }
+    
+    .detection-result.error {
+      background: rgba(239,71,111,0.1);
+      border-color: var(--error);
+    }
+    
+    pre {
+      background: #0f1730;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      overflow-x: auto;
+      font-size: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .network-log {
+      background: #0f1730;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .url-list {
+      background: rgba(122,162,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px;
+      margin: 8px 0;
+    }
+    
+    .url-item {
+      padding: 4px 8px;
+      margin: 2px 0;
+      background: var(--bg-panel);
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+    }
+    
+    .url-item.websocket {
+      border-left: 3px solid var(--primary);
+    }
+    
+    .url-item.signaling {
+      border-left: 3px solid var(--success);
+    }
+    
+    .url-item.stun {
+      border-left: 3px solid var(--warning);
+    }
+    
+    .url-item.turn {
+      border-left: 3px solid var(--error);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <strong>🔍 WebRTC Signaling Server Detector</strong>
+    <div class="row">
+      <button id="startDetection" class="btn" title="Action Button">Detection starten</button>
+      <button id="stopDetection" class="btn error" disabled title="Action Button">Detection stoppen</button>
+      <button id="clearResults" class="btn warning" title="Action Button">Ergebnisse löschen</button>
+    </div>
+  </header>
+  
+  <div class="container">
+    <main>
+      <!-- URL Input -->
+      <section class="detector-panel">
+        <h3>🎯 Ziel-URL eingeben</h3>
+        <div class="row">
+          <input id="targetUrl" placeholder="https://example.com oder ws://signaling.example.com" / aria-label="Input Field">
+          <button id="analyzeUrl" class="btn" title="Action Button">URL analysieren</button>
+        </div>
+        <div class="row">
+          <select id="detectionMode">
+            <option value="auto">Automatische Erkennung</option>
+            <option value="websocket">WebSocket-Suche</option>
+            <option value="signaling">Signaling-Suche</option>
+            <option value="stun">STUN/TURN-Suche</option>
+            <option value="deep">Tiefe Analyse</option>
+          </select>
+          <button id="deepScan" class="btn" title="Action Button">Tiefe Analyse</button>
+        </div>
+      </section>
+
+      <!-- Live Detection -->
+      <section class="detector-panel">
+        <h3>🔍 Live Detection</h3>
+        <div class="row">
+          <button id="startLiveDetection" class="btn success" title="Action Button">Live Detection starten</button>
+          <button id="analyzeCurrentPage" class="btn" title="Action Button">Aktuelle Seite analysieren</button>
+          <button id="analyzeNetworkTraffic" class="btn" title="Action Button">Netzwerk-Traffic analysieren</button>
+        </div>
+        <div class="network-log" id="networkLog">
+          Live Detection bereit...
+        </div>
+      </section>
+
+      <!-- Detection Results -->
+      <section class="detector-panel">
+        <h3>📊 Detection Ergebnisse</h3>
+        <div id="detectionResults">
+          <div class="detection-result">
+            <h4>🔍 WebRTC Signaling Server Detection</h4>
+            <p>Klicken Sie auf "Detection starten" um mit der Analyse zu beginnen.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Found URLs -->
+      <section class="detector-panel">
+        <h3>🌐 Gefundene URLs</h3>
+        <div class="url-list" id="foundUrls">
+          <div class="url-item">Noch keine URLs gefunden</div>
+        </div>
+      </section>
+
+      <!-- Network Analysis -->
+      <section class="detector-panel">
+        <h3>📡 Netzwerk-Analyse</h3>
+        <div class="status-grid">
+          <div class="status-item">
+            <h4>WebSocket-Verbindungen</h4>
+            <div id="websocketCount">0</div>
+          </div>
+          <div class="status-item">
+            <h4>STUN-Server</h4>
+            <div id="stunCount">0</div>
+          </div>
+          <div class="status-item">
+            <h4>TURN-Server</h4>
+            <div id="turnCount">0</div>
+          </div>
+          <div class="status-item">
+            <h4>Signaling-Endpunkte</h4>
+            <div id="signalingCount">0</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Detailed Log -->
+      <section class="detector-panel">
+        <h3>📝 Detailliertes Log</h3>
+        <pre id="detailedLog">WebRTC Signaling Server Detector bereit...
+
+Verfügbare Detection-Modi:
+- Automatische Erkennung: Sucht nach allen WebRTC-Komponenten
+- WebSocket-Suche: Findet WebSocket-Verbindungen
+- Signaling-Suche: Sucht nach Signaling-Servern
+- STUN/TURN-Suche: Findet ICE-Server
+- Tiefe Analyse: Vollständige Code-Analyse
+
+Verwendung:
+1. URL eingeben oder aktuelle Seite analysieren
+2. Detection-Modus wählen
+3. Detection starten
+4. Ergebnisse analysieren</pre>
+      </section>
+    </main>
+  </div>
+
+  <script>
+  class WebRTCSignalingDetector {
+    constructor() {
+      this.isDetecting = false;
+      this.foundUrls = new Set();
+      this.websocketConnections = new Set();
+      this.stunServers = new Set();
+      this.turnServers = new Set();
+      this.signalingEndpoints = new Set();
+      this.networkLog = [];
+      this.detectionResults = [];
+      
+      this.init();
+    }
+
+    init() {
+      this.setupEventListeners();
+      this.setupNetworkMonitoring();
+      this.log('WebRTC Signaling Detector initialisiert');
+    }
+
+    setupEventListeners() {
+      document.getElementById('startDetection').onclick = () => this.startDetection();
+      document.getElementById('stopDetection').onclick = () => this.stopDetection();
+      document.getElementById('clearResults').onclick = () => this.clearResults();
+      document.getElementById('analyzeUrl').onclick = () => this.analyzeUrl();
+      document.getElementById('deepScan').onclick = () => this.deepScan();
+      document.getElementById('startLiveDetection').onclick = () => this.startLiveDetection();
+      document.getElementById('analyzeCurrentPage').onclick = () => this.analyzeCurrentPage();
+      document.getElementById('analyzeNetworkTraffic').onclick = () => this.analyzeNetworkTraffic();
+    }
+
+    setupNetworkMonitoring() {
+      // Monitor WebSocket connections
+      const originalWebSocket = window.WebSocket;
+      const self = this;
+      
+      window.WebSocket = function(url, protocols) {
+        self.log(`🔗 WebSocket-Verbindung erkannt: ${url}`);
+        self.websocketConnections.add(url);
+        self.foundUrls.add(url);
+        self.updateCounts();
+        
+        const ws = new originalWebSocket(url, protocols);
+        
+        ws.addEventListener('open', () => {
+          self.log(`✅ WebSocket verbunden: ${url}`);
+        });
+        
+        ws.addEventListener('error', (error) => {
+          self.log(`❌ WebSocket Fehler: ${url} - ${error.message}`);
+        });
+        
+        return ws;
+      };
+      
+      // Monitor fetch requests
+      const originalFetch = window.fetch;
+      window.fetch = function(url, options) {
+        if (typeof url === 'string') {
+          self.log(`🌐 Fetch-Request: ${url}`);
+          if (url.includes('signaling') || url.includes('webrtc') || url.includes('stun') || url.includes('turn')) {
+            self.foundUrls.add(url);
+            self.updateCounts();
+          }
+        }
+        return originalFetch.apply(this, arguments);
+      };
+    }
+
+    async startDetection() {
+      this.isDetecting = true;
+      this.log('🔍 Detection gestartet...');
+      
+      document.getElementById('startDetection').disabled = true;
+      document.getElementById('stopDetection').disabled = false;
+      
+      // Analyze current page
+      await this.analyzeCurrentPage();
+      
+      // Analyze network traffic
+      await this.analyzeNetworkTraffic();
+      
+      // Deep scan
+      await this.deepScan();
+      
+      this.log('✅ Detection abgeschlossen');
+      this.isDetecting = false;
+      
+      document.getElementById('startDetection').disabled = false;
+      document.getElementById('stopDetection').disabled = true;
+    }
+
+    stopDetection() {
+      this.isDetecting = false;
+      this.log('⏹️ Detection gestoppt');
+      
+      document.getElementById('startDetection').disabled = false;
+      document.getElementById('stopDetection').disabled = true;
+    }
+
+    clearResults() {
+      this.foundUrls.clear();
+      this.websocketConnections.clear();
+      this.stunServers.clear();
+      this.turnServers.clear();
+      this.signalingEndpoints.clear();
+      this.networkLog = [];
+      this.detectionResults = [];
+      
+      this.updateDisplay();
+      this.log('🗑️ Alle Ergebnisse gelöscht');
+    }
+
+    async analyzeUrl() {
+      const url = document.getElementById('targetUrl').value.trim();
+      if (!url) {
+        this.log('❌ Bitte URL eingeben');
+        return;
+      }
+      
+      this.log(`🎯 Analysiere URL: ${url}`);
+      
+      try {
+        // Check if it's a WebSocket URL
+        if (url.startsWith('ws://') || url.startsWith('wss://')) {
+          await this.testWebSocketConnection(url);
+        } else {
+          // Analyze web page
+          await this.analyzeWebPage(url);
+        }
+      } catch (error) {
+        this.log(`❌ Fehler bei URL-Analyse: ${error.message}`);
+      }
+    }
+
+    async testWebSocketConnection(url) {
+      this.log(`🔗 Teste WebSocket-Verbindung: ${url}`);
+      
+      return new Promise((resolve) => {
+        const ws = new WebSocket(url);
+        const timeout = setTimeout(() => {
+          ws.close();
+          this.log(`⏰ WebSocket-Timeout: ${url}`);
+          resolve();
+        }, 5000);
+        
+        ws.onopen = () => {
+          clearTimeout(timeout);
+          this.log(`✅ WebSocket erfolgreich verbunden: ${url}`);
+          this.foundUrls.add(url);
+          this.signalingEndpoints.add(url);
+          this.updateCounts();
+          ws.close();
+          resolve();
+        };
+        
+        ws.onerror = (error) => {
+          clearTimeout(timeout);
+          this.log(`❌ WebSocket-Verbindung fehlgeschlagen: ${url}`);
+          resolve();
+        };
+      });
+    }
+
+    async analyzeWebPage(url) {
+      this.log(`🌐 Analysiere Web-Seite: ${url}`);
+      
+      try {
+        const response = await fetch(url, { mode: 'no-cors' });
+        this.log(`📄 Seite erreichbar: ${url}`);
+        
+        // Try to detect common signaling patterns
+        const commonSignalingPaths = [
+          '/signaling',
+          '/ws',
+          '/websocket',
+          '/webrtc',
+          '/peer',
+          '/room',
+          '/session'
+        ];
+        
+        for (const path of commonSignalingPaths) {
+          const signalingUrl = url.replace(/\/$/, '') + path;
+          await this.testWebSocketConnection(signalingUrl);
+        }
+        
+      } catch (error) {
+        this.log(`❌ Fehler beim Analysieren der Seite: ${error.message}`);
+      }
+    }
+
+    async deepScan() {
+      this.log('🔍 Starte tiefe Analyse...');
+      
+      // Scan JavaScript files for WebRTC patterns
+      const scripts = document.querySelectorAll('script[src]');
+      for (const script of scripts) {
+        try {
+          const response = await fetch(script.src);
+          const text = await response.text();
+          this.scanJavaScriptForWebRTC(text, script.src);
+        } catch (error) {
+          this.log(`❌ Fehler beim Scannen von ${script.src}: ${error.message}`);
+        }
+      }
+      
+      // Scan inline scripts
+      const inlineScripts = document.querySelectorAll('script:not([src])');
+      for (const script of inlineScripts) {
+        this.scanJavaScriptForWebRTC(script.textContent, 'inline');
+      }
+      
+      this.log('✅ Tiefe Analyse abgeschlossen');
+    }
+
+    scanJavaScriptForWebRTC(code, source) {
+      const patterns = [
+        // WebSocket patterns
+        { regex: /new\s+WebSocket\s*\(\s*['"`]([^'"`]+)['"`]/g, type: 'websocket' },
+        { regex: /WebSocket\s*\(\s*['"`]([^'"`]+)['"`]/g, type: 'websocket' },
+        
+        // Signaling patterns
+        { regex: /signaling[^'"]*['"`]([^'"`]+)['"`]/gi, type: 'signaling' },
+        { regex: /ws:\/\/[^\s'"]+/g, type: 'websocket' },
+        { regex: /wss:\/\/[^\s'"]+/g, type: 'websocket' },
+        
+        // STUN/TURN patterns
+        { regex: /stun:[^\s'"]+/g, type: 'stun' },
+        { regex: /turn:[^\s'"]+/g, type: 'turn' },
+        { regex: /turns:[^\s'"]+/g, type: 'turn' },
+        
+        // ICE servers
+        { regex: /iceServers[^}]*urls[^}]*['"`]([^'"`]+)['"`]/gi, type: 'ice' },
+        
+        // Common signaling endpoints
+        { regex: /['"`]\/signaling[^'"`]*['"`]/g, type: 'signaling' },
+        { regex: /['"`]\/ws[^'"`]*['"`]/g, type: 'websocket' },
+        { regex: /['"`]\/webrtc[^'"`]*['"`]/g, type: 'signaling' }
+      ];
+      
+      for (const pattern of patterns) {
+        let match;
+        while ((match = pattern.regex.exec(code)) !== null) {
+          const url = match[1] || match[0];
+          this.log(`🔍 Gefunden in ${source}: ${url} (${pattern.type})`);
+          
+          this.foundUrls.add(url);
+          
+          switch (pattern.type) {
+            case 'websocket':
+              this.websocketConnections.add(url);
+              break;
+            case 'signaling':
+              this.signalingEndpoints.add(url);
+              break;
+            case 'stun':
+              this.stunServers.add(url);
+              break;
+            case 'turn':
+              this.turnServers.add(url);
+              break;
+          }
+        }
+      }
+      
+      this.updateCounts();
+    }
+
+    async startLiveDetection() {
+      this.log('🔴 Live Detection gestartet...');
+      
+      // Monitor network requests
+      const observer = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          if (entry.name.includes('ws://') || entry.name.includes('wss://')) {
+            this.log(`🔗 Live WebSocket erkannt: ${entry.name}`);
+            this.foundUrls.add(entry.name);
+            this.updateCounts();
+          }
+        }
+      });
+      
+      observer.observe({ entryTypes: ['resource'] });
+      
+      // Monitor for new WebSocket connections
+      setInterval(() => {
+        if (this.isDetecting) {
+          this.log('🔍 Live Detection aktiv...');
+        }
+      }, 5000);
+    }
+
+    async analyzeCurrentPage() {
+      this.log('📄 Analysiere aktuelle Seite...');
+      
+      // Get current URL
+      const currentUrl = window.location.href;
+      this.log(`🎯 Aktuelle URL: ${currentUrl}`);
+      
+      // Analyze current page
+      await this.analyzeWebPage(currentUrl);
+      
+      // Deep scan current page
+      await this.deepScan();
+    }
+
+    async analyzeNetworkTraffic() {
+      this.log('📡 Analysiere Netzwerk-Traffic...');
+      
+      // Get performance entries
+      const entries = performance.getEntriesByType('resource');
+      
+      for (const entry of entries) {
+        const url = entry.name;
+        
+        if (url.includes('ws://') || url.includes('wss://')) {
+          this.log(`🔗 WebSocket-Request gefunden: ${url}`);
+          this.foundUrls.add(url);
+          this.websocketConnections.add(url);
+        }
+        
+        if (url.includes('signaling') || url.includes('webrtc')) {
+          this.log(`📡 Signaling-Request gefunden: ${url}`);
+          this.foundUrls.add(url);
+          this.signalingEndpoints.add(url);
+        }
+        
+        if (url.includes('stun') || url.includes('turn')) {
+          this.log(`🧊 ICE-Server gefunden: ${url}`);
+          this.foundUrls.add(url);
+          if (url.includes('stun')) {
+            this.stunServers.add(url);
+          } else {
+            this.turnServers.add(url);
+          }
+        }
+      }
+      
+      this.updateCounts();
+    }
+
+    updateCounts() {
+      document.getElementById('websocketCount').textContent = this.websocketConnections.size;
+      document.getElementById('stunCount').textContent = this.stunServers.size;
+      document.getElementById('turnCount').textContent = this.turnServers.size;
+      document.getElementById('signalingCount').textContent = this.signalingEndpoints.size;
+      
+      this.updateDisplay();
+    }
+
+    updateDisplay() {
+      // Update found URLs
+      const urlList = document.getElementById('foundUrls');
+      if (this.foundUrls.size === 0) {
+        urlList.innerHTML = '<div class="url-item">Noch keine URLs gefunden</div>';
+      } else {
+        urlList.innerHTML = '';
+        for (const url of this.foundUrls) {
+          const div = document.createElement('div');
+          div.className = 'url-item';
+          
+          if (this.websocketConnections.has(url)) {
+            div.className += ' websocket';
+          } else if (this.signalingEndpoints.has(url)) {
+            div.className += ' signaling';
+          } else if (this.stunServers.has(url)) {
+            div.className += ' stun';
+          } else if (this.turnServers.has(url)) {
+            div.className += ' turn';
+          }
+          
+          div.textContent = url;
+          urlList.appendChild(div);
+        }
+      }
+      
+      // Update detection results
+      const resultsDiv = document.getElementById('detectionResults');
+      resultsDiv.innerHTML = `
+        <div class="detection-result ${this.foundUrls.size > 0 ? 'found' : ''}">
+          <h4>🔍 WebRTC Signaling Server Detection</h4>
+          <p><strong>Gefundene URLs:</strong> ${this.foundUrls.size}</p>
+          <p><strong>WebSocket-Verbindungen:</strong> ${this.websocketConnections.size}</p>
+          <p><strong>Signaling-Endpunkte:</strong> ${this.signalingEndpoints.size}</p>
+          <p><strong>STUN-Server:</strong> ${this.stunServers.size}</p>
+          <p><strong>TURN-Server:</strong> ${this.turnServers.size}</p>
+        </div>
+      `;
+    }
+
+    log(message) {
+      const timestamp = new Date().toLocaleTimeString();
+      const logMessage = `[${timestamp}] ${message}`;
+      
+      this.networkLog.push(logMessage);
+      
+      // Update network log display
+      const logDiv = document.getElementById('networkLog');
+      logDiv.innerHTML = this.networkLog.slice(-10).join('<br>');
+      logDiv.scrollTop = logDiv.scrollHeight;
+      
+      // Update detailed log
+      const detailedLog = document.getElementById('detailedLog');
+      detailedLog.textContent += '\n' + logMessage;
+      detailedLog.scrollTop = detailedLog.scrollHeight;
+      
+      console.log(logMessage);
+    }
+  }
+
+  // Initialize detector
+  const detector = new WebRTCSignalingDetector();
+  
+  // Auto-start detection if URL parameter is provided
+  const urlParams = new URLSearchParams(window.location.search);
+  const targetUrl = urlParams.get('url');
+  if (targetUrl) {
+    document.getElementById('targetUrl').value = targetUrl;
+    detector.analyzeUrl();
+  }
+  </script>
+</body>
+</html>

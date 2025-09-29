@@ -1,0 +1,356 @@
+<!-- TODO: Replacement character detected () - verify source encoding -->
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>SUBVOX WIRELESS BRIDGE - TELCO Hub</title>
+<h1 style="position: absolute; left: -9999px;">SUBVOX WIRELESS BRIDGE - TELCO Hub</h1>
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#FF6B35">
+  <meta name="description" content="SUBVOX WIRELESS BRIDGE - Subvocal Speech & Accessibility für TELCO Hub">
+</head>
+<body>
+  <div id="app">
+    <header class="top-app-bar">
+      <div class="top-app-bar-content">
+        <button class="icon-button" onclick="window.history.back()" title="Zurück" title="Action Button">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <h1 class="app-title">🧠 SUBVOX WIRELESS BRIDGE</h1>
+        <div class="top-app-bar-actions">
+          <button class="icon-button" onclick="toggleScanningKeyboard()" title="Scanning-Keyboard" title="Action Button">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M9 11H7v6h2v-6zm4 0h-2v6h2v-6zm4 0h-2v6h2v-6zM4 19h16v2H4v-2zM20 3H4v14h16V3z"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section class="hero-card">
+        <h2 class="hero-title">Subvocal Speech & Accessibility</h2>
+        <p class="hero-subtitle">Drahtlose Steuerung für behinderte Menschen - Gedankensteuerung, EMG-Signale und adaptive Eingabegeräte</p>
+        <div class="badge">ACCESSIBILITY READY</div>
+      </section>
+
+      <div class="grid features-grid">
+        <div class="feature-card" onclick="connectEMG()">
+          <h4>💪 BLE EMG Sensor</h4>
+          <p>Muskelaktivität → SELECT-Befehle</p>
+        </div>
+
+        <div class="feature-card" onclick="connectSwitch()">
+          <h4>🎮 BLE Switch</h4>
+          <p>Adaptive Schalter → Navigation</p>
+        </div>
+
+        <div class="feature-card" onclick="connectEEG()">
+          <h4>🧠 OpenBCI/EEG</h4>
+          <p>Gehirnaktivität → Gedankensteuerung</p>
+        </div>
+
+        <div class="feature-card" onclick="connectHID()">
+          <h4>🖱️ WebHID</h4>
+          <p>Adaptive Eingabegeräte</p>
+        </div>
+
+        <div class="feature-card" onclick="showDocumentation()">
+          <h4>📚 Dokumentation</h4>
+          <p>Vollständige Anleitung und Bauanleitungen</p>
+        </div>
+
+        <div class="feature-card" onclick="showCommunity()">
+          <h4>🌐 Community</h4>
+          <p>Developer-Foren und Support-Ressourcen</p>
+        </div>
+      </div>
+
+      <div class="config-section">
+        <h3>⚙️ Konfiguration</h3>
+        <div class="grid features-grid">
+          <div class="feature-card">
+            <h4>EMG Threshold On</h4>
+            <input type="number" value="0.12" step="0.01" id="emg-threshold-on" aria-label="Input Field">
+          </div>
+          <div class="feature-card">
+            <h4>EMG Threshold Off</h4>
+            <input type="number" value="0.06" step="0.01" id="emg-threshold-off" aria-label="Input Field">
+          </div>
+          <div class="feature-card">
+            <h4>WebSocket URL</h4>
+            <input type="text" value="ws://localhost:8080/subvox" id="ws-url" aria-label="Input Field">
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- SUBVOX WIRELESS BRIDGE Script -->
+  <script async type="module">
+// SUBVOX Bridge Implementation
+class Subvox {
+  constructor() {
+    this.state = {connected: false};
+    this.map = {
+      YES: 'ui/confirm',
+      NO: 'ui/back', 
+      LEFT: 'ui/left',
+      RIGHT: 'ui/right',
+      SELECT: 'ui/select',
+      HELP: 'access/help',
+      SPEAK: 'access/tts'
+    };
+  }
+
+  async connectBLE_EMG() {
+    try {
+      const device = await navigator.bluetooth.requestDevice({
+        filters: [{services: ['0000ffe0-0000-1000-8000-00805f9b34fb']}]
+      });
+      const server = await device.gatt.connect();
+      const service = await server.getPrimaryService('0000ffe0-0000-1000-8000-00805f9b34fb');
+      const characteristic = await service.getCharacteristic('0000ffe1-0000-1000-8000-00805f9b34fb');
+      
+      await characteristic.startNotifications();
+      characteristic.addEventListener('characteristicvaluechanged', (event) => {
+        const value = event.target.value;
+        const emgValue = value.getInt8(0);
+        if (emgValue > 50) {
+          this._token('SELECT');
+        }
+      });
+      
+      this.state.connected = true;
+      alert('EMG-Sensor erfolgreich verbunden!');
+    } catch (error) {
+      alert('EMG-Verbindung fehlgeschlagen: ' + error.message);
+    }
+  }
+
+  async connectBLE_Switch() {
+    try {
+      const device = await navigator.bluetooth.requestDevice({
+        acceptAllDevices: true,
+        optionalServices: ['00001812-0000-1000-8000-00805f9b34fb']
+      });
+      const server = await device.gatt.connect();
+      const service = await server.getPrimaryService('00001812-0000-1000-8000-00805f9b34fb');
+      const characteristic = await service.getCharacteristic('00002a4d-0000-1000-8000-00805f9b34fb');
+      
+      await characteristic.startNotifications();
+      characteristic.addEventListener('characteristicvaluechanged', (event) => {
+        const value = new Uint8Array(event.target.value.buffer);
+        if (value[0] & 1) this._token('LEFT');
+        if (value[0] & 2) this._token('RIGHT');
+        if (value[0] & 4) this._token('UP');
+        if (value[0] & 8) this._token('DOWN');
+      });
+      
+      alert('BLE-Switch erfolgreich verbunden!');
+    } catch (error) {
+      alert('Switch-Verbindung fehlgeschlagen: ' + error.message);
+    }
+  }
+
+  async connectEEG() {
+    try {
+      const wsUrl = document.getElementById('ws-url').value;
+      const ws = new WebSocket(wsUrl);
+      
+      ws.onopen = () => {
+        alert('OpenBCI erfolgreich verbunden!');
+      };
+      
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === 'token') {
+          this._token(data.token);
+        }
+      };
+      
+      ws.onerror = (error) => {
+        alert('OpenBCI-Verbindung fehlgeschlagen: ' + error.message);
+      };
+    } catch (error) {
+      alert('OpenBCI-Verbindung fehlgeschlagen: ' + error.message);
+    }
+  }
+
+  async connectHID() {
+    try {
+      if (!('hid' in navigator)) {
+        throw new Error('WebHID nicht verfügbar');
+      }
+      
+      const [device] = await navigator.hid.requestDevice({
+        filters: [{vendorId: 0x0000}]
+      });
+      
+      await device.open();
+      device.addEventListener('inputreport', (event) => {
+        const data = new Uint8Array(event.data.buffer);
+        if (data[0] === 1) this._token('SELECT');
+        if (data[1] === 1) this._token('HELP');
+      });
+      
+      alert('WebHID-Gerät erfolgreich verbunden!');
+    } catch (error) {
+      alert('WebHID-Verbindung fehlgeschlagen: ' + error.message);
+    }
+  }
+
+  _token(token) {
+    const action = this.map[token] || token;
+    console.log('SUBVOX Token:', token, '→ Action:', action);
+    
+    // Haptic Feedback
+    if (navigator.vibrate) {
+      navigator.vibrate([10, 10]);
+    }
+    
+    // Custom Event dispatch
+    window.dispatchEvent(new CustomEvent('subvox-action', {
+      detail: {token, action}
+    }));
+  }
+}
+
+// Globale SUBVOX-Instanz
+window.subvox = new Subvox();
+
+// Event-Handler
+window.addEventListener('subvox-action', function(e) {
+  const {action, token} = e.detail;
+  console.log('SUBVOX Action:', action, 'from token:', token);
+  
+  // TELCO Hub-spezifische Aktionen
+  switch(action) {
+    case 'ui/confirm':
+      const confirmBtn = document.querySelector('.btn-primary, .feature-card');
+      if(confirmBtn) confirmBtn.click();
+      break;
+    case 'ui/back':
+      window.history.back();
+      break;
+    case 'access/help':
+      showSubvoxHelp();
+      break;
+    case 'access/tts':
+      speakCurrentElement();
+      break;
+  }
+});
+
+// UI-Funktionen
+function connectEMG() {
+  window.subvox.connectBLE_EMG();
+}
+
+function connectSwitch() {
+  window.subvox.connectBLE_Switch();
+}
+
+function connectEEG() {
+  window.subvox.connectEEG();
+}
+
+function connectHID() {
+  window.subvox.connectHID();
+}
+
+function showDocumentation() {
+  window.open('../SUBVOX_WIRELESS_BRIDGE_DOCUMENTATION.md', '_blank');
+}
+
+function showCommunity() {
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>🌐 SUBVOX Community</h3>
+        <button aria-label="×" class="modal-close" onclick="this.closest('.modal-overlay').remove()" title="Action Button">×</button>
+      </div>
+      <div style="line-height: 1.6;">
+        <h4>🔗 Wichtige Links:</h4>
+        <ul>
+          <li><a href="https://openbci.com/community/" target="_blank">OpenBCI Community</a></li>
+          <li><a href="https://www.a11yproject.com/" target="_blank">A11y Project</a></li>
+          <li><a href="https://forum.arduino.cc/" target="_blank">Arduino Forum</a></li>
+          <li><a href="https://github.com/OpenBCI/OpenBCI_GUI" target="_blank">OpenBCI GitHub</a></li>
+        </ul>
+        
+        <h4>📚 Dokumentation:</h4>
+        <p>Vollständige Dokumentation mit Bauanleitungen und Konfigurationsdaten ist verfügbar.</p>
+        
+        <button onclick="showDocumentation()" style="background: var(--primary); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer; margin-top: 1rem;" title="Action Button">
+          📖 Dokumentation öffnen
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function showSubvoxHelp() {
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>🧠 SUBVOX WIRELESS BRIDGE - Hilfe</h3>
+        <button aria-label="×" class="modal-close" onclick="this.closest('.modal-overlay').remove()" title="Action Button">×</button>
+      </div>
+      <div style="line-height: 1.6;">
+        <h4>🎯 Unterstützte Geräte:</h4>
+        <ul>
+          <li><strong>BLE EMG:</strong> Muskelaktivität → SELECT</li>
+          <li><strong>BLE Switch:</strong> Adaptive Schalter → Navigation</li>
+          <li><strong>OpenBCI/EEG:</strong> Gehirnaktivität → Gedankensteuerung</li>
+          <li><strong>WebHID:</strong> Adaptive Eingabegeräte</li>
+        </ul>
+        
+        <h4>🎮 Steuerung:</h4>
+        <ul>
+          <li><strong>YES:</strong> Bestätigen/Auswählen</li>
+          <li><strong>NO:</strong> Zurück/Ablehnen</li>
+          <li><strong>LEFT/RIGHT/UP/DOWN:</strong> Navigation</li>
+          <li><strong>HELP:</strong> Diese Hilfe</li>
+          <li><strong>SPEAK:</strong> Text vorlesen</li>
+        </ul>
+        
+        <h4>🔧 Aktivierung:</h4>
+        <p>Klicken Sie auf die Geräte-Karten um drahtlose Geräte zu verbinden.</p>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function speakCurrentElement() {
+  const element = document.activeElement;
+  let text = '';
+  
+  if(element.textContent) {
+    text = element.textContent.trim();
+  } else if(element.alt) {
+    text = element.alt;
+  } else if(element.title) {
+    text = element.title;
+  }
+  
+  if(text && 'speechSynthesis' in window) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'de-DE';
+    speechSynthesis.speak(utterance);
+  }
+}
+
+function toggleScanningKeyboard() {
+  // Scanning-Keyboard Toggle
+  console.log('Scanning-Keyboard toggle');
+}
+  </script>
+</body>
+</html>

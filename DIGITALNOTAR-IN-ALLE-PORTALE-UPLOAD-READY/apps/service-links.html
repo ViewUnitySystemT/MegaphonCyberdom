@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Links - TELCO Hub</title>
+<h1 style="position: absolute; left: -9999px;">Service Links - TELCO Hub</h1>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .service-links-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .link-category {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .category-icon {
+            font-size: 24px;
+        }
+
+        .category-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .link-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            margin: 8px 0;
+            background: var(--surface-variant);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--outline-variant);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .link-item {
+            position: relative;
+        }
+
+        .link-item:hover {
+            background: var(--primary-container);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .popup-info {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-10px);
+            background: var(--surface);
+            border: 2px solid var(--primary);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            min-width: 320px;
+            max-width: 400px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: visible;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        .popup-info.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(-20px);
+        }
+
+        .popup-info::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 10px solid transparent;
+            border-top-color: var(--primary);
+        }
+
+        .popup-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--outline);
+        }
+
+        .popup-icon {
+            font-size: 20px;
+        }
+
+        .popup-title {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 16px;
+        }
+
+        .popup-description {
+            color: var(--on-surface);
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .popup-features {
+            background: var(--surface-variant);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .popup-features-title {
+            font-weight: 600;
+            color: var(--on-surface);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .popup-feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .popup-feature-list li {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+            font-size: 13px;
+            color: var(--on-surface-variant);
+        }
+
+        .popup-feature-list li::before {
+            content: '✓';
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .popup-tech {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .popup-tech-tag {
+            background: var(--primary);
+            color: var(--on-primary);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .popup-url {
+            background: var(--surface-variant);
+            border-radius: var(--radius-sm);
+            padding: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            color: var(--primary);
+            word-break: break-all;
+            border: 1px solid var(--outline-variant);
+        }
+
+        .popup-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .popup-btn {
+            flex: 1;
+            background: var(--primary);
+            color: var(--on-primary);
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .popup-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        .popup-btn.secondary {
+            background: var(--surface-variant);
+            color: var(--on-surface);
+            border: 1px solid var(--outline);
+        }
+
+        .popup-btn.secondary:hover {
+            background: var(--primary-container);
+            border-color: var(--primary);
+        }
+
+        .link-icon {
+            font-size: 20px;
+            min-width: 24px;
+        }
+
+        .link-content {
+            flex: 1;
+        }
+
+        .link-title {
+            font-weight: 600;
+            color: var(--on-surface);
+            margin-bottom: 4px;
+        }
+
+        .link-description {
+            font-size: 14px;
+            color: var(--on-surface-variant);
+            line-height: 1.4;
+        }
+
+        .link-url {
+            font-size: 12px;
+            color: var(--primary);
+            word-break: break-all;
+            margin-top: 4px;
+        }
+
+        .copy-button {
+            background: var(--primary);
+            color: var(--on-primary);
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-button:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        .copy-all-section {
+            background: var(--surface);
+            border: 2px solid var(--primary);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .copy-all-button {
+            background: var(--primary);
+            color: var(--on-primary);
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .copy-all-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-section {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--outline);
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            background: var(--surface-variant);
+            color: var(--on-surface);
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .stats-section {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--on-surface-variant);
+            margin-top: 4px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: var(--on-primary);
+            padding: 12px 20px;
+            border-radius: var(--radius-md);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .navigation-buttons {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+        
+        .nav-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: var(--primary, #007bff);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <header class="top-app-bar">
+        <div class="top-app-bar-content">
+            <button class="icon-button" onclick="window.history.back()" title="Zurück" title="Action Button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                </svg>
+            </button>
+            <h1 class="top-app-bar-title">Service Links</h1>
+            <div class="top-app-bar-actions">
+                <button class="icon-button" onclick="toggleTheme()" title="Theme wechseln" title="Action Button">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="service-links-container">
+        <div class="search-section">
+            <h3>🔍 Links durchsuchen</h3>
+            <input type="text" id="searchInput" class="search-input" placeholder="Suche nach NASA, DTN, Matrix, Mesh, Hosting..." aria-label="Input Field">
+        </div>
+
+        <div class="stats-section">
+            <div class="stat-item">
+                <div class="stat-number" id="totalLinks">28</div>
+                <div class="stat-label">Gesamt Links</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="nasaLinks">7</div>
+                <div class="stat-label">NASA/ARISS</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="dtnLinks">5</div>
+                <div class="stat-label">DTN/Space</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="meshLinks">4</div>
+                <div class="stat-label">Mesh Networks</div>
+            </div>
+        </div>
+
+        <div class="copy-all-section">
+            <h3>📋 Alle URLs kopieren</h3>
+            <p>Kopiere alle Service-Links auf einmal für externe Verwendung</p>
+            <button class="copy-all-button" onclick="copyAllUrls()" title="Action Button">📋 Alle URLs kopieren</button>
+            <button class="copy-all-button" onclick="exportToFile()" title="Action Button">💾 Als Datei exportieren</button>
+        </div>
+
+        <div class="links-grid" id="linksGrid">
+            <!-- NASA & ARISS Links -->
+            <div class="link-category">
+                <div class="category-header">
+                    <span class="category-icon">🚀</span>
+                    <span class="category-title">NASA & ARISS</span>
+                </div>
+                <div class="link-item" data-url="https://nodis3.gsfc.nasa.gov/displayDir.cfm?Internal_ID=N_PR_2570_001C_&page_name=main">
+                    <span class="link-icon">📡</span>
+                    <div class="link-content">
+                        <div class="link-title">NASA RF Spectrum Management</div>
+                        <div class="link-description">NPR 2570.1C - Frequenzmanagement-Handbuch</div>
+                        <div class="link-url">nodis3.gsfc.nasa.gov</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                    <div class="popup-info">
+                        <div class="popup-header">
+                            <span class="popup-icon">📡</span>
+                            <span class="popup-title">NASA RF Spectrum Management</span>
+                        </div>
+                        <div class="popup-description">
+                            Offizielles NASA-Handbuch für Frequenzmanagement und Spektrum-Zuweisungen. 
+                            NPR 2570.1C definiert Standards für alle NASA-Kommunikationssysteme.
+                        </div>
+                        <div class="popup-features">
+                            <div class="popup-features-title">Angebot:</div>
+                            <ul class="popup-feature-list">
+                                <li>Komplette RF-Spektrum-Standards</li>
+                                <li>Frequenzzuweisungen für Missionen</li>
+                                <li>Interferenz-Vermeidungsrichtlinien</li>
+                                <li>Kommunikationsprotokolle</li>
+                            </ul>
+                        </div>
+                        <div class="popup-tech">
+                            <span class="popup-tech-tag">RF</span>
+                            <span class="popup-tech-tag">Spektrum</span>
+                            <span class="popup-tech-tag">NASA Standards</span>
+                        </div>
+                        <div class="popup-url">nodis3.gsfc.nasa.gov/displayDir.cfm</div>
+                        <div class="popup-actions">
+                            <button class="popup-btn" onclick="openLink('https://nodis3.gsfc.nasa.gov/displayDir.cfm?Internal_ID=N_PR_2570_001C_&page_name=main')" title="Action Button">Öffnen</button>
+                            <button class="popup-btn secondary" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="link-item" data-url="https://www.nasa.gov/technology/space-comms/delay-disruption-tolerant-networking-overview/">
+                    <span class="link-icon">🌐</span>
+                    <div class="link-content">
+                        <div class="link-title">NASA DTN Overview</div>
+                        <div class="link-description">Delay-Tolerant Networking für Weltraum-Kommunikation</div>
+                        <div class="link-url">nasa.gov/technology/space-comms</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                </div>
+                <div class="link-item" data-url="https://ntrs.nasa.gov/citations/20250003508">
+                    <span class="link-icon">📄</span>
+                    <div class="link-content">
+                        <div class="link-title">HLS RF Communications ConOps</div>
+                        <div class="link-description">Artemis 2025 - RF Kommunikationskonzept</div>
+                        <div class="link-url">ntrs.nasa.gov/citations/20250003508</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                </div>
+                <div class="link-item" data-url="https://www.ariss.org/forms-and-resources.html">
+                    <span class="link-icon">📋</span>
+                    <div class="link-content">
+                        <div class="link-title">ARISS Forms & Resources</div>
+                        <div class="link-description">Amateur Radio on the ISS - Formulare und Ressourcen</div>
+                        <div class="link-url">ariss.org/forms-and-resources</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                </div>
+                <div class="link-item" data-url="https://www.ariss.org/ariss-application.html">
+                    <span class="link-icon">📝</span>
+                    <div class="link-content">
+                        <div class="link-title">ARISS Application</div>
+                        <div class="link-description">Bewerbung für ARISS-Schulkontakte</div>
+                        <div class="link-url">ariss.org/ariss-application</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                </div>
+                <div class="link-item" data-url="https://ntrs.nasa.gov/api/citations/20030025773/downloads/20030025773.pdf">
+                    <span class="link-icon">📊</span>
+                    <div class="link-content">
+                        <div class="link-title">ARISS 2002 Paper</div>
+                        <div class="link-description">Amateur Radio on the ISS - Einführung</div>
+                        <div class="link-url">ntrs.nasa.gov/api/citations/20030025773</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                </div>
+                <div class="link-item" data-url="https://ntrs.nasa.gov/api/citations/20040012946/downloads/20040012946.pdf">
+                    <span class="link-icon">🔬</span>
+                    <div class="link-content">
+                        <div class="link-title">ARISS Phase-2 Hardware</div>
+                        <div class="link-description">ARISS Hardware-Entwicklung 2003</div>
+                        <div class="link-url">ntrs.nasa.gov/api/citations/20040012946</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                </div>
+            </div>
+
+            <!-- DTN & Space Communication -->
+            <div class="link-category">
+                <div class="category-header">
+                    <span class="category-icon">🛰️</span>
+                    <span class="category-title">DTN & Space Communication</span>
+                </div>
+                <div class="link-item" data-url="https://ccsds.org/publications/bluebooks/">
+                    <span class="link-icon">📚</span>
+                    <div class="link-content">
+                        <div class="link-title">CCSDS Blue Books</div>
+                        <div class="link-description">Space Communications Standards - Blue Books</div>
+                        <div class="link-url">ccsds.org/publications/bluebooks</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                </div>
+                <div class="link-item" data-url="https://github.com/nasa-jpl/ION-DTN">
+                    <span class="link-icon">💻</span>
+                    <div class="link-content">
+                        <div class="link-title">ION-DTN (NASA-JPL)</div>
+                        <div class="link-description">NASA Jet Propulsion Laboratory DTN Implementation</div>
+                        <div class="link-url">github.com/nasa-jpl/ION-DTN</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                </div>
+                <div class="link-item" data-url="https://github.com/ibrdtn/ibrdtn">
+                    <span class="link-icon">🔧</span>
+                    <div class="link-content">
+                        <div class="link-title">IBR-DTN</div>
+                        <div class="link-description">Alternative DTN Implementation für Embedded/OpenWrt</div>
+                        <div class="link-url">github.com/ibrdtn/ibrdtn</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                </div>
+                <div class="link-item" data-url="https://dtn7.github.io/">
+                    <span class="link-icon">⚡</span>
+                    <div class="link-content">
+                        <div class="link-title">DTN7 (BPv7)</div>
+                        <div class="link-description">Modern DTN Implementation mit Bundle Protocol v7</div>
+                        <div class="link-url">dtn7.github.io</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                </div>
+                <div class="link-item" data-url="https://github.com/dtn7/awesome-dtn">
+                    <span class="link-icon">⭐</span>
+                    <div class="link-content">
+                        <div class="link-title">Awesome DTN</div>
+                        <div class="link-description">Curated list of DTN resources and tools</div>
+                        <div class="link-url">github.com/dtn7/awesome-dtn</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                </div>
+            </div>
+
+            <!-- Satellite & Radio -->
+            <div class="link-category">
+                <div class="category-header">
+                    <span class="category-icon">📡</span>
+                    <span class="category-title">Satellite & Radio</span>
+                </div>
+                <div class="link-item" data-url="https://github.com/daniestevez/gr-satellites">
+                    <span class="link-icon">🛰️</span>
+                    <div class="link-content">
+                        <div class="link-title">gr-satellites</div>
+                        <div class="link-description">GNU Radio decoders für Satelliten</div>
+                        <div class="link-url">github.com/daniestevez/gr-satellites</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                </div>
+                <div class="link-item" data-url="https://github.com/wb2osz/aprsspec">
+                    <span class="link-icon">📻</span>
+                    <div class="link-content">
+                        <div class="link-title">APRS Specification</div>
+                        <div class="link-description">Automatic Packet Reporting System Spezifikation</div>
+                        <div class="link-url">github.com/wb2osz/aprsspec</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                </div>
+                <div class="link-item" data-url="https://wiki.satnogs.org/Build">
+                    <span class="link-icon">🏗️</span>
+                    <div class="link-content">
+                        <div class="link-title">SatNOGS Build</div>
+                        <div class="link-description">Open Ground Station Network - Build Guide</div>
+                        <div class="link-url">wiki.satnogs.org/Build</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                </div>
+                <div class="link-item" data-url="https://en.wikipedia.org/wiki/Spartan_Packet_Radio_Experiment">
+                    <span class="link-icon">📜</span>
+                    <div class="link-content">
+                        <div class="link-title">SPRE (STS-72)</div>
+                        <div class="link-description">Spartan Packet Radio Experiment - Historische Referenz</div>
+                        <div class="link-url">en.wikipedia.org/wiki/Spartan_Packet_Radio_Experiment</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                </div>
+            </div>
+
+            <!-- Matrix & Protocols -->
+            <div class="link-category">
+                <div class="category-header">
+                    <span class="category-icon">🔗</span>
+                    <span class="category-title">Matrix & Protocols</span>
+                </div>
+                <div class="link-item" data-url="https://spec.matrix.org/">
+                    <span class="link-icon">📋</span>
+                    <div class="link-content">
+                        <div class="link-title">Matrix Specification</div>
+                        <div class="link-description">Offizielle Matrix Protocol Spezifikation</div>
+                        <div class="link-url">spec.matrix.org</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                </div>
+                <div class="link-item" data-url="https://github.com/libp2p/specs">
+                    <span class="link-icon">🌐</span>
+                    <div class="link-content">
+                        <div class="link-title">libp2p Specifications</div>
+                        <div class="link-description">Peer-to-peer Networking Protocol Stack</div>
+                        <div class="link-url">github.com/libp2p/specs</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                </div>
+                <div class="link-item" data-url="https://docs.libp2p.io/">
+                    <span class="link-icon">📖</span>
+                    <div class="link-content">
+                        <div class="link-title">libp2p Documentation</div>
+                        <div class="link-description">Comprehensive libp2p documentation and guides</div>
+                        <div class="link-url">docs.libp2p.io</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                </div>
+                <div class="link-item" data-url="https://datatracker.ietf.org/doc/rfc9420/">
+                    <span class="link-icon">🔐</span>
+                    <div class="link-content">
+                        <div class="link-title">MLS RFC 9420</div>
+                        <div class="link-description">Message Layer Security - End-to-End Encryption</div>
+                        <div class="link-url">datatracker.ietf.org/doc/rfc9420</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                </div>
+                <div class="link-item" data-url="https://www.w3.org/TR/activitypub/">
+                    <span class="link-icon">🌍</span>
+                    <div class="link-content">
+                        <div class="link-title">ActivityPub (W3C)</div>
+                        <div class="link-description">Decentralized Social Networking Protocol</div>
+                        <div class="link-url">w3.org/TR/activitypub</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                </div>
+                <div class="link-item" data-url="https://github.com/nostr-protocol/nostr">
+                    <span class="link-icon">⚡</span>
+                    <div class="link-content">
+                        <div class="link-title">Nostr Protocol</div>
+                        <div class="link-description">Decentralized Social Protocol - Notes and Other Stuff Transmitted by Relays</div>
+                        <div class="link-url">github.com/nostr-protocol/nostr</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                </div>
+            </div>
+
+            <!-- Mesh Networks -->
+            <div class="link-category">
+                <div class="category-header">
+                    <span class="category-icon">🕸️</span>
+                    <span class="category-title">Mesh Networks</span>
+                </div>
+                <div class="link-item" data-url="https://yggdrasil-network.github.io/">
+                    <span class="link-icon">🌳</span>
+                    <div class="link-content">
+                        <div class="link-title">Yggdrasil Network</div>
+                        <div class="link-description">End-to-End IPv6 Overlay Network</div>
+                        <div class="link-url">yggdrasil-network.github.io</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                </div>
+                <div class="link-item" data-url="https://reticulum.network/manual/">
+                    <span class="link-icon">🔗</span>
+                    <div class="link-content">
+                        <div class="link-title">Reticulum Manual</div>
+                        <div class="link-description">Cryptographic Mesh Networking Protocol</div>
+                        <div class="link-url">reticulum.network/manual</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                </div>
+                <div class="link-item" data-url="https://meshtastic.org/docs/introduction/">
+                    <span class="link-icon">📻</span>
+                    <div class="link-content">
+                        <div class="link-title">Meshtastic Documentation</div>
+                        <div class="link-description">Open Source Mesh Networking mit LoRa</div>
+                        <div class="link-url">meshtastic.org/docs/introduction</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                </div>
+            </div>
+
+            <!-- Hosting Services -->
+            <div class="link-category">
+                <div class="category-header">
+                    <span class="category-icon">☁️</span>
+                    <span class="category-title">Hosting Services</span>
+                </div>
+                <div class="link-item" data-url="https://pages.github.com/">
+                    <span class="link-icon">📄</span>
+                    <div class="link-content">
+                        <div class="link-title">GitHub Pages</div>
+                        <div class="link-description">Free static site hosting from GitHub repositories</div>
+                        <div class="link-url">pages.github.com</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                </div>
+                <div class="link-item" data-url="https://www.netlify.com/">
+                    <span class="link-icon">🚀</span>
+                    <div class="link-content">
+                        <div class="link-title">Netlify</div>
+                        <div class="link-description">Modern web development platform with continuous deployment</div>
+                        <div class="link-url">netlify.com</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                </div>
+                <div class="link-item" data-url="https://vercel.com/">
+                    <span class="link-icon">⚡</span>
+                    <div class="link-content">
+                        <div class="link-title">Vercel</div>
+                        <div class="link-description">Frontend cloud platform for static sites and serverless functions</div>
+                        <div class="link-url">vercel.com</div>
+                    </div>
+                    <button class="copy-button" onclick="copyUrl(this)" title="Action Button">Kopieren</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="navigation-buttons">
+        <button class="nav-btn" onclick="window.history.back()" title="Zurück" title="Action Button">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+            </svg>
+        </button>
+        <button class="nav-btn" onclick="window.location.href='../index.html'" title="Home" title="Action Button">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="../shared/common-functions.js"></script>
+    <script src="generate-popup-data.js"></script>
+    <script>
+        // Service Links Data
+        const serviceLinks = [
+            {
+                url: "https://nodis3.gsfc.nasa.gov/displayDir.cfm?Internal_ID=N_PR_2570_001C_&page_name=main",
+                title: "NASA RF Spectrum Management",
+                description: "NPR 2570.1C - Frequenzmanagement-Handbuch",
+                category: "NASA & ARISS",
+                icon: "📡"
+            },
+            {
+                url: "https://www.nasa.gov/technology/space-comms/delay-disruption-tolerant-networking-overview/",
+                title: "NASA DTN Overview",
+                description: "Delay-Tolerant Networking für Weltraum-Kommunikation",
+                category: "NASA & ARISS",
+                icon: "🌐"
+            },
+            {
+                url: "https://ntrs.nasa.gov/citations/20250003508",
+                title: "HLS RF Communications ConOps",
+                description: "Artemis 2025 - RF Kommunikationskonzept",
+                category: "NASA & ARISS",
+                icon: "📄"
+            },
+            {
+                url: "https://www.ariss.org/forms-and-resources.html",
+                title: "ARISS Forms & Resources",
+                description: "Amateur Radio on the ISS - Formulare und Ressourcen",
+                category: "NASA & ARISS",
+                icon: "📋"
+            },
+            {
+                url: "https://www.ariss.org/ariss-application.html",
+                title: "ARISS Application",
+                description: "Bewerbung für ARISS-Schulkontakte",
+                category: "NASA & ARISS",
+                icon: "📝"
+            },
+            {
+                url: "https://ntrs.nasa.gov/api/citations/20030025773/downloads/20030025773.pdf",
+                title: "ARISS 2002 Paper",
+                description: "Amateur Radio on the ISS - Einführung",
+                category: "NASA & ARISS",
+                icon: "📊"
+            },
+            {
+                url: "https://ntrs.nasa.gov/api/citations/20040012946/downloads/20040012946.pdf",
+                title: "ARISS Phase-2 Hardware",
+                description: "ARISS Hardware-Entwicklung 2003",
+                category: "NASA & ARISS",
+                icon: "🔬"
+            },
+            {
+                url: "https://ccsds.org/publications/bluebooks/",
+                title: "CCSDS Blue Books",
+                description: "Space Communications Standards - Blue Books",
+                category: "DTN & Space Communication",
+                icon: "📚"
+            },
+            {
+                url: "https://github.com/nasa-jpl/ION-DTN",
+                title: "ION-DTN (NASA-JPL)",
+                description: "NASA Jet Propulsion Laboratory DTN Implementation",
+                category: "DTN & Space Communication",
+                icon: "💻"
+            },
+            {
+                url: "https://github.com/ibrdtn/ibrdtn",
+                title: "IBR-DTN",
+                description: "Alternative DTN Implementation für Embedded/OpenWrt",
+                category: "DTN & Space Communication",
+                icon: "🔧"
+            },
+            {
+                url: "https://dtn7.github.io/",
+                title: "DTN7 (BPv7)",
+                description: "Modern DTN Implementation mit Bundle Protocol v7",
+                category: "DTN & Space Communication",
+                icon: "⚡"
+            },
+            {
+                url: "https://github.com/dtn7/awesome-dtn",
+                title: "Awesome DTN",
+                description: "Curated list of DTN resources and tools",
+                category: "DTN & Space Communication",
+                icon: "⭐"
+            },
+            {
+                url: "https://github.com/daniestevez/gr-satellites",
+                title: "gr-satellites",
+                description: "GNU Radio decoders für Satelliten",
+                category: "Satellite & Radio",
+                icon: "🛰️"
+            },
+            {
+                url: "https://github.com/wb2osz/aprsspec",
+                title: "APRS Specification",
+                description: "Automatic Packet Reporting System Spezifikation",
+                category: "Satellite & Radio",
+                icon: "📻"
+            },
+            {
+                url: "https://wiki.satnogs.org/Build",
+                title: "SatNOGS Build",
+                description: "Open Ground Station Network - Build Guide",
+                category: "Satellite & Radio",
+                icon: "🏗️"
+            },
+            {
+                url: "https://en.wikipedia.org/wiki/Spartan_Packet_Radio_Experiment",
+                title: "SPRE (STS-72)",
+                description: "Spartan Packet Radio Experiment - Historische Referenz",
+                category: "Satellite & Radio",
+                icon: "📜"
+            },
+            {
+                url: "https://spec.matrix.org/",
+                title: "Matrix Specification",
+                description: "Offizielle Matrix Protocol Spezifikation",
+                category: "Matrix & Protocols",
+                icon: "📋"
+            },
+            {
+                url: "https://github.com/libp2p/specs",
+                title: "libp2p Specifications",
+                description: "Peer-to-peer Networking Protocol Stack",
+                category: "Matrix & Protocols",
+                icon: "🌐"
+            },
+            {
+                url: "https://docs.libp2p.io/",
+                title: "libp2p Documentation",
+                description: "Comprehensive libp2p documentation and guides",
+                category: "Matrix & Protocols",
+                icon: "📖"
+            },
+            {
+                url: "https://datatracker.ietf.org/doc/rfc9420/",
+                title: "MLS RFC 9420",
+                description: "Message Layer Security - End-to-End Encryption",
+                category: "Matrix & Protocols",
+                icon: "🔐"
+            },
+            {
+                url: "https://www.w3.org/TR/activitypub/",
+                title: "ActivityPub (W3C)",
+                description: "Decentralized Social Networking Protocol",
+                category: "Matrix & Protocols",
+                icon: "🌍"
+            },
+            {
+                url: "https://github.com/nostr-protocol/nostr",
+                title: "Nostr Protocol",
+                description: "Decentralized Social Protocol - Notes and Other Stuff Transmitted by Relays",
+                category: "Matrix & Protocols",
+                icon: "⚡"
+            },
+            {
+                url: "https://yggdrasil-network.github.io/",
+                title: "Yggdrasil Network",
+                description: "End-to-End IPv6 Overlay Network",
+                category: "Mesh Networks",
+                icon: "🌳"
+            },
+            {
+                url: "https://reticulum.network/manual/",
+                title: "Reticulum Manual",
+                description: "Cryptographic Mesh Networking Protocol",
+                category: "Mesh Networks",
+                icon: "🔗"
+            },
+            {
+                url: "https://meshtastic.org/docs/introduction/",
+                title: "Meshtastic Documentation",
+                description: "Open Source Mesh Networking mit LoRa",
+                category: "Mesh Networks",
+                icon: "📻"
+            },
+            {
+                url: "https://pages.github.com/",
+                title: "GitHub Pages",
+                description: "Free static site hosting from GitHub repositories",
+                category: "Hosting Services",
+                icon: "📄"
+            },
+            {
+                url: "https://www.netlify.com/",
+                title: "Netlify",
+                description: "Modern web development platform with continuous deployment",
+                category: "Hosting Services",
+                icon: "🚀"
+            },
+            {
+                url: "https://vercel.com/",
+                title: "Vercel",
+                description: "Frontend cloud platform for static sites and serverless functions",
+                category: "Hosting Services",
+                icon: "⚡"
+            }
+        ];
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const linkItems = document.querySelectorAll('.link-item');
+            
+            linkItems.forEach(item => {
+                const title = item.querySelector('.link-title').textContent.toLowerCase();
+                const description = item.querySelector('.link-description').textContent.toLowerCase();
+                const url = item.querySelector('.link-url').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || description.includes(searchTerm) || url.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        // Copy URL function
+        function copyUrl(button) {
+            const linkItem = button.closest('.link-item');
+            const url = linkItem.getAttribute('data-url');
+            
+            navigator.clipboard.writeText(url).then(() => {
+                showToast('URL kopiert!');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = url;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showToast('URL kopiert!');
+            });
+        }
+
+        // Copy all URLs
+        function copyAllUrls() {
+            const allUrls = serviceLinks.map(link => link.url).join('\n');
+            
+            navigator.clipboard.writeText(allUrls).then(() => {
+                showToast('Alle URLs kopiert!');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = allUrls;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showToast('Alle URLs kopiert!');
+            });
+        }
+
+        // Export to file
+        function exportToFile() {
+            const content = serviceLinks.map(link => 
+                `${link.title}\n${link.description}\n${link.url}\n${link.category}\n---`
+            ).join('\n\n');
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'service-links.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showToast('Datei exportiert!');
+        }
+
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Theme toggle
+        function toggleTheme() {
+            document.body.classList.toggle('dark-theme');
+            localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+        }
+
+        // Load saved theme
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-theme');
+        }
+
+        // Popup hover functionality
+        document.querySelectorAll('.link-item').forEach(item => {
+            let hoverTimeout;
+            
+            item.addEventListener('mouseenter', function() {
+                hoverTimeout = setTimeout(() => {
+                    const popup = this.querySelector('.popup-info');
+                    if (popup) {
+                        popup.classList.add('show');
+                    }
+                }, 300); // 300ms delay before showing popup
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                clearTimeout(hoverTimeout);
+                const popup = this.querySelector('.popup-info');
+                if (popup) {
+                    popup.classList.remove('show');
+                }
+            });
+            
+            item.addEventListener('click', function(e) {
+                if (e.target.classList.contains('copy-button') || 
+                    e.target.classList.contains('popup-btn')) return;
+                
+                const url = this.getAttribute('data-url');
+                window.open(url, '_blank');
+            });
+        });
+
+        // Open link function for popup buttons
+        function openLink(url) {
+            window.open(url, '_blank');
+        }
+
+        // Generate popups for all links on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.link-item').forEach(item => {
+                const url = item.getAttribute('data-url');
+                if (popupData[url]) {
+                    const popupHTML = generatePopupHTML(url, popupData[url]);
+                    item.insertAdjacentHTML('beforeend', popupHTML);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

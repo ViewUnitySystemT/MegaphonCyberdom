@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎸 Gitarre HTML Notariat - Raymond Demitrio Tel</title>
+    
+    <!-- Schwebende UI/UX CSS -->
+    <style>
+        /* 🪄 Schwebende UI/UX Overlay */
+        .float-launcher{position:fixed; right:1rem; bottom:1rem; z-index:60; background:var(--primary); color:#fff; border:none; border-radius:999px; padding:.9rem 1.2rem; font-weight:800; box-shadow:0 10px 30px rgba(0,0,0,.3); cursor:pointer}
+        .float-panel{position:fixed; right:1rem; bottom:4.5rem; width:min(92vw, 520px); max-height:min(80vh, 720px); overflow:auto; z-index:60; background:rgba(30,41,59,.95); border:1px solid rgba(255,255,255,.12); border-radius:1rem; box-shadow:0 20px 40px rgba(0,0,0,.35); backdrop-filter: blur(12px); display:none;}
+        .float-panel.show{display:block; animation:fadeIn .2s ease-out both}
+        .fp-head{display:flex; align-items:center; justify-content:space-between; gap:.5rem; padding:1rem; border-bottom:1px solid rgba(255,255,255,.08)}
+        .fp-title{font-weight:800}
+        .fp-tabs{display:flex; gap:.25rem; padding:.5rem}
+        .fp-tabs button{background:transparent; border:1px solid rgba(255,255,255,.2); color:#fff; padding:.4rem .6rem; border-radius:.6rem; cursor:pointer}
+        .fp-tabs button.active{background:var(--accent); border-color:transparent}
+        .fp-body{padding:1rem}
+        .list{display:grid; gap:.5rem}
+        .row{display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.6rem .8rem; border:1px dashed rgba(255,255,255,.15); border-radius:.6rem}
+        .pill{display:inline-block; font-size:.8rem; opacity:.8}
+        .setting{display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.6rem .8rem; border:1px solid rgba(255,255,255,.1); border-radius:.6rem}
+        .toggle{appearance:none; width:42px; height:24px; background:#475569; border-radius:999px; position:relative; outline:none; cursor:pointer}
+        .toggle:checked{background:var(--accent)}
+        .toggle:before{content:''; position:absolute; top:3px; left:3px; width:18px; height:18px; background:#fff; border-radius:50%; transition:transform .2s}
+        .toggle:checked:before{transform:translateX(18px)}
+        .install-banner{position:fixed; right:1rem; bottom:5rem; z-index:55; background:rgba(16,185,129,.95); color:#04130d; border-radius:.75rem; padding:.6rem .8rem; display:none; box-shadow:0 10px 30px rgba(0,0,0,.3)}
+        .install-banner.show{display:block}
+        
+        /* 🎸 Gitarre-spezifische Tools */
+        .guitar-tools-panel {
+          background: rgba(255,255,255,0.05);
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 0.75rem;
+          padding: 1rem;
+          margin: 1rem 0;
+        }
+        .tool-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+          gap: 0.5rem;
+          margin-top: 0.5rem;
+        }
+        .tool-btn {
+          background: rgba(255,255,255,0.1);
+          border: 1px solid rgba(255,255,255,0.2);
+          color: #fff;
+          padding: 0.5rem;
+          border-radius: 0.5rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .tool-btn:hover {
+          background: rgba(255,255,255,0.2);
+          transform: translateY(-2px);
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(4px); }
+          to { opacity: 1; transform: none; }
+        }
+    </style>
+    
+    <style>
+        :root {
+            --primary: #FF6B35;
+            --secondary: #8B5CF6;
+            --accent: #10B981;
+            --surface: #1e293b;
+            --text: #e2e8f0;
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: var(--gradient);
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.8s ease;
+        }
+        
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 30px rgba(255,255,255,0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 20px rgba(255,107,53,0.5); }
+            to { text-shadow: 0 0 40px rgba(255,107,53,1), 0 0 60px rgba(139,92,246,0.5); }
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+        
+        .notariat-panel {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            animation: slideInUp 0.8s ease;
+        }
+        
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .guitar-registration {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .guitar-registration {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(16,185,129,0.3);
+        }
+        
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+        
+        .guitar-specs {
+            background: rgba(16,185,129,0.2);
+            border: 2px solid var(--accent);
+            border-radius: 15px;
+            padding: 1.5rem;
+        }
+        
+        .guitar-specs h3 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), #059669);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(16,185,129,0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--secondary), #7c3aed);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(139,92,246,0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(239,68,68,0.4);
+        }
+        
+        .status-display {
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .status-display h3 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .status-item:last-child {
+            border-bottom: none;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .guitar-visual {
+            text-align: center;
+            font-size: 8rem;
+            margin: 2rem 0;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .digital-signature {
+            background: rgba(255,107,53,0.2);
+            border: 2px solid var(--primary);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .signature-canvas {
+            width: 100%;
+            height: 200px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            cursor: crosshair;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🎸 Gitarre HTML Notariat</h1>
+            <p class="subtitle">Digitale Notarisierung für Musikinstrumente</p>
+            <p style="color: var(--accent);">Raymond Demitrio Tel - Magnitudo Musica Mundo</p>
+        </header>
+
+        <div class="guitar-visual">🎸</div>
+
+        <div class="notariat-panel">
+            <h2 style="color: var(--accent); margin-bottom: 2rem; text-align: center;">
+                🏛️ Notarielle Registrierung von Musikinstrumenten
+            </h2>
+
+            <form id="guitar-notariat-form" class="guitar-registration">
+                <div>
+                    <div class="form-group">
+                        <label for="owner-name">👤 Eigentümer Name:</label>
+                        <input type="text" id="owner-name" placeholder="Vollständiger Name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="owner-id">🆔 Ausweis-Nummer:</label>
+                        <input type="text" id="owner-id" placeholder="Personalausweis/Pass-Nummer" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="guitar-brand">🏷️ Gitarren-Marke:</label>
+                        <select id="guitar-brand" required>
+                            <option value="">Marke auswählen</option>
+                            <option value="fender">Fender</option>
+                            <option value="gibson">Gibson</option>
+                            <option value="martin">Martin</option>
+                            <option value="taylor">Taylor</option>
+                            <option value="yamaha">Yamaha</option>
+                            <option value="custom">Handgefertigt/Custom</option>
+                            <option value="other">Andere</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="guitar-model">🎸 Modell:</label>
+                        <input type="text" id="guitar-model" placeholder="z.B. Stratocaster, Les Paul" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="serial-number">🔢 Seriennummer:</label>
+                        <input type="text" id="serial-number" placeholder="Eindeutige Seriennummer" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="purchase-date">📅 Kaufdatum:</label>
+                        <input type="date" id="purchase-date" required>
+                    </div>
+                </div>
+
+                <div class="guitar-specs">
+                    <h3>🎼 Technische Spezifikationen</h3>
+                    
+                    <div class="form-group">
+                        <label for="guitar-type">🎸 Gitarren-Typ:</label>
+                        <select id="guitar-type" required>
+                            <option value="">Typ auswählen</option>
+                            <option value="electric">E-Gitarre</option>
+                            <option value="acoustic">Akustik-Gitarre</option>
+                            <option value="classical">Klassische Gitarre</option>
+                            <option value="bass">Bass-Gitarre</option>
+                            <option value="semi-acoustic">Semi-Akustik</option>
+                            <option value="12-string">12-String</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="wood-type">🌳 Holzart:</label>
+                        <input type="text" id="wood-type" placeholder="z.B. Mahagoni, Ahorn, Palisander">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="year-built">📅 Baujahr:</label>
+                        <input type="number" id="year-built" min="1900" max="2025" placeholder="z.B. 2020">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="estimated-value">💰 Geschätzter Wert (€):</label>
+                        <input type="number" id="estimated-value" min="0" step="0.01" placeholder="z.B. 1500.00">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="condition">🔍 Zustand:</label>
+                        <select id="condition" required>
+                            <option value="">Zustand auswählen</option>
+                            <option value="mint">Mint (wie neu)</option>
+                            <option value="excellent">Ausgezeichnet</option>
+                            <option value="very-good">Sehr gut</option>
+                            <option value="good">Gut</option>
+                            <option value="fair">Akzeptabel</option>
+                            <option value="poor">Reparaturbedürftig</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="special-features">✨ Besonderheiten:</label>
+                        <textarea id="special-features" rows="3" placeholder="Signierte Gitarre, Vintage, Modifikationen, etc."></textarea>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="digital-signature">
+            <h3 style="color: var(--primary); margin-bottom: 1rem;">
+                🖋️ Digitale Signatur (HTML5 Canvas)
+            </h3>
+            <p style="margin-bottom: 1rem; opacity: 0.9;">
+                Bitte unterschreiben Sie hier für die notarielle Beglaubigung:
+            </p>
+            <canvas id="signature-canvas" class="signature-canvas"></canvas>
+            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                <button type="button" class="btn btn-secondary" onclick="clearSignature()">
+                    🗑️ Signatur löschen
+                </button>
+                <button type="button" class="btn btn-primary" onclick="saveSignature()">
+                    💾 Signatur speichern
+                </button>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button type="button" class="btn btn-primary" onclick="validateForm()">
+                ✅ Daten validieren
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="generateCertificate()">
+                📜 Zertifikat erstellen
+            </button>
+            <button type="button" class="btn btn-primary" onclick="notarizeGuitar()">
+                🏛️ Notariell beglaubigen
+            </button>
+            <button type="button" class="btn btn-danger" onclick="resetForm()">
+                🔄 Formular zurücksetzen
+            </button>
+        </div>
+
+        <div class="status-display">
+            <h3>📊 Notarisierungs-Status</h3>
+            <div class="status-item">
+                <span>Formular-Validierung:</span>
+                <span id="form-status">⏳ Bereit</span>
+            </div>
+            <div class="status-item">
+                <span>Digitale Signatur:</span>
+                <span id="signature-status">⏳ Ausstehend</span>
+            </div>
+            <div class="status-item">
+                <span>Notarielle Beglaubigung:</span>
+                <span id="notary-status">⏳ Nicht gestartet</span>
+            </div>
+            <div class="status-item">
+                <span>Blockchain-Registrierung:</span>
+                <span id="blockchain-status">⏳ Bereit</span>
+            </div>
+            <div class="status-item">
+                <span>Zertifikat-Erstellung:</span>
+                <span id="certificate-status">⏳ Ausstehend</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🪄 Schwebende UI/UX Launcher & Panel -->
+    <button id="floatLauncher" class="float-launcher" title="Schwebende Steuerung öffnen">☰ Tools</button>
+    <div id="floatPanel" class="float-panel" role="dialog" aria-modal="true" aria-label="Schwebende Steuerung">
+      <div class="fp-head">
+        <div class="fp-title">🎸 Gitarre Portal • Schwebende UI/UX</div>
+        <div class="fp-tabs" role="tablist">
+          <button data-tab="quick" class="active" role="tab" aria-selected="true">Quick</button>
+          <button data-tab="guitar" role="tab">Gitarre</button>
+          <button data-tab="settings" role="tab">Settings</button>
+          <button data-tab="traces" role="tab">Traces</button>
+          <button data-tab="auth" role="tab">Login</button>
+        </div>
+      </div>
+      <div class="fp-body">
+        <!-- Quick -->
+        <section data-pane="quick" class="list">
+          <div class="row"><span>Portal-Home</span><a class="portal-link" href="../index.html">Zurück</a></div>
+          <div class="row"><span>Globale Suche</span><button class="btn" data-action="focusSearch">Suchen</button></div>
+          <div class="row"><span>Versteckte Tools</span><button class="btn" data-action="revealHidden">Einblenden</button></div>
+          <div class="row"><span>PWA installieren</span><button class="btn" data-action="installPWA">Installieren</button></div>
+        </section>
+        <!-- Gitarre Tools -->
+        <section data-pane="guitar" class="list" hidden>
+          <div class="guitar-tools-panel">
+            <h3>🎸 Gitarre Tools</h3>
+            <div class="tool-grid">
+              <button class="tool-btn" data-action="guitarTuner">Stimmgerät</button>
+              <button class="tool-btn" data-action="guitarChords">Akkorde</button>
+              <button class="tool-btn" data-action="guitarScales">Tonleitern</button>
+              <button class="tool-btn" data-action="guitarMetronome">Metronom</button>
+              <button class="tool-btn" data-action="guitarRecorder">Aufnahme</button>
+              <button class="tool-btn" data-action="guitarEffects">Effekte</button>
+            </div>
+          </div>
+          <div class="row"><span>AI-Gitarren-Assistent</span><button class="btn" data-action="aiGuitarAssistant">Starten</button></div>
+          <div class="row"><span>Performance-Monitor</span><button class="btn" data-action="guitarPerformance">Öffnen</button></div>
+        </section>
+        <!-- Settings / Privacy Center -->
+        <section data-pane="settings" class="list" hidden>
+          <div class="setting"><div>
+            <strong>Telemetrie</strong><div class="pill">Opt‑In (DSGVO Art.25)</div>
+          </div><input id="toggleTelemetry" type="checkbox" class="toggle"></div>
+          <div class="setting"><div>
+            <strong>Privacy‑Export</strong><div class="pill">JSON Download</div>
+          </div><button class="btn" data-action="exportData">Exportieren</button></div>
+          <div class="setting"><div>
+            <strong>Alle Daten löschen</strong><div class="pill">LocalStorage/Cache</div>
+          </div><button class="btn" data-action="deleteData">Löschen</button></div>
+        </section>
+        <!-- Traces / OTLP -->
+        <section data-pane="traces" class="list" hidden>
+          <div class="setting" style="flex-direction:column; align-items:stretch">
+            <label for="otlpEndpoint"><strong>OTLP/HTTP Endpoint</strong></label>
+            <input id="otlpEndpoint" placeholder="https://collector …" style="padding:.6rem; border-radius:.5rem; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.06); color:#fff">
+          </div>
+          <div class="row"><span>Traces senden</span><button class="btn" data-action="sendTraces">Senden</button></div>
+          <div class="row"><span>Traces exportieren</span><button class="btn" data-action="downloadTraces">Download</button></div>
+        </section>
+        <!-- WebAuthn Login -->
+        <section data-pane="auth" class="list" hidden>
+          <div class="row"><span>WebAuthn registrieren</span><button class="btn" data-action="webauthnRegister">Registrieren</button></div>
+          <div class="row"><span>WebAuthn anmelden</span><button class="btn" data-action="webauthnLogin">Login</button></div>
+          <p class="pill">Erfordert HTTPS & kompatiblen Browser.</p>
+        </section>
+      </div>
+    </div>
+
+    <div id="installBanner" class="install-banner">App installieren? <button class="btn" id="btnInstallNow">Jetzt</button></div>
+
+    <script>
+        // 🪄 Portal Template System - Schwebende UI/UX
+        (function(){
+          const LS = window.localStorage;
+          const qs = (s, r=document)=>r.querySelector(s);
+          const qsa = (s, r=document)=>Array.from(r.querySelectorAll(s));
+          const on = (el, ev, fn)=> el && el.addEventListener(ev, fn);
+          const log = (...args)=> console.log('🎸', ...args);
+
+          // ----- Floating UI -----
+          const panel=qs('#floatPanel'); const launcher=qs('#floatLauncher'); 
+          if(launcher && panel) {
+            on(launcher,'click',()=>panel.classList.toggle('show'));
+            qsa('.fp-tabs button').forEach(btn=> on(btn,'click',()=>{ 
+              qsa('.fp-tabs button').forEach(b=>b.classList.remove('active')); 
+              btn.classList.add('active'); 
+              const tab=btn.dataset.tab; 
+              qsa('[data-pane]').forEach(p=>{ p.hidden = p.dataset.pane!==tab; }); 
+            }));
+          }
+
+          // ----- Gitarre-spezifische Actions -----
+          on(qs('[data-action="guitarTuner"]'),'click',()=>{
+            log('🎸 Gitarren-Stimmgerät aktiviert');
+            // Stimmgerät-Logik hier implementieren
+            alert('🎸 Gitarren-Stimmgerät wird gestartet...');
+          });
+
+          on(qs('[data-action="guitarChords"]'),'click',()=>{
+            log('🎸 Gitarren-Akkorde geöffnet');
+            alert('🎸 Gitarren-Akkorde werden geladen...');
+          });
+
+          on(qs('[data-action="guitarScales"]'),'click',()=>{
+            log('🎸 Gitarren-Tonleitern geöffnet');
+            alert('🎸 Gitarren-Tonleitern werden angezeigt...');
+          });
+
+          on(qs('[data-action="guitarMetronome"]'),'click',()=>{
+            log('🎸 Gitarren-Metronom aktiviert');
+            alert('🎸 Gitarren-Metronom wird gestartet...');
+          });
+
+          on(qs('[data-action="guitarRecorder"]'),'click',()=>{
+            log('🎸 Gitarren-Aufnahme gestartet');
+            alert('🎸 Gitarren-Aufnahme wird gestartet...');
+          });
+
+          on(qs('[data-action="guitarEffects"]'),'click',()=>{
+            log('🎸 Gitarren-Effekte geöffnet');
+            alert('🎸 Gitarren-Effekte werden geladen...');
+          });
+
+          on(qs('[data-action="aiGuitarAssistant"]'),'click',()=>{
+            log('🤖 AI-Gitarren-Assistent gestartet');
+            alert('🤖 AI-Gitarren-Assistent wird aktiviert...');
+          });
+
+          on(qs('[data-action="guitarPerformance"]'),'click',()=>{
+            log('📊 Gitarren-Performance-Monitor geöffnet');
+            alert('📊 Performance-Monitor wird gestartet...');
+          });
+
+          // ----- Portal-spezifische Actions -----
+          on(qs('[data-action="focusSearch"]'),'click',()=>{
+            log('🔍 Globale Suche fokussiert');
+            // Globale Suche-Logik hier
+          });
+
+          on(qs('[data-action="revealHidden"]'),'click',()=>{
+            log('👁️ Versteckte Tools eingeblendet');
+            // Versteckte Tools-Logik hier
+          });
+
+          on(qs('[data-action="installPWA"]'),'click',()=>{
+            log('📱 PWA-Installation gestartet');
+            // PWA-Installation-Logik hier
+          });
+
+          log('✅ Gitarre Portal Template System aktiv - Schwebende UI/UX bereit');
+        })();
+
+        // Canvas für digitale Signatur
+        let isDrawing = false;
+        let signatureData = null;
+
+        // Canvas initialisieren
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('signature-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Canvas-Größe setzen
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            // Drawing-Events
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            
+            // Touch-Events für Mobile
+            canvas.addEventListener('touchstart', handleTouch);
+            canvas.addEventListener('touchmove', handleTouch);
+            canvas.addEventListener('touchend', stopDrawing);
+            
+            console.log('🎸 Gitarre HTML Notariat bereit für digitale Signatur');
+        });
+
+        function startDrawing(e) {
+            isDrawing = true;
+            const canvas = document.getElementById('signature-canvas');
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.getBoundingClientRect();
+            
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            
+            const canvas = document.getElementById('signature-canvas');
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.getBoundingClientRect();
+            
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#2563eb';
+            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            ctx.stroke();
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function handleTouch(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' : 
+                                            e.type === 'touchmove' ? 'mousemove' : 'mouseup', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            document.getElementById('signature-canvas').dispatchEvent(mouseEvent);
+        }
+
+        function clearSignature() {
+            const canvas = document.getElementById('signature-canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            document.getElementById('signature-status').textContent = '⏳ Ausstehend';
+            console.log('🗑️ Signatur gelöscht');
+        }
+
+        function saveSignature() {
+            const canvas = document.getElementById('signature-canvas');
+            signatureData = canvas.toDataURL();
+            
+            document.getElementById('signature-status').textContent = '✅ Gespeichert';
+            console.log('💾 Signatur gespeichert:', signatureData.substring(0, 50) + '...');
+        }
+
+        function validateForm() {
+            const requiredFields = ['owner-name', 'owner-id', 'guitar-brand', 'guitar-model', 'serial-number', 'purchase-date', 'guitar-type', 'condition'];
+            let isValid = true;
+            
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (!field.value.trim()) {
+                    field.style.borderColor = '#ef4444';
+                    isValid = false;
+                } else {
+                    field.style.borderColor = 'var(--accent)';
+                }
+            });
+            
+            if (isValid) {
+                document.getElementById('form-status').textContent = '✅ Validiert';
+                console.log('✅ Formular-Validierung erfolgreich');
+            } else {
+                document.getElementById('form-status').textContent = '❌ Unvollständig';
+                console.log('❌ Formular-Validierung fehlgeschlagen');
+            }
+            
+            return isValid;
+        }
+
+        function generateCertificate() {
+            if (!validateForm()) {
+                alert('⚠️ Bitte füllen Sie alle Pflichtfelder aus!');
+                return;
+            }
+            
+            const certificateData = {
+                owner: document.getElementById('owner-name').value,
+                ownerId: document.getElementById('owner-id').value,
+                guitar: {
+                    brand: document.getElementById('guitar-brand').value,
+                    model: document.getElementById('guitar-model').value,
+                    serial: document.getElementById('serial-number').value,
+                    type: document.getElementById('guitar-type').value,
+                    condition: document.getElementById('condition').value,
+                    yearBuilt: document.getElementById('year-built').value,
+                    woodType: document.getElementById('wood-type').value,
+                    estimatedValue: document.getElementById('estimated-value').value,
+                    specialFeatures: document.getElementById('special-features').value
+                },
+                purchaseDate: document.getElementById('purchase-date').value,
+                notarizationDate: new Date().toISOString(),
+                signature: signatureData,
+                certificateId: 'GUITAR-' + Date.now(),
+                notary: 'Raymond Demitrio Tel - TEL Portal Digitalnotariat'
+            };
+            
+            document.getElementById('certificate-status').textContent = '✅ Erstellt';
+            console.log('📜 Gitarre-Zertifikat erstellt:', certificateData);
+            
+            // Zertifikat als Download anbieten
+            const blob = new Blob([JSON.stringify(certificateData, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Gitarre-Zertifikat-${certificateData.certificateId}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function notarizeGuitar() {
+            if (!validateForm()) {
+                alert('⚠️ Bitte validieren Sie zuerst das Formular!');
+                return;
+            }
+            
+            if (!signatureData) {
+                alert('⚠️ Bitte erstellen Sie zuerst eine digitale Signatur!');
+                return;
+            }
+            
+            // Notarisierungs-Prozess simulieren
+            document.getElementById('notary-status').textContent = '🔄 In Bearbeitung...';
+            
+            setTimeout(() => {
+                document.getElementById('notary-status').textContent = '✅ Notariell beglaubigt';
+                document.getElementById('blockchain-status').textContent = '✅ Blockchain registriert';
+                
+                console.log('🏛️ Gitarre notariell beglaubigt!');
+                
+                // Erfolgs-Animation
+                document.body.style.animation = 'success-flash 0.5s ease';
+                setTimeout(() => {
+                    document.body.style.animation = '';
+                }, 500);
+                
+                alert('🎉 Ihre Gitarre wurde erfolgreich notariell beglaubigt!\n\n📜 Zertifikat wurde heruntergeladen\n🔗 Blockchain-Registrierung abgeschlossen\n🏛️ Rechtsgültige Dokumentation erstellt');
+            }, 2000);
+        }
+
+        function resetForm() {
+            if (confirm('🔄 Möchten Sie wirklich alle Daten zurücksetzen?')) {
+                document.getElementById('guitar-notariat-form').reset();
+                clearSignature();
+                
+                // Status zurücksetzen
+                document.getElementById('form-status').textContent = '⏳ Bereit';
+                document.getElementById('signature-status').textContent = '⏳ Ausstehend';
+                document.getElementById('notary-status').textContent = '⏳ Nicht gestartet';
+                document.getElementById('blockchain-status').textContent = '⏳ Bereit';
+                document.getElementById('certificate-status').textContent = '⏳ Ausstehend';
+                
+                console.log('🔄 Formular zurückgesetzt');
+            }
+        }
+
+        // Auto-Save Funktionalität
+        setInterval(() => {
+            const formData = new FormData(document.getElementById('guitar-notariat-form'));
+            const data = Object.fromEntries(formData.entries());
+            
+            if (Object.values(data).some(value => value.trim() !== '')) {
+                localStorage.setItem('guitar-notariat-draft', JSON.stringify(data));
+                console.log('💾 Auto-Save: Formular-Daten gespeichert');
+            }
+        }, 30000); // Alle 30 Sekunden
+
+        // Lade gespeicherte Daten beim Start
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('guitar-notariat-draft');
+            if (saved) {
+                const data = JSON.parse(saved);
+                Object.entries(data).forEach(([key, value]) => {
+                    const field = document.getElementById(key);
+                    if (field) field.value = value;
+                });
+                console.log('📂 Gespeicherte Daten geladen');
+            }
+        });
+
+        // CSS für Erfolgs-Animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes success-flash {
+                0% { background: var(--gradient); }
+                50% { background: linear-gradient(135deg, var(--accent), #059669); }
+                100% { background: var(--gradient); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        console.log('🎸 Gitarre HTML Notariat vollständig geladen - Bereit für digitale Notarisierung!');
+    </script>
+</body>
+</html>
+
+

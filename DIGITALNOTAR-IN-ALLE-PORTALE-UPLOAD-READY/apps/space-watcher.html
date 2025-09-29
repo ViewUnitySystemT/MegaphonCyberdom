@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Space Watcher - Live Astronauten APIs & Funding Tracker</title>
+<h1 style="position: absolute; left: -9999px;">🚀 Space Watcher - Live Astronauten APIs & Funding Tracker</h1>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        :root {
+            --space-primary: #0B1426;
+            --space-secondary: #1E3A8A;
+            --space-accent: #3B82F6;
+            --space-success: #10B981;
+            --space-warning: #F59E0B;
+            --space-danger: #EF4444;
+            --space-info: #06B6D4;
+        }
+
+        .space-watcher {
+            background: linear-gradient(135deg, var(--space-primary) 0%, var(--space-secondary) 100%);
+            min-height: 100vh;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .space-header {
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 2px solid var(--space-accent);
+        }
+
+        .space-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(255,215,0,0.5);
+        }
+
+        .space-subtitle {
+            font-size: 1.2rem;
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+        }
+
+        .ampel-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .ampel-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: visible;
+        }
+
+        .ampel-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .ampel-card.new {
+            border: 2px solid var(--space-success);
+            box-shadow: 0 0 20px rgba(16,185,129,0.3);
+        }
+
+        .ampel-card.new::before {
+            content: "NEU";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--space-success);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .ampel-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .ampel-icon {
+            font-size: 2rem;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            border: 2px solid var(--space-accent);
+        }
+
+        .ampel-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .ampel-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+
+        .status-active { background: var(--space-success); }
+        .status-upcoming { background: var(--space-warning); }
+        .status-closed { background: var(--space-danger); }
+        .status-monitoring { background: var(--space-info); }
+
+        .ampel-content {
+            margin: 1rem 0;
+        }
+
+        .ampel-description {
+            opacity: 0.9;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .ampel-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+        }
+
+        .detail-label {
+            opacity: 0.7;
+        }
+
+        .detail-value {
+            font-weight: 500;
+        }
+
+        .ampel-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--space-accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563EB;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .btn-success {
+            background: var(--space-success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .watcher-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .control-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            background: var(--space-accent);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        }
+
+        .control-btn.active {
+            background: var(--space-success);
+            animation: pulse 2s infinite;
+        }
+
+        .rvc-integration {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid var(--space-accent);
+            z-index: 1000;
+        }
+
+        .rvc-status {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .rvc-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .rvc-btn {
+            padding: 0.5rem;
+            border: none;
+            border-radius: 5px;
+            background: var(--space-accent);
+            color: white;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .notification-toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--space-success);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 2000;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .notification-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--space-accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .ampel-dashboard {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+            
+            .space-title {
+                font-size: 2rem;
+            }
+            
+            .watcher-controls {
+                bottom: 10px;
+                right: 10px;
+            }
+            
+            .control-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="space-watcher">
+        <!-- Header -->
+        <div class="space-header">
+            <h1 class="space-title">🚀 Space Watcher</h1>
+            <p class="space-subtitle">Live Astronauten APIs, Hackathons & Funding Calls Tracker</p>
+        </div>
+
+        <!-- Stats Dashboard -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="total-events">0</div>
+                <div class="stat-label">Aktive Events</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="new-events">0</div>
+                <div class="stat-label">Neue Events</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="api-status">🟢</div>
+                <div class="stat-label">API Status</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="last-update">--:--</div>
+                <div class="stat-label">Letztes Update</div>
+            </div>
+        </div>
+
+        <!-- Ampel Dashboard -->
+        <div class="ampel-dashboard" id="ampel-dashboard">
+            <!-- Events werden hier dynamisch eingefügt -->
+        </div>
+
+        <!-- Watcher Controls -->
+        <div class="watcher-controls">
+            <button class="control-btn" id="start-watcher" title="Watcher starten" title="Action Button">▶️</button>
+            <button class="control-btn" id="stop-watcher" title="Watcher stoppen" title="Action Button">⏹️</button>
+            <button class="control-btn" id="refresh-data" title="Daten aktualisieren" title="Action Button">🔄</button>
+            <button class="control-btn" id="export-data" title="Daten exportieren" title="Action Button">📤</button>
+        </div>
+
+        <!-- RVC Integration -->
+        <div class="rvc-integration">
+            <div class="rvc-status">RVC Status: <span id="rvc-status">Verbunden</span></div>
+            <div class="rvc-actions">
+                <button class="rvc-btn" id="stamp-all" title="Action Button">Stempeln</button>
+                <button class="rvc-btn" id="sync-rvc" title="Action Button">Sync</button>
+            </div>
+        </div>
+
+        <!-- Notification Toast -->
+        <div class="notification-toast" id="notification-toast"></div>
+    </div>
+
+    <script>
+        class SpaceWatcher {
+            constructor() {
+                this.isRunning = false;
+                this.events = [];
+                this.lastUpdate = null;
+                this.watcherInterval = null;
+                this.rvcConnected = false;
+                
+                this.init();
+            }
+
+            async init() {
+                await this.loadEvents();
+                this.bindEvents();
+                this.startWatcher();
+                this.updateStats();
+                this.initRVC();
+            }
+
+            bindEvents() {
+                document.getElementById('start-watcher').onclick = () => this.startWatcher();
+                document.getElementById('stop-watcher').onclick = () => this.stopWatcher();
+                document.getElementById('refresh-data').onclick = () => this.refreshData();
+                document.getElementById('export-data').onclick = () => this.exportData();
+                document.getElementById('stamp-all').onclick = () => this.stampAllEvents();
+                document.getElementById('sync-rvc').onclick = () => this.syncRVC();
+            }
+
+            async loadEvents() {
+                try {
+                    // Lade gespeicherte Events aus localStorage
+                    const savedEvents = localStorage.getItem('space-watcher-events');
+                    if (savedEvents) {
+                        this.events = JSON.parse(savedEvents);
+                    } else {
+                        // Initiale Events laden
+                        this.events = await this.fetchInitialEvents();
+                        this.saveEvents();
+                    }
+                } catch (error) {
+                    console.error('Fehler beim Laden der Events:', error);
+                    this.events = [];
+                }
+            }
+
+            async fetchInitialEvents() {
+                // Simulierte API-Calls für verschiedene Space-Events
+                const events = [
+                    {
+                        id: 'nasa-space-apps-2025',
+                        title: 'NASA International Space Apps Challenge 2025',
+                        type: 'hackathon',
+                        status: 'upcoming',
+                        description: 'Größter Weltraum-Hackathon weltweit mit Fokus auf Live-Astronauten-APIs',
+                        url: 'https://www.spaceappschallenge.org',
+                        contact: 'info@spaceappschallenge.org',
+                        deadline: '2025-04-15',
+                        location: 'Weltweit',
+                        participants: '10,000+',
+                        isNew: true,
+                        lastChecked: Date.now()
+                    },
+                    {
+                        id: 'iss-national-lab-nlra',
+                        title: 'ISS National Lab Research Announcement',
+                        type: 'funding',
+                        status: 'active',
+                        description: 'Förderung für ISS-Experimente mit Live-Telemetrie-APIs',
+                        url: 'https://www.issnationallab.org/research-on-the-iss/funding-opportunities/',
+                        contact: 'inquiries@issnationallab.org',
+                        deadline: '2025-03-30',
+                        location: 'USA',
+                        participants: '50+',
+                        isNew: false,
+                        lastChecked: Date.now()
+                    },
+                    {
+                        id: 'trish-health-api',
+                        title: 'TRISH Health Data API Development',
+                        type: 'research',
+                        status: 'monitoring',
+                        description: 'Entwicklung von APIs für Astronauten-Gesundheitsdaten',
+                        url: 'https://www.bcm.edu/centers/space-health',
+                        contact: 'trish@bcm.edu',
+                        deadline: '2025-06-15',
+                        location: 'Houston, TX',
+                        participants: '25+',
+                        isNew: true,
+                        lastChecked: Date.now()
+                    },
+                    {
+                        id: 'esa-bic-uk-2025',
+                        title: 'ESA BIC UK Business Incubation',
+                        type: 'funding',
+                        status: 'active',
+                        description: 'Förderung für Space-Tech Startups mit API-Fokus',
+                        url: 'https://www.esa-bic.org/uk',
+                        contact: 'info@esa-bic.org.uk',
+                        deadline: '2025-05-20',
+                        location: 'UK',
+                        participants: '100+',
+                        isNew: false,
+                        lastChecked: Date.now()
+                    },
+                    {
+                        id: 'actinspace-2025',
+                        title: 'ActInSpace International Innovation',
+                        type: 'hackathon',
+                        status: 'upcoming',
+                        description: 'Innovationswettbewerb basierend auf realen Weltraum-Patenten',
+                        url: 'https://actinspace.org',
+                        contact: 'contact@actinspace.org',
+                        deadline: '2025-07-10',
+                        location: 'Weltweit',
+                        participants: '5,000+',
+                        isNew: true,
+                        lastChecked: Date.now()
+                    },
+                    {
+                        id: 'copernicus-hackathon-de',
+                        title: 'Copernicus Hackathon Deutschland',
+                        type: 'hackathon',
+                        status: 'upcoming',
+                        description: 'Erdbeobachtungsdaten für Space-API-Entwicklung',
+                        url: 'https://coding-copernicus.de',
+                        contact: 'info@coding-copernicus.de',
+                        deadline: '2025-04-25',
+                        location: 'Deutschland',
+                        participants: '500+',
+                        isNew: false,
+                        lastChecked: Date.now()
+                    }
+                ];
+
+                return events;
+            }
+
+            async startWatcher() {
+                if (this.isRunning) return;
+                
+                this.isRunning = true;
+                document.getElementById('start-watcher').classList.add('active');
+                
+                // Watcher alle 5 Minuten ausführen
+                this.watcherInterval = setInterval(() => {
+                    this.checkForUpdates();
+                }, 5 * 60 * 1000);
+
+                this.showNotification('Watcher gestartet', 'success');
+                console.log('🚀 Space Watcher gestartet');
+            }
+
+            stopWatcher() {
+                if (!this.isRunning) return;
+                
+                this.isRunning = false;
+                document.getElementById('start-watcher').classList.remove('active');
+                
+                if (this.watcherInterval) {
+                    clearInterval(this.watcherInterval);
+                    this.watcherInterval = null;
+                }
+
+                this.showNotification('Watcher gestoppt', 'info');
+                console.log('⏹️ Space Watcher gestoppt');
+            }
+
+            async checkForUpdates() {
+                try {
+                    console.log('🔍 Prüfe auf neue Events...');
+                    
+                    // Simuliere API-Calls zu verschiedenen Quellen
+                    const newEvents = await this.simulateAPICalls();
+                    
+                    if (newEvents.length > 0) {
+                        this.events = [...this.events, ...newEvents];
+                        this.saveEvents();
+                        this.renderEvents();
+                        this.updateStats();
+                        
+                        this.showNotification(`${newEvents.length} neue Events gefunden!`, 'success');
+                    }
+                    
+                    this.lastUpdate = new Date();
+                    this.updateLastUpdateTime();
+                    
+                } catch (error) {
+                    console.error('Fehler beim Prüfen auf Updates:', error);
+                    this.showNotification('Fehler beim Update-Check', 'error');
+                }
+            }
+
+            async simulateAPICalls() {
+                // Simuliere zufällige neue Events
+                const possibleEvents = [
+                    {
+                        id: `event-${Date.now()}`,
+                        title: 'Neue ISS Live-Stream API',
+                        type: 'api',
+                        status: 'active',
+                        description: 'Neue API für Live-Video-Streams von der ISS',
+                        url: 'https://api.nasa.gov',
+                        contact: 'api@nasa.gov',
+                        deadline: '2025-08-15',
+                        location: 'Weltweit',
+                        participants: 'Unbegrenzt',
+                        isNew: true,
+                        lastChecked: Date.now()
+                    },
+                    {
+                        id: `event-${Date.now()}-2`,
+                        title: 'SpaceX Crew Dragon API',
+                        type: 'api',
+                        status: 'upcoming',
+                        description: 'API für Live-Daten von Crew Dragon Missionen',
+                        url: 'https://api.spacex.com',
+                        contact: 'api@spacex.com',
+                        deadline: '2025-09-20',
+                        location: 'Weltweit',
+                        participants: 'Unbegrenzt',
+                        isNew: true,
+                        lastChecked: Date.now()
+                    }
+                ];
+
+                // 30% Chance auf neues Event
+                if (Math.random() < 0.3) {
+                    return [possibleEvents[Math.floor(Math.random() * possibleEvents.length)]];
+                }
+                
+                return [];
+            }
+
+            async refreshData() {
+                this.showNotification('Daten werden aktualisiert...', 'info');
+                
+                try {
+                    await this.checkForUpdates();
+                    this.renderEvents();
+                    this.updateStats();
+                    this.showNotification('Daten aktualisiert!', 'success');
+                } catch (error) {
+                    console.error('Fehler beim Aktualisieren:', error);
+                    this.showNotification('Fehler beim Aktualisieren', 'error');
+                }
+            }
+
+            renderEvents() {
+                const dashboard = document.getElementById('ampel-dashboard');
+                dashboard.innerHTML = '';
+
+                this.events.forEach(event => {
+                    const eventCard = this.createEventCard(event);
+                    dashboard.appendChild(eventCard);
+                });
+            }
+
+            createEventCard(event) {
+                const card = document.createElement('div');
+                card.className = `ampel-card ${event.isNew ? 'new' : ''}`;
+                
+                const statusClass = `status-${event.status}`;
+                const typeIcon = this.getTypeIcon(event.type);
+                
+                card.innerHTML = `
+                    <div class="ampel-header">
+                        <div class="ampel-icon">${typeIcon}</div>
+                        <div>
+                            <h3 class="ampel-title">${event.title}</h3>
+                            <span class="ampel-status ${statusClass}">${this.getStatusText(event.status)}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="ampel-content">
+                        <p class="ampel-description">${event.description}</p>
+                        
+                        <div class="ampel-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Deadline:</span>
+                                <span class="detail-value">${event.deadline}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Location:</span>
+                                <span class="detail-value">${event.location}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Participants:</span>
+                                <span class="detail-value">${event.participants}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Type:</span>
+                                <span class="detail-value">${event.type.toUpperCase()}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ampel-actions">
+                        <a href="${event.url}" target="_blank" class="action-btn btn-primary">🌐 Website</a>
+                        <button class="action-btn btn-secondary" onclick="spaceWatcher.openContact('${event.contact}')" title="Action Button">📧 Kontakt</button>
+                        <button class="action-btn btn-success" onclick="spaceWatcher.stampEvent('${event.id}')" title="Action Button">🔖 Stempeln</button>
+                    </div>
+                `;
+                
+                return card;
+            }
+
+            getTypeIcon(type) {
+                const icons = {
+                    'hackathon': '🏆',
+                    'funding': '💰',
+                    'research': '🔬',
+                    'api': '🔌',
+                    'event': '📅'
+                };
+                return icons[type] || '📅';
+            }
+
+            getStatusText(status) {
+                const texts = {
+                    'active': 'Aktiv',
+                    'upcoming': 'Bald',
+                    'closed': 'Geschlossen',
+                    'monitoring': 'Monitoring'
+                };
+                return texts[status] || status;
+            }
+
+            openContact(email) {
+                window.open(`mailto:${email}?subject=Space Watcher - Interesse an Event&body=Hallo,%0D%0A%0D%0AIch interessiere mich für dieses Event und möchte mehr Informationen erhalten.%0D%0A%0D%0AMit freundlichen Grüßen`, '_blank');
+            }
+
+            async stampEvent(eventId) {
+                try {
+                    const event = this.events.find(e => e.id === eventId);
+                    if (!event) return;
+
+                    // RVC Stamping
+                    if (window.TEL_RVC) {
+                        const stampData = {
+                            id: eventId,
+                            title: event.title,
+                            type: event.type,
+                            timestamp: Date.now(),
+                            sha256: await this.calculateSHA256(event)
+                        };
+                        
+                        await window.TEL_RVC.stamp(stampData);
+                        this.showNotification(`Event "${event.title}" gestempelt!`, 'success');
+                    } else {
+                        this.showNotification('RVC nicht verfügbar', 'warning');
+                    }
+                } catch (error) {
+                    console.error('Fehler beim Stempeln:', error);
+                    this.showNotification('Fehler beim Stempeln', 'error');
+                }
+            }
+
+            async calculateSHA256(data) {
+                const encoder = new TextEncoder();
+                const dataBuffer = encoder.encode(JSON.stringify(data));
+                const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            }
+
+            async stampAllEvents() {
+                try {
+                    let stampedCount = 0;
+                    
+                    for (const event of this.events) {
+                        if (!event.stamped) {
+                            await this.stampEvent(event.id);
+                            event.stamped = true;
+                            stampedCount++;
+                        }
+                    }
+                    
+                    this.saveEvents();
+                    this.showNotification(`${stampedCount} Events gestempelt!`, 'success');
+                } catch (error) {
+                    console.error('Fehler beim Stempeln aller Events:', error);
+                    this.showNotification('Fehler beim Stempeln', 'error');
+                }
+            }
+
+            async syncRVC() {
+                try {
+                    if (window.TEL_RVC) {
+                        const rvcData = {
+                            section: 34,
+                            items: this.events.map(event => ({
+                                id: event.id,
+                                title: event.title,
+                                type: event.type,
+                                status: event.status,
+                                url: event.url,
+                                contact: event.contact,
+                                timestamp: event.lastChecked
+                            }))
+                        };
+                        
+                        await window.TEL_RVC.sync(rvcData);
+                        this.showNotification('RVC synchronisiert!', 'success');
+                    } else {
+                        this.showNotification('RVC nicht verfügbar', 'warning');
+                    }
+                } catch (error) {
+                    console.error('Fehler beim RVC-Sync:', error);
+                    this.showNotification('Fehler beim Sync', 'error');
+                }
+            }
+
+            initRVC() {
+                // RVC Integration
+                if (window.TEL_RVC) {
+                    this.rvcConnected = true;
+                    document.getElementById('rvc-status').textContent = 'Verbunden';
+                    console.log('✅ RVC verbunden');
+                } else {
+                    this.rvcConnected = false;
+                    document.getElementById('rvc-status').textContent = 'Nicht verbunden';
+                    console.log('❌ RVC nicht verfügbar');
+                }
+            }
+
+            updateStats() {
+                const totalEvents = this.events.length;
+                const newEvents = this.events.filter(e => e.isNew).length;
+                const apiStatus = this.isRunning ? '🟢' : '🔴';
+                
+                document.getElementById('total-events').textContent = totalEvents;
+                document.getElementById('new-events').textContent = newEvents;
+                document.getElementById('api-status').textContent = apiStatus;
+            }
+
+            updateLastUpdateTime() {
+                if (this.lastUpdate) {
+                    const timeString = this.lastUpdate.toLocaleTimeString('de-DE', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                    });
+                    document.getElementById('last-update').textContent = timeString;
+                }
+            }
+
+            saveEvents() {
+                localStorage.setItem('space-watcher-events', JSON.stringify(this.events));
+            }
+
+            exportData() {
+                const data = {
+                    events: this.events,
+                    exportDate: new Date().toISOString(),
+                    totalEvents: this.events.length,
+                    newEvents: this.events.filter(e => e.isNew).length
+                };
+                
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `space-watcher-export-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                this.showNotification('Daten exportiert!', 'success');
+            }
+
+            showNotification(message, type = 'info') {
+                const toast = document.getElementById('notification-toast');
+                toast.textContent = message;
+                toast.className = `notification-toast show ${type}`;
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // Initialize Space Watcher
+        const spaceWatcher = new SpaceWatcher();
+        
+        // Make it globally available
+        window.spaceWatcher = spaceWatcher;
+
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            if (spaceWatcher.isRunning) {
+                spaceWatcher.checkForUpdates();
+            }
+        }, 30 * 1000);
+
+        console.log('🚀 Space Watcher initialized');
+    </script>
+</body>
+</html>

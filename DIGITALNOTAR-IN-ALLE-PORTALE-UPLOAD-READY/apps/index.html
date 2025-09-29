@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="de" data-theme="dark">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>📱 TEL Portal Apps - 87 Anwendungen | DIGITALNOTAR.IN</title>
+    <meta name="description" content="87 TEL Portal Apps für alle Bereiche: Admin, AI, Banking, Space, Kommunikation und mehr.">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --success: #10b981;
+            --dark-bg: #0f172a;
+            --surface: #1e293b;
+            --text: #e2e8f0;
+            --border: #334155;
+            --orange: #FF6B35;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: linear-gradient(135deg, var(--dark-bg), var(--surface));
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, var(--orange), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .search-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--orange);
+            border-radius: 12px;
+            background: var(--surface);
+            color: var(--text);
+            font-size: 1.1rem;
+        }
+        
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .app-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .app-card:hover {
+            border-color: var(--orange);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.15);
+        }
+        
+        .app-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--orange);
+        }
+        
+        .app-description {
+            color: var(--text);
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+        
+        .back-link {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            background: var(--orange);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .back-link:hover {
+            background: #ff8554;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <a href="../" class="back-link">← Zurück zum TEL Portal</a>
+    
+    <div class="header">
+        <h1 class="title">📱 TEL Portal Apps</h1>
+        <p>87 Anwendungen für alle Bereiche</p>
+    </div>
+    
+    <div class="search-container">
+        <input type="text" class="search-input" id="appSearch" placeholder="🔍 Suche in 87 Apps...">
+    </div>
+    
+    <div class="apps-grid" id="appsGrid">
+        <!-- Apps werden dynamisch geladen -->
+    </div>
+    
+    <script>
+        // Simulierte App-Liste (wird später durch echte Apps ersetzt)
+        const apps = [
+            { name: 'admin-dashboard', title: '🏛️ Admin Dashboard', description: 'Vollständiges System-Management und Kontrolle' },
+            { name: 'ai-terminal-manager', title: '🤖 AI Terminal Manager', description: 'KI-gestützte Terminal-Verwaltung und Automatisierung' },
+            { name: 'banking-api-explorer', title: '💰 Banking API Explorer', description: 'PSD2-konforme Banking-Integration und API-Tests' },
+            { name: 'space-watcher', title: '🚀 Space Watcher', description: 'NASA/ESA APIs für Weltraum-Daten und Satelliten' },
+            { name: 'media-gallery', title: '🎵 Media Gallery', description: 'Multimedia-Verwaltung und Wiedergabe-System' },
+            { name: 'server-monitor', title: '📊 Server Monitor', description: 'Echtzeit-Serverüberwachung und Performance-Analyse' },
+            { name: 'api-status-checker', title: '🔍 API Status Checker', description: 'API-Endpunkt-Überwachung und Verfügbarkeitsprüfung' },
+            { name: 'file-manager', title: '📁 File Manager', description: 'Erweiterte Dateiverwaltung mit Cloud-Integration' },
+            { name: 'security-scanner', title: '🛡️ Security Scanner', description: 'Sicherheitsanalyse und Vulnerability-Assessment' },
+            { name: 'network-analyzer', title: '🌐 Network Analyzer', description: 'Netzwerk-Diagnose und Traffic-Analyse' }
+            // ... weitere Apps werden hier hinzugefügt
+        ];
+        
+        function renderApps(filteredApps = apps) {
+            const grid = document.getElementById('appsGrid');
+            grid.innerHTML = filteredApps.map(app => `
+                <div class="app-card" onclick="openApp('${app.name}')">
+                    <div class="app-title">${app.title}</div>
+                    <div class="app-description">${app.description}</div>
+                </div>
+            `).join('');
+        }
+        
+        function openApp(appName) {
+            // Prüfe ob App-Datei existiert
+            window.open(`${appName}.html`, '_blank');
+        }
+        
+        // Suchfunktion
+        document.getElementById('appSearch').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const filtered = apps.filter(app => 
+                app.name.toLowerCase().includes(query) ||
+                app.title.toLowerCase().includes(query) ||
+                app.description.toLowerCase().includes(query)
+            );
+            renderApps(filtered);
+        });
+        
+        // Initial render
+        renderApps();
+        
+        // Lade echte Apps-Liste wenn verfügbar
+        fetch('./app-list.json').then(r => r.json()).then(data => {
+            apps.splice(0, apps.length, ...data);
+            renderApps();
+        }).catch(() => {
+            console.log('Using default app list');
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+

@@ -1,0 +1,496 @@
+<!-- TODO: Replacement character detected () - verify source encoding -->
+<!DOCTYPE html>
+<html lang="de" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Caddy Config Generator - Android Server</title>
+<h1 style="position: absolute; left: -9999px;">Caddy Config Generator - Android Server</h1>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .config-generator {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .config-section {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+        }
+        .config-section h2 {
+            color: #333333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .config-section h3 {
+            color: #333333;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .config-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #333333;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+        }
+        .code-block {
+            background: #1e1e1e;
+            color: #333333;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        .generate-button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin: 1rem 0;
+            width: 100%;
+        }
+        .generate-button:hover {
+            background: #218838;
+        }
+        .copy-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0.5rem 0;
+        }
+        .copy-button:hover {
+            background: #0056b3;
+        }
+        .feature-checkbox {
+            display: flex;
+            align-items: center;
+            margin: 0.5rem 0;
+        }
+        .feature-checkbox input {
+            margin-right: 0.5rem;
+        }
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .warning-box h4 {
+            color: #333333;
+            margin-top: 0;
+        }
+        .info-box {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .info-box h4 {
+            color: #333333;
+            margin-top: 0;
+        }
+        .config-preview {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .config-preview h4 {
+            margin-top: 0;
+            color: #333333;
+        }
+    </style>
+</head>
+<body>
+    <div class="config-generator">
+        <header class="top-app-bar">
+            <div class="top-app-bar-content">
+                <button class="icon-button" onclick="window.history.back()" title="Action Button">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                    </svg>
+                </button>
+                <h1 class="app-title">⚙️ Caddy Config Generator</h1>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Basic Configuration -->
+            <div class="config-section">
+                <h2>🔧 Grundkonfiguration</h2>
+                
+                <div class="config-form">
+                    <div class="form-group">
+                        <label for="domain">Domain:</label>
+                        <input type="text" id="domain" placeholder="android.example.com" value="android.example.com" aria-label="Input Field">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="port">Port:</label>
+                        <input type="number" id="port" placeholder="8080" value="8080" aria-label="Input Field">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="webroot">Webroot:</label>
+                        <input type="text" id="webroot" placeholder="/data/data/com.termux/files/home/www" value="/data/data/com.termux/files/home/www" aria-label="Input Field">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features -->
+            <div class="config-section">
+                <h2>✨ Features</h2>
+                
+                <div class="feature-checkbox">
+                    <input type="checkbox" id="gzip" checked aria-label="Input Field">
+                    <label for="gzip">Gzip Kompression</label>
+                </div>
+                
+                <div class="feature-checkbox">
+                    <input type="checkbox" id="zstd" checked aria-label="Input Field">
+                    <label for="zstd">Zstandard Kompression</label>
+                </div>
+                
+                <div class="feature-checkbox">
+                    <input type="checkbox" id="security-headers" checked aria-label="Input Field">
+                    <label for="security-headers">Sicherheits-Headers</label>
+                </div>
+                
+                <div class="feature-checkbox">
+                    <input type="checkbox" id="logging" checked aria-label="Input Field">
+                    <label for="logging">Logging</label>
+                </div>
+                
+                <div class="feature-checkbox">
+                    <input type="checkbox" id="health-check" checked aria-label="Input Field">
+                    <label for="health-check">Health Check Endpoint</label>
+                </div>
+                
+                <div class="feature-checkbox">
+                    <input type="checkbox" id="cors" aria-label="Input Field">
+                    <label for="cors">CORS Headers</label>
+                </div>
+                
+                <div class="feature-checkbox">
+                    <input type="checkbox" id="rate-limiting" aria-label="Input Field">
+                    <label for="rate-limiting">Rate Limiting</label>
+                </div>
+                
+                <div class="feature-checkbox">
+                    <input type="checkbox" id="basic-auth" aria-label="Input Field">
+                    <label for="basic-auth">Basic Authentication</label>
+                </div>
+            </div>
+
+            <!-- Advanced Options -->
+            <div class="config-section">
+                <h2>🔧 Erweiterte Optionen</h2>
+                
+                <div class="config-form">
+                    <div class="form-group">
+                        <label for="log-level">Log Level:</label>
+                        <select id="log-level">
+                            <option value="INFO">INFO</option>
+                            <option value="DEBUG">DEBUG</option>
+                            <option value="WARN">WARN</option>
+                            <option value="ERROR">ERROR</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="log-size">Log Dateigröße:</label>
+                        <input type="text" id="log-size" placeholder="5MiB" value="5MiB" aria-label="Input Field">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="log-keep">Log Dateien behalten:</label>
+                        <input type="number" id="log-keep" placeholder="5" value="5" aria-label="Input Field">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="custom-headers">Custom Headers (JSON):</label>
+                    <textarea id="custom-headers" rows="3" placeholder='{"X-Custom-Header": "value"}'></textarea>
+                </div>
+            </div>
+
+            <!-- Generate Configuration -->
+            <div class="config-section">
+                <h2>🚀 Konfiguration generieren</h2>
+                
+                <button class="generate-button" onclick="generateConfig()" title="Action Button">
+                    ⚙️ Caddyfile generieren
+                </button>
+                
+                <div class="config-preview" id="config-preview" class="optimized-style">
+                    <h4>📋 Generierte Caddyfile:</h4>
+                    <div class="code-block" id="generated-config"></div>
+                    <button class="copy-button" onclick="copyConfig()" title="Action Button">
+                        📋 Konfiguration kopieren
+                    </button>
+                </div>
+            </div>
+
+            <!-- Installation Instructions -->
+            <div class="config-section" id="installation-instructions" class="optimized-style">
+                <h2>📋 Installations-Anleitung</h2>
+                
+                <div class="info-box">
+                    <h4>💡 Automatische Installation</h4>
+                    <p>Das Android Microsite Server Setup-Script erstellt automatisch eine optimierte Caddyfile. Diese Konfiguration ist für erweiterte Anpassungen gedacht.</p>
+                </div>
+                
+                <h3>🔧 Manuelle Installation:</h3>
+                <div class="code-block" id="install-script"></div>
+                
+                <div class="warning-box">
+                    <h4>⚠️ Wichtige Hinweise</h4>
+                    <ul>
+                        <li>Stelle sicher, dass der Webroot-Pfad korrekt ist</li>
+                        <li>Teste die Konfiguration mit <code>caddy validate --config Caddyfile</code></li>
+                        <li>Bei Problemen verwende die Standard-Konfiguration</li>
+                        <li>Logs findest du in <code>~/caddy.log</code></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Examples -->
+            <div class="config-section">
+                <h2>📚 Beispiel-Konfigurationen</h2>
+                
+                <h3>🌐 Einfache Konfiguration:</h3>
+                <div class="code-block">
+:8080 {
+  root * /data/data/com.termux/files/home/www
+  file_server
+  encode gzip
+  log {
+    output file /data/data/com.termux/files/home/caddy.log
+  }
+}
+                </div>
+                
+                <h3>🔒 Mit Basic Auth:</h3>
+                <div class="code-block">
+:8080 {
+  root * /data/data/com.termux/files/home/www
+  file_server
+  basicauth {
+    admin $2a$14$hash
+  }
+  encode gzip zstd
+  log {
+    output file /data/data/com.termux/files/home/caddy.log
+  }
+}
+                </div>
+                
+                <h3>🌍 Mit CORS:</h3>
+                <div class="code-block">
+:8080 {
+  root * /data/data/com.termux/files/home/www
+  file_server
+  header Access-Control-Allow-Origin "*"
+  header Access-Control-Allow-Methods "GET, POST, OPTIONS"
+  header Access-Control-Allow-Headers "Content-Type"
+  encode gzip zstd
+  log {
+    output file /data/data/com.termux/files/home/caddy.log
+  }
+}
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script async>
+        function generateConfig() {
+            const domain = document.getElementById('domain').value || 'android.example.com';
+            const port = document.getElementById('port').value || '8080';
+            const webroot = document.getElementById('webroot').value || '/data/data/com.termux/files/home/www';
+            const logLevel = document.getElementById('log-level').value || 'INFO';
+            const logSize = document.getElementById('log-size').value || '5MiB';
+            const logKeep = document.getElementById('log-keep').value || '5';
+            const customHeaders = document.getElementById('custom-headers').value;
+            
+            // Build configuration
+            let config = `${domain} {\n`;
+            config += `  root * ${webroot}\n`;
+            config += `  file_server\n`;
+            
+            // Add features
+            if (document.getElementById('gzip').checked || document.getElementById('zstd').checked) {
+                config += `  encode`;
+                if (document.getElementById('gzip').checked) config += ` gzip`;
+                if (document.getElementById('zstd').checked) config += ` zstd`;
+                config += `\n`;
+            }
+            
+            // Security headers
+            if (document.getElementById('security-headers').checked) {
+                config += `  header {\n`;
+                config += `    X-Content-Type-Options nosniff\n`;
+                config += `    X-Frame-Options DENY\n`;
+                config += `    X-XSS-Protection "1; mode=block"\n`;
+                config += `  }\n`;
+            }
+            
+            // CORS
+            if (document.getElementById('cors').checked) {
+                config += `  header Access-Control-Allow-Origin "*"\n`;
+                config += `  header Access-Control-Allow-Methods "GET, POST, OPTIONS"\n`;
+                config += `  header Access-Control-Allow-Headers "Content-Type"\n`;
+            }
+            
+            // Rate limiting
+            if (document.getElementById('rate-limiting').checked) {
+                config += `  rate_limit {\n`;
+                config += `    zone static {\n`;
+                config += `      key {remote_host}\n`;
+                config += `      events 100\n`;
+                config += `      window 1m\n`;
+                config += `    }\n`;
+                config += `  }\n`;
+            }
+            
+            // Basic auth
+            if (document.getElementById('basic-auth').checked) {
+                config += `  basicauth {\n`;
+                config += `    admin $2a$14$hash  # Ersetze mit echtem Hash\n`;
+                config += `  }\n`;
+            }
+            
+            // Custom headers
+            if (customHeaders) {
+                try {
+                    const headers = JSON.parse(customHeaders);
+                    for (const [key, value] of Object.entries(headers)) {
+                        config += `  header ${key} "${value}"\n`;
+                    }
+                } catch (e) {
+                    console.warn('Invalid custom headers JSON');
+                }
+            }
+            
+            // Health check
+            if (document.getElementById('health-check').checked) {
+                config += `  respond /healthz "OK" 200\n`;
+            }
+            
+            // Logging
+            if (document.getElementById('logging').checked) {
+                config += `  log {\n`;
+                config += `    level ${logLevel}\n`;
+                config += `    output file /data/data/com.termux/files/home/caddy.log {\n`;
+                config += `      roll_size ${logSize}\n`;
+                config += `      roll_keep ${logKeep}\n`;
+                config += `    }\n`;
+                config += `  }\n`;
+            }
+            
+            config += `}`;
+            
+            // Show configuration
+            document.getElementById('generated-config').textContent = config;
+            document.getElementById('config-preview').style.display = 'block';
+            
+            // Generate installation script
+            generateInstallScript(domain, port, webroot);
+        }
+        
+        function generateInstallScript(domain, port, webroot) {
+            const installScript = `#!/data/data/com.termux/files/usr/bin/bash
+# === Caddy Konfiguration aktualisieren ===
+echo "⚙️ Aktualisiere Caddy-Konfiguration..."
+
+# Backup alte Konfiguration
+cp ~/Caddyfile ~/Caddyfile.backup.$(date +%Y%m%d_%H%M%S)
+
+# Neue Konfiguration schreiben
+cat > ~/Caddyfile <<'CADDY'
+${document.getElementById('generated-config').textContent}
+CADDY
+
+# Konfiguration validieren
+echo "🔍 Validiere Konfiguration..."
+caddy validate --config ~/Caddyfile
+
+if [ $? -eq 0 ]; then
+    echo "✅ Konfiguration ist gültig!"
+    
+    # Caddy neu starten
+    echo "🔄 Starte Caddy neu..."
+    sv down caddy
+    sv up caddy
+    
+    echo "✅ Caddy wurde erfolgreich neu gestartet!"
+    echo "🌐 Server läuft auf: http://${domain}:${port}"
+else
+    echo "❌ Konfiguration ist ungültig!"
+    echo "🔄 Stelle alte Konfiguration wieder her..."
+    cp ~/Caddyfile.backup.* ~/Caddyfile
+    sv up caddy
+fi
+`;
+            
+            document.getElementById('install-script').textContent = installScript;
+            document.getElementById('installation-instructions').style.display = 'block';
+        }
+        
+        function copyConfig() {
+            const config = document.getElementById('generated-config').textContent;
+            navigator.clipboard.writeText(config).then(() => {
+                alert('✅ Caddyfile in Zwischenablage kopiert!');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = config;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('✅ Caddyfile in Zwischenablage kopiert!');
+            });
+        }
+        
+        // Initialize with default values
+        document.addEventListener('DOMContentLoaded', () => {
+            generateConfig();
+        });
+    </script>
+</body>
+</html>

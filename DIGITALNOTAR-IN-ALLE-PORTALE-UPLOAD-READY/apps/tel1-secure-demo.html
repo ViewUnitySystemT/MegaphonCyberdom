@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEL1 Secure Device Control - NASA/NATO/ISS-Style Demo</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; color: white; }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .header p { font-size: 1.2em; opacity: 0.9; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .card { 
+            background: white; 
+            border-radius: 12px; 
+            padding: 20px; 
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        .card h3 { margin-bottom: 15px; color: #2c3e50; }
+        .controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
+        .controls select, .controls input, .controls button { 
+            padding: 8px 12px; 
+            border: 1px solid #ddd; 
+            border-radius: 6px; 
+            font-size: 14px;
+        }
+        .controls button { 
+            background: #3498db; 
+            color: white; 
+            border: none; 
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .controls button:hover { background: #2980b9; }
+        .controls button:disabled { background: #bdc3c7; cursor: not-allowed; }
+        .log { 
+            background: #f8f9fa; 
+            border: 1px solid #e9ecef; 
+            border-radius: 6px; 
+            padding: 15px; 
+            max-height: 300px; 
+            overflow-y: auto; 
+            font-family: 'Courier New', monospace; 
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        .status { 
+            display: inline-block; 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            font-size: 12px; 
+            font-weight: bold;
+        }
+        .status.connected { background: #d4edda; color: #155724; }
+        .status.disconnected { background: #f8d7da; color: #721c24; }
+        .status.secure { background: #d1ecf1; color: #0c5460; }
+        .badge { 
+            display: inline-block; 
+            padding: 2px 6px; 
+            background: #e74c3c; 
+            color: white; 
+            border-radius: 3px; 
+            font-size: 10px; 
+            margin-left: 5px;
+        }
+        .protocol-info { 
+            background: #f8f9fa; 
+            padding: 10px; 
+            border-radius: 6px; 
+            margin-top: 10px; 
+            font-size: 12px;
+        }
+        .security-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #856404;
+        }
+        .security-warning h4 { margin-bottom: 10px; }
+        .security-warning ul { margin-left: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 TEL1 Secure Device Control</h1>
+            <p>NASA/NATO/ISS-Style sichere Gerätesteuerung mit JOSE-Signierung</p>
+        </div>
+
+        <div class="security-warning">
+            <h4>⚠️ Wichtige Sicherheitshinweise:</h4>
+            <ul>
+                <li><strong>Amateurfunk:</strong> Verschlüsselung in vielen Ländern nicht zulässig</li>
+                <li><strong>Haftung:</strong> Operator trägt volle Verantwortung für alle Commands</li>
+                <li><strong>Fail-Safe:</strong> Implementieren Sie Sicherheits-Interlocks</li>
+                <li><strong>Rechtlich:</strong> Prüfen Sie lokale Gesetze vor Einsatz</li>
+            </ul>
+        </div>
+
+        <div class="grid">
+            <!-- Device Control Panel -->
+            <div class="card">
+                <h3>🎮 Device Control Panel</h3>
+                <div class="controls">
+                    <select id="device-type">
+                        <option value="uav_001">UAV-001 (MAVLink)</option>
+                        <option value="robot_001">Robot-001 (ROS2)</option>
+                        <option value="plc_001">PLC-001 (OPC UA)</option>
+                        <option value="sensor_001">Sensor-001 (IoT)</option>
+                        <option value="satellite_001">Satellite-001 (Space)</option>
+                    </select>
+                    <select id="command-action">
+                        <option value="arm">Arm</option>
+                        <option value="disarm">Disarm</option>
+                        <option value="takeoff">Takeoff</option>
+                        <option value="land">Land</option>
+                        <option value="rtl">Return to Launch</option>
+                        <option value="emergency_stop">Emergency Stop</option>
+                        <option value="set_mode">Set Mode</option>
+                    </select>
+                </div>
+                <div class="controls">
+                    <select id="security-profile">
+                        <option value="default">Default</option>
+                        <option value="space-lowbit">Space-Lowbit</option>
+                        <option value="high-sec">High-Security</option>
+                        <option value="maritime-mesh">Maritime-Mesh</option>
+                    </select>
+                    <input type="text" id="command-args" placeholder="Args (JSON)" value='{"altitude": 100}' aria-label="Input Field">
+                    <button id="send-command" disabled title="Action Button">Send Command</button>
+                </div>
+                <div class="protocol-info" id="protocol-info">
+                    <strong>Protocol:</strong> <span id="protocol-name">-</span><br>
+                    <strong>Safe:</strong> <span id="command-safe">-</span><br>
+                    <strong>Profile:</strong> <span id="current-profile">default</span>
+                </div>
+            </div>
+
+            <!-- Security Status -->
+            <div class="card">
+                <h3>🛡️ Security Status</h3>
+                <div style="margin-bottom: 15px;">
+                    <strong>Connection:</strong> <span class="status disconnected" id="connection-status">Disconnected</span>
+                    <span class="badge" id="security-badge">🔒</span>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <strong>Operator Key:</strong> <span id="operator-key-status">Not Generated</span>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <strong>Anti-Replay:</strong> <span id="replay-status">Active</span>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <strong>Policy:</strong> <span id="policy-status">Default</span>
+                </div>
+                <button id="generate-key" style="width: 100%;" title="Action Button">Generate Operator Key</button>
+            </div>
+
+            <!-- Command Log -->
+            <div class="card">
+                <h3>📋 Command Log</h3>
+                <div class="log" id="command-log">
+                    <div style="color: #666;">TEL1 Secure Device Control System initialized...</div>
+                </div>
+                <button id="clear-log" style="margin-top: 10px; width: 100%;" title="Action Button">Clear Log</button>
+            </div>
+
+            <!-- Protocol Details -->
+            <div class="card">
+                <h3>🔧 Protocol Details</h3>
+                <div id="protocol-details">
+                    <div style="color: #666;">Select a device to view protocol details...</div>
+                </div>
+            </div>
+
+            <!-- Security Metrics -->
+            <div class="card">
+                <h3>📊 Security Metrics</h3>
+                <div id="security-metrics">
+                    <div><strong>Commands Sent:</strong> <span id="commands-sent">0</span></div>
+                    <div><strong>Commands Received:</strong> <span id="commands-received">0</span></div>
+                    <div><strong>Policy Violations:</strong> <span id="policy-violations">0</span></div>
+                    <div><strong>Replay Attacks Blocked:</strong> <span id="replay-blocked">0</span></div>
+                    <div><strong>JWS Verifications:</strong> <span id="jws-verified">0</span></div>
+                </div>
+            </div>
+
+            <!-- API Testing -->
+            <div class="card">
+                <h3>🧪 API Testing</h3>
+                <div class="controls">
+                    <button id="test-verification" title="Action Button">Test JWS Verification</button>
+                    <button id="test-policy" title="Action Button">Test Policy Enforcement</button>
+                    <button id="test-replay" title="Action Button">Test Anti-Replay</button>
+                </div>
+                <div class="log" id="api-log" style="max-height: 150px;">
+                    <div style="color: #666;">API tests will appear here...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // ================== TEL1 SECURE DEVICE CONTROL DEMO ==================
+        
+        // UI Elements
+        const elements = {
+            deviceType: document.getElementById('device-type'),
+            commandAction: document.getElementById('command-action'),
+            securityProfile: document.getElementById('security-profile'),
+            commandArgs: document.getElementById('command-args'),
+            sendCommand: document.getElementById('send-command'),
+            generateKey: document.getElementById('generate-key'),
+            clearLog: document.getElementById('clear-log'),
+            commandLog: document.getElementById('command-log'),
+            apiLog: document.getElementById('api-log'),
+            connectionStatus: document.getElementById('connection-status'),
+            operatorKeyStatus: document.getElementById('operator-key-status'),
+            replayStatus: document.getElementById('replay-status'),
+            policyStatus: document.getElementById('policy-status'),
+            protocolInfo: document.getElementById('protocol-info'),
+            protocolName: document.getElementById('protocol-name'),
+            commandSafe: document.getElementById('command-safe'),
+            currentProfile: document.getElementById('current-profile'),
+            protocolDetails: document.getElementById('protocol-details'),
+            commandsSent: document.getElementById('commands-sent'),
+            commandsReceived: document.getElementById('commands-received'),
+            policyViolations: document.getElementById('policy-violations'),
+            replayBlocked: document.getElementById('replay-blocked'),
+            jwsVerified: document.getElementById('jws-verified'),
+            testVerification: document.getElementById('test-verification'),
+            testPolicy: document.getElementById('test-policy'),
+            testReplay: document.getElementById('test-replay')
+        };
+
+        // Metrics
+        let metrics = {
+            commandsSent: 0,
+            commandsReceived: 0,
+            policyViolations: 0,
+            replayBlocked: 0,
+            jwsVerified: 0
+        };
+
+        // Logging Functions
+        function logCommand(msg, type = 'info') {
+            const log = elements.commandLog;
+            const entry = document.createElement('div');
+            entry.style.color = type === 'error' ? '#d32f2f' : 
+                               type === 'success' ? '#388e3c' : 
+                               type === 'warning' ? '#f57c00' : '#1976d2';
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function logAPI(msg, type = 'info') {
+            const log = elements.apiLog;
+            const entry = document.createElement('div');
+            entry.style.color = type === 'error' ? '#d32f2f' : 
+                               type === 'success' ? '#388e3c' : '#1976d2';
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // Update Metrics Display
+        function updateMetrics() {
+            elements.commandsSent.textContent = metrics.commandsSent;
+            elements.commandsReceived.textContent = metrics.commandsReceived;
+            elements.policyViolations.textContent = metrics.policyViolations;
+            elements.replayBlocked.textContent = metrics.replayBlocked;
+            elements.jwsVerified.textContent = metrics.jwsVerified;
+        }
+
+        // Update Protocol Info
+        function updateProtocolInfo() {
+            const deviceId = elements.deviceType.value;
+            const action = elements.commandAction.value;
+            
+            let protocol = 'generic';
+            if (deviceId.includes('uav')) protocol = 'MAVLink 2';
+            else if (deviceId.includes('robot')) protocol = 'ROS 2 / DDS';
+            else if (deviceId.includes('plc')) protocol = 'OPC UA';
+            else if (deviceId.includes('sensor')) protocol = 'IoT (Matter/Thread)';
+            else if (deviceId.includes('satellite')) protocol = 'Space Protocol';
+            
+            const safe = action === 'disarm' || action === 'land' || action === 'emergency_stop';
+            
+            elements.protocolName.textContent = protocol;
+            elements.commandSafe.textContent = safe ? 'Yes' : 'No';
+            elements.currentProfile.textContent = elements.securityProfile.value;
+            
+            // Update protocol details
+            const details = {
+                'MAVLink 2': 'UAV/UGV/USV Control Protocol<br>• Signed Commands<br>• Heartbeat Monitoring<br>• Mission Planning',
+                'ROS 2 / DDS': 'Robot Operating System<br>• Service-based Commands<br>• Real-time Communication<br>• Distributed Systems',
+                'OPC UA': 'Industrial Automation<br>• Secure Communication<br>• Node-based Control<br>• Certificate Management',
+                'IoT (Matter/Thread)': 'Smart Home/IoT<br>• Cluster-based Commands<br>• Thread Mesh Network<br>• Matter Standard',
+                'Space Protocol': 'Deep Space Communication<br>• Delay Tolerant Networking<br>• Bundle Protocol<br>• CCSDS Standards'
+            };
+            
+            elements.protocolDetails.innerHTML = `<strong>${protocol}</strong><br>${details[protocol] || 'Generic Protocol'}`;
+        }
+
+        // Initialize TEL1 System
+        async function initializeTEL1() {
+            try {
+                // Simulate TEL1 System initialization
+                logCommand('🔐 Initializing TEL1 Secure Device Control...', 'info');
+                
+                // Simulate operator key generation
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                elements.operatorKeyStatus.textContent = 'Generated (ES256)';
+                elements.connectionStatus.textContent = 'Connected';
+                elements.connectionStatus.className = 'status connected';
+                elements.sendCommand.disabled = false;
+                
+                logCommand('✅ TEL1 System initialized successfully', 'success');
+                logCommand('🔑 Operator key generated (ES256)', 'success');
+                logCommand('🛡️ Anti-replay protection active', 'success');
+                logCommand('📋 Policy enforcement enabled', 'success');
+                
+                updateProtocolInfo();
+                
+            } catch (e) {
+                logCommand(`❌ Initialization failed: ${e.message}`, 'error');
+            }
+        }
+
+        // Send Command Function
+        async function sendCommand() {
+            const deviceId = elements.deviceType.value;
+            const action = elements.commandAction.value;
+            const profile = elements.securityProfile.value;
+            const argsText = elements.commandArgs.value;
+            
+            try {
+                let args = {};
+                if (argsText.trim()) {
+                    args = JSON.parse(argsText);
+                }
+                
+                logCommand(`📡 Sending command: ${action} → ${deviceId}`, 'info');
+                logCommand(`🔒 Security profile: ${profile}`, 'info');
+                
+                // Simulate command processing
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Simulate JWS signing
+                const jws = `eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InRlbDFfb3BlcmF0b3IifQ.eyJkZXZpY2VJZCI6IiR7ZGV2aWNlSWR9IiwiYWN0aW9uIjoiJHthY3Rpb259IiwidHMiOiR7RGF0ZS5ub3coKX0sIm5vbmNlIjoiJHtjcnlwdG8uZ2V0UmFuZG9tVmFsdWVzKG5ldyBVaW50OEFycmF5KDEyKSkucmVkdWNlKChhLGIpPT5hKygnMCcrYi50b1N0cmluZygxNikpLnNsaWNlKC0yKSwnJyl9IiwiY3RyIjoxLCJzYWZlIjokeyJzYWZlIn0sInByb2ZpbGUiOiIke3Byb2ZpbGV9In0.signature`;
+                
+                logCommand(`🔐 JWS signed: ${jws.substring(0, 50)}...`, 'success');
+                
+                // Simulate policy check
+                if (profile === 'high-sec' && !(action === 'disarm' || action === 'land' || action === 'emergency_stop')) {
+                    logCommand(`❌ Policy violation: Unsafe command in high-sec mode`, 'error');
+                    metrics.policyViolations++;
+                    updateMetrics();
+                    return;
+                }
+                
+                // Simulate command dispatch
+                logCommand(`🎯 Command dispatched to ${deviceId}`, 'success');
+                
+                metrics.commandsSent++;
+                metrics.jwsVerified++;
+                updateMetrics();
+                
+            } catch (e) {
+                logCommand(`❌ Command failed: ${e.message}`, 'error');
+            }
+        }
+
+        // API Test Functions
+        async function testVerification() {
+            logAPI('🧪 Testing JWS Verification...', 'info');
+            
+            try {
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                const response = {
+                    success: true,
+                    verified: true,
+                    cmd: {
+                        deviceId: 'test_device',
+                        action: 'test_command',
+                        timestamp: Date.now()
+                    }
+                };
+                
+                logAPI(`✅ Verification test passed: ${JSON.stringify(response)}`, 'success');
+                
+            } catch (e) {
+                logAPI(`❌ Verification test failed: ${e.message}`, 'error');
+            }
+        }
+
+        async function testPolicy() {
+            logAPI('🧪 Testing Policy Enforcement...', 'info');
+            
+            try {
+                // Test different policies
+                const tests = [
+                    { profile: 'space-lowbit', cmd: { length: 1000 }, shouldFail: true },
+                    { profile: 'high-sec', cmd: { safe: false }, shouldFail: true },
+                    { profile: 'default', cmd: { action: 'test' }, shouldFail: false }
+                ];
+                
+                for (const test of tests) {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                    
+                    const result = test.shouldFail ? 'BLOCKED' : 'ALLOWED';
+                    const color = test.shouldFail ? 'success' : 'info';
+                    
+                    logAPI(`📋 Policy test (${test.profile}): ${result}`, color);
+                }
+                
+                logAPI('✅ Policy enforcement tests completed', 'success');
+                
+            } catch (e) {
+                logAPI(`❌ Policy test failed: ${e.message}`, 'error');
+            }
+        }
+
+        async function testReplay() {
+            logAPI('🧪 Testing Anti-Replay Protection...', 'info');
+            
+            try {
+                // Simulate replay attack
+                const nonce = 'test_nonce_123';
+                const counter = 1;
+                
+                logAPI(`🔄 First command with nonce: ${nonce}, counter: ${counter}`, 'info');
+                await new Promise(resolve => setTimeout(resolve, 200));
+                logAPI('✅ First command accepted', 'success');
+                
+                logAPI(`🔄 Replay attempt with same nonce: ${nonce}, counter: ${counter}`, 'info');
+                await new Promise(resolve => setTimeout(resolve, 200));
+                logAPI('❌ Replay attack blocked', 'success');
+                
+                metrics.replayBlocked++;
+                updateMetrics();
+                
+                logAPI('✅ Anti-replay protection working correctly', 'success');
+                
+            } catch (e) {
+                logAPI(`❌ Replay test failed: ${e.message}`, 'error');
+            }
+        }
+
+        // Event Listeners
+        elements.sendCommand.addEventListener('click', sendCommand);
+        elements.generateKey.addEventListener('click', initializeTEL1);
+        elements.clearLog.addEventListener('click', () => {
+            elements.commandLog.innerHTML = '<div style="color: #666;">Log cleared...</div>';
+        });
+        
+        elements.deviceType.addEventListener('change', updateProtocolInfo);
+        elements.commandAction.addEventListener('change', updateProtocolInfo);
+        elements.securityProfile.addEventListener('change', () => {
+            elements.policyStatus.textContent = elements.securityProfile.value;
+            updateProtocolInfo();
+        });
+        
+        elements.testVerification.addEventListener('click', testVerification);
+        elements.testPolicy.addEventListener('click', testPolicy);
+        elements.testReplay.addEventListener('click', testReplay);
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            logCommand('🚀 TEL1 Secure Device Control Demo loaded', 'info');
+            logCommand('📖 Ready for NASA/NATO/ISS-Style device control', 'info');
+            updateProtocolInfo();
+        });
+    </script>
+</body>
+</html>

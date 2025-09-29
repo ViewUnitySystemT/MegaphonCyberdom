@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebRTC Test Harness - OmniRTC Reference Node</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a237e 0%, #283593 50%, #3949ab 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      color: white;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .header p {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+
+    .status-bar {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 30px;
+      color: white;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .status-item {
+      background: rgba(255,255,255,0.1);
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .status-item h3 {
+      margin-bottom: 5px;
+      font-size: 1.1rem;
+    }
+
+    .status-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 8px;
+    }
+
+    .status-online { background: #4CAF50; }
+    .status-offline { background: #f44336; }
+    .status-warning { background: #ff9800; }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .panel h2 {
+      margin-bottom: 20px;
+      color: #333;
+      border-bottom: 2px solid #1a237e;
+      padding-bottom: 10px;
+    }
+
+    .config-section {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 10px;
+    }
+
+    .config-section h4 {
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #555;
+    }
+
+    .input-group input,
+    .input-group select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.3s ease;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+
+    .btn-primary {
+      background: #1a237e;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #283593;
+    }
+
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #218838;
+    }
+
+    .btn-warning {
+      background: #ffc107;
+      color: #333;
+    }
+
+    .btn-warning:hover {
+      background: #e0a800;
+    }
+
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #c82333;
+    }
+
+    .video-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .video-box {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+    }
+
+    .video-box h4 {
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .video-box video {
+      width: 100%;
+      max-width: 300px;
+      height: 200px;
+      background: #000;
+      border-radius: 5px;
+    }
+
+    .chat-container {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 10px;
+    }
+
+    .chat-messages {
+      height: 200px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 10px;
+      background: white;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+
+    .chat-input {
+      display: flex;
+      gap: 10px;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .results {
+      margin-top: 15px;
+      padding: 15px;
+      background: white;
+      border-radius: 10px;
+      border: 1px solid #e9ecef;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+    }
+
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+
+    .success {
+      background: #d4edda;
+      color: #155724;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+
+    .footer {
+      text-align: center;
+      color: white;
+      margin-top: 30px;
+      opacity: 0.8;
+    }
+
+    @media (max-width: 768px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+      
+      .header h1 {
+        font-size: 2rem;
+      }
+      
+      .status-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .video-container {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🌐 WebRTC Test Harness</h1>
+      <p>OmniRTC Reference Node - No-Account Rendezvous</p>
+    </div>
+
+    <div class="status-bar">
+      <h3>WebRTC System Status</h3>
+      <div class="status-grid">
+        <div class="status-item">
+          <h3><span class="status-indicator status-offline"></span>Connection</h3>
+          <p id="connection-status">Disconnected</p>
+        </div>
+        <div class="status-item">
+          <h3><span class="status-indicator status-offline"></span>E2EE</h3>
+          <p id="e2ee-status">Disabled</p>
+        </div>
+        <div class="status-item">
+          <h3><span class="status-indicator status-offline"></span>Data Channel</h3>
+          <p id="datachannel-status">Closed</p>
+        </div>
+        <div class="status-item">
+          <h3><span class="status-indicator status-offline"></span>Media Stream</h3>
+          <p id="media-status">Stopped</p>
+        </div>
+        <div class="status-item">
+          <h3><span class="status-indicator status-offline"></span>ICE State</h3>
+          <p id="ice-status">New</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div class="panel">
+        <h2>⚙️ Configuration</h2>
+        
+        <div class="config-section">
+          <h4>🔗 Connection Settings</h4>
+          <div class="input-group">
+            <label for="room-id">Room ID</label>
+            <input type="text" id="room-id" placeholder="Enter room ID or leave empty for auto-generated" aria-label="Input Field">
+          </div>
+          <div class="input-group">
+            <label for="signal-url">Signal URL (WebSocket)</label>
+            <input type="text" id="signal-url" placeholder="ws://localhost:3001/signal" value="ws://localhost:3001/signal" aria-label="Input Field">
+          </div>
+          <div class="input-group">
+            <label for="turn-url">TURN Server URL</label>
+            <input type="text" id="turn-url" placeholder="turn:your-turn-server:3478" aria-label="Input Field">
+          </div>
+          <div class="input-group">
+            <label for="turn-username">TURN Username</label>
+            <input type="text" id="turn-username" placeholder="TURN username" aria-label="Input Field">
+          </div>
+          <div class="input-group">
+            <label for="turn-credential">TURN Credential</label>
+            <input type="password" id="turn-credential" placeholder="TURN password" aria-label="Input Field">
+          </div>
+        </div>
+
+        <div class="config-section">
+          <h4>🔐 Security Settings</h4>
+          <div class="input-group">
+            <label for="e2ee-enabled">Enable E2EE</label>
+            <select id="e2ee-enabled">
+              <option value="true">Enabled</option>
+              <option value="false">Disabled</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label for="e2ee-key">E2EE Key (optional)</label>
+            <input type="text" id="e2ee-key" placeholder="Enter custom key or leave empty for auto-generated" aria-label="Input Field">
+          </div>
+        </div>
+
+        <div class="config-section">
+          <h4>🎮 Controls</h4>
+          <button class="btn btn-primary" onclick="initializeWebRTC()" title="Action Button">Initialize WebRTC</button>
+          <button class="btn btn-success" onclick="createDataChannel()" title="Action Button">Create Data Channel</button>
+          <button class="btn btn-warning" onclick="startAV()" title="Action Button">Start A/V</button>
+          <button class="btn btn-danger" onclick="closeWebRTC()" title="Action Button">Close Connection</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>📹 Media & Communication</h2>
+        
+        <div class="video-container">
+          <div class="video-box">
+            <h4>Local Video</h4>
+            <video id="local-video" autoplay muted></video>
+          </div>
+          <div class="video-box">
+            <h4>Remote Video</h4>
+            <video id="remote-video" autoplay></video>
+          </div>
+        </div>
+
+        <div class="chat-container">
+          <h4>💬 Data Channel Chat</h4>
+          <div class="chat-messages" id="chat-messages"></div>
+          <div class="chat-input">
+            <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="handleChatKeyPress(event)" aria-label="Input Field">
+            <button class="btn btn-primary" onclick="sendChatMessage()" title="Action Button">Send</button>
+          </div>
+        </div>
+
+        <div class="config-section">
+          <h4>🧪 Test Functions</h4>
+          <button class="btn btn-success" onclick="testDataChannel()" title="Action Button">Test Data Channel</button>
+          <button class="btn btn-warning" onclick="testMediaStream()" title="Action Button">Test Media Stream</button>
+          <button class="btn btn-primary" onclick="testE2EE()" title="Action Button">Test E2EE</button>
+          <button class="btn btn-danger" onclick="testConnection()" title="Action Button">Test Connection</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>📊 Logs & Results</h2>
+      <div id="results" class="results" style="display: block;"></div>
+    </div>
+
+    <div class="footer">
+      <p>WebRTC Test Harness v1.0.0 | OmniRTC Reference Node</p>
+      <p>Standards: RFC 8830 (JSEP), RFC 8445 (ICE), RFC 5764 (SRTP), W3C WebRTC</p>
+    </div>
+  </div>
+
+  <script>
+    // WebRTC Test Harness JavaScript
+    class WebRTCTestHarness {
+      constructor() {
+        this.isInitialized = false;
+        this.dataChannel = null;
+        this.localStream = null;
+        this.remoteStream = null;
+        this.init();
+      }
+
+      init() {
+        this.setupEventListeners();
+        this.checkOMNISTACKStatus();
+      }
+
+      setupEventListeners() {
+        // Listen for OMNISTACK ready event
+        document.addEventListener('omni:ready', (event) => {
+          console.log('🚀 OMNISTACK ready!', event.detail);
+          this.updateStatus('connection-status', 'OMNISTACK Ready');
+        });
+
+        // Listen for WebRTC events
+        if (window.OmniRTC) {
+          this.setupWebRTCEvents();
+        }
+      }
+
+      checkOMNISTACKStatus() {
+        // Check if OMNISTACK is available
+        if (window.OmniRTC) {
+          this.updateStatus('connection-status', 'OmniRTC Available');
+        }
+      }
+
+      setupWebRTCEvents() {
+        OmniRTC.on('log', (data) => {
+          this.log('📝 Log:', data);
+        });
+
+        OmniRTC.on('error', (data) => {
+          this.log('❌ Error:', data);
+          this.updateStatus('connection-status', 'Error');
+        });
+
+        OmniRTC.on('peer-joined', (data) => {
+          this.log('👥 Peer Joined:', data);
+          this.updateStatus('connection-status', 'Peer Connected');
+        });
+
+        OmniRTC.on('ice', (state) => {
+          this.log('🧊 ICE State:', state);
+          this.updateStatus('ice-status', state);
+        });
+
+        OmniRTC.on('message', (data) => {
+          this.log('💬 Message:', data);
+          this.addChatMessage(`Peer: ${data.data}`);
+        });
+
+        OmniRTC.on('e2ee-state', (data) => {
+          this.log('🔐 E2EE State:', data);
+          this.updateStatus('e2ee-status', data.enabled ? 'Enabled' : 'Disabled');
+        });
+      }
+
+      updateStatus(elementId, status) {
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.textContent = status;
+          
+          // Update status indicator
+          const indicator = element.previousElementSibling;
+          if (indicator && indicator.classList.contains('status-indicator')) {
+            indicator.className = 'status-indicator';
+            if (status.includes('Connected') || status.includes('Enabled') || status.includes('Open')) {
+              indicator.classList.add('status-online');
+            } else if (status.includes('Error') || status.includes('Failed')) {
+              indicator.classList.add('status-offline');
+            } else {
+              indicator.classList.add('status-warning');
+            }
+          }
+        }
+      }
+
+      showResults(content, isError = false) {
+        const resultsDiv = document.getElementById('results');
+        resultsDiv.style.display = 'block';
+        resultsDiv.innerHTML = content;
+      }
+
+      log(...args) {
+        const timestamp = new Date().toISOString();
+        const message = `[${timestamp}] ${args.join(' ')}`;
+        console.log(message);
+        
+        const resultsDiv = document.getElementById('results');
+        if (resultsDiv.style.display !== 'none') {
+          resultsDiv.innerHTML += `<div>${message}</div>`;
+          resultsDiv.scrollTop = resultsDiv.scrollHeight;
+        }
+      }
+
+      addChatMessage(message) {
+        const chatMessages = document.getElementById('chat-messages');
+        const messageDiv = document.createElement('div');
+        messageDiv.textContent = message;
+        messageDiv.style.marginBottom = '5px';
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      async initializeWebRTC() {
+        try {
+          const roomId = document.getElementById('room-id').value || undefined;
+          const signalUrl = document.getElementById('signal-url').value || undefined;
+          const turnUrl = document.getElementById('turn-url').value;
+          const turnUsername = document.getElementById('turn-username').value;
+          const turnCredential = document.getElementById('turn-credential').value;
+          const e2eeEnabled = document.getElementById('e2ee-enabled').value === 'true';
+          const e2eeKey = document.getElementById('e2ee-key').value || undefined;
+
+          const config = {
+            roomId,
+            signalUrl,
+            e2ee: e2eeEnabled,
+            key: e2eeKey
+          };
+
+          // Add TURN server if configured
+          if (turnUrl && turnUsername && turnCredential) {
+            config.turn = {
+              urls: turnUrl,
+              username: turnUsername,
+              credential: turnCredential
+            };
+          }
+
+          this.log('🚀 Initializing WebRTC with config:', config);
+          const result = await OmniRTC.init(config);
+          
+          this.isInitialized = true;
+          this.updateStatus('connection-status', 'Connected');
+          this.showResults(`
+            <div class="success">✅ WebRTC initialized successfully!</div>
+            <div><strong>Room:</strong> ${result.room}</div>
+            <div><strong>Ready:</strong> ${result.ready}</div>
+            <div><strong>Signal URL:</strong> ${signalUrl || 'Not configured'}</div>
+            <div><strong>E2EE:</strong> ${e2eeEnabled ? 'Enabled' : 'Disabled'}</div>
+            <div><strong>TURN:</strong> ${turnUrl ? 'Configured' : 'Not configured'}</div>
+          `);
+        } catch (error) {
+          this.showResults(`<div class="error">❌ Failed to initialize WebRTC: ${error.message}</div>`, true);
+        }
+      }
+
+      async createDataChannel() {
+        if (!this.isInitialized) {
+          this.showResults('<div class="error">❌ WebRTC not initialized. Please initialize first.</div>', true);
+          return;
+        }
+
+        try {
+          this.log('📡 Creating data channel...');
+          this.dataChannel = await OmniRTC.createDataChannel('chat', {
+            ordered: true,
+            negotiated: false
+          });
+
+          this.dataChannel.onopen = () => {
+            this.log('📡 Data channel opened');
+            this.updateStatus('datachannel-status', 'Open');
+          };
+
+          this.dataChannel.onclose = () => {
+            this.log('📡 Data channel closed');
+            this.updateStatus('datachannel-status', 'Closed');
+          };
+
+          this.dataChannel.onmessage = (event) => {
+            this.log('📡 Data channel message:', event.data);
+            this.addChatMessage(`Data Channel: ${event.data}`);
+          };
+
+          this.showResults(`
+            <div class="success">✅ Data channel created successfully!</div>
+            <div><strong>Label:</strong> chat</div>
+            <div><strong>State:</strong> ${this.dataChannel.readyState}</div>
+            <div><strong>Ordered:</strong> true</div>
+            <div><strong>Negotiated:</strong> false</div>
+          `);
+        } catch (error) {
+          this.showResults(`<div class="error">❌ Failed to create data channel: ${error.message}</div>`, true);
+        }
+      }
+
+      async startAV() {
+        if (!this.isInitialized) {
+          this.showResults('<div class="error">❌ WebRTC not initialized. Please initialize first.</div>', true);
+          return;
+        }
+
+        try {
+          this.log('🎥 Starting A/V...');
+          this.localStream = await OmniRTC.startAV({
+            audio: true,
+            video: true
+          });
+
+          const localVideo = document.getElementById('local-video');
+          localVideo.srcObject = this.localStream;
+
+          // Attach remote video
+          OmniRTC.attachRemoteVideo(document.getElementById('remote-video'));
+
+          this.updateStatus('media-status', 'Active');
+          this.showResults(`
+            <div class="success">✅ A/V started successfully!</div>
+            <div><strong>Audio Tracks:</strong> ${this.localStream.getAudioTracks().length}</div>
+            <div><strong>Video Tracks:</strong> ${this.localStream.getVideoTracks().length}</div>
+            <div><strong>Stream ID:</strong> ${this.localStream.id}</div>
+          `);
+        } catch (error) {
+          this.showResults(`<div class="error">❌ Failed to start A/V: ${error.message}</div>`, true);
+        }
+      }
+
+      closeWebRTC() {
+        try {
+          this.log('🔌 Closing WebRTC connection...');
+          OmniRTC.close();
+          
+          this.isInitialized = false;
+          this.dataChannel = null;
+          this.localStream = null;
+          this.remoteStream = null;
+
+          // Clear video elements
+          document.getElementById('local-video').srcObject = null;
+          document.getElementById('remote-video').srcObject = null;
+
+          // Reset status
+          this.updateStatus('connection-status', 'Disconnected');
+          this.updateStatus('datachannel-status', 'Closed');
+          this.updateStatus('media-status', 'Stopped');
+          this.updateStatus('ice-status', 'New');
+
+          this.showResults('<div class="success">✅ WebRTC connection closed successfully!</div>');
+        } catch (error) {
+          this.showResults(`<div class="error">❌ Failed to close WebRTC: ${error.message}</div>`, true);
+        }
+      }
+
+      sendChatMessage() {
+        const input = document.getElementById('chat-input');
+        const message = input.value.trim();
+        
+        if (!message) return;
+        
+        if (!this.dataChannel || this.dataChannel.readyState !== 'open') {
+          this.showResults('<div class="error">❌ Data channel not open. Please create data channel first.</div>', true);
+          return;
+        }
+
+        try {
+          OmniRTC.send('chat', message);
+          this.addChatMessage(`You: ${message}`);
+          input.value = '';
+        } catch (error) {
+          this.showResults(`<div class="error">❌ Failed to send message: ${error.message}</div>`, true);
+        }
+      }
+
+      handleChatKeyPress(event) {
+        if (event.key === 'Enter') {
+          this.sendChatMessage();
+        }
+      }
+
+      async testDataChannel() {
+        if (!this.dataChannel || this.dataChannel.readyState !== 'open') {
+          this.showResults('<div class="error">❌ Data channel not open. Please create data channel first.</div>', true);
+          return;
+        }
+
+        try {
+          const testMessage = `Test message ${Date.now()}`;
+          OmniRTC.send('chat', testMessage);
+          this.log('🧪 Data channel test message sent:', testMessage);
+          this.showResults('<div class="success">✅ Data channel test message sent successfully!</div>');
+        } catch (error) {
+          this.showResults(`<div class="error">❌ Data channel test failed: ${error.message}</div>`, true);
+        }
+      }
+
+      async testMediaStream() {
+        if (!this.localStream) {
+          this.showResults('<div class="error">❌ Media stream not active. Please start A/V first.</div>', true);
+          return;
+        }
+
+        try {
+          const audioTracks = this.localStream.getAudioTracks();
+          const videoTracks = this.localStream.getVideoTracks();
+          
+          this.log('🧪 Media stream test:', {
+            audioTracks: audioTracks.length,
+            videoTracks: videoTracks.length,
+            audioEnabled: audioTracks[0]?.enabled,
+            videoEnabled: videoTracks[0]?.enabled
+          });
+
+          this.showResults(`
+            <div class="success">✅ Media stream test completed!</div>
+            <div><strong>Audio Tracks:</strong> ${audioTracks.length}</div>
+            <div><strong>Video Tracks:</strong> ${videoTracks.length}</div>
+            <div><strong>Audio Enabled:</strong> ${audioTracks[0]?.enabled}</div>
+            <div><strong>Video Enabled:</strong> ${videoTracks[0]?.enabled}</div>
+          `);
+        } catch (error) {
+          this.showResults(`<div class="error">❌ Media stream test failed: ${error.message}</div>`, true);
+        }
+      }
+
+      async testE2EE() {
+        if (!this.isInitialized) {
+          this.showResults('<div class="error">❌ WebRTC not initialized. Please initialize first.</div>', true);
+          return;
+        }
+
+        try {
+          const e2eeEnabled = document.getElementById('e2ee-enabled').value === 'true';
+          this.log('🧪 E2EE test:', { enabled: e2eeEnabled });
+          
+          this.showResults(`
+            <div class="success">✅ E2EE test completed!</div>
+            <div><strong>E2EE Enabled:</strong> ${e2eeEnabled}</div>
+            <div><strong>Browser Support:</strong> ${'createEncodedStreams' in RTCRtpSender.prototype ? 'Supported' : 'Not Supported'}</div>
+            <div><strong>Encryption:</strong> ${e2eeEnabled ? 'AES-GCM' : 'DTLS-SRTP'}</div>
+          `);
+        } catch (error) {
+          this.showResults(`<div class="error">❌ E2EE test failed: ${error.message}</div>`, true);
+        }
+      }
+
+      async testConnection() {
+        if (!this.isInitialized) {
+          this.showResults('<div class="error">❌ WebRTC not initialized. Please initialize first.</div>', true);
+          return;
+        }
+
+        try {
+          const signalUrl = document.getElementById('signal-url').value;
+          const turnUrl = document.getElementById('turn-url').value;
+          
+          this.log('🧪 Connection test:', {
+            signalUrl: signalUrl || 'Not configured',
+            turnUrl: turnUrl || 'Not configured',
+            isInitialized: this.isInitialized,
+            dataChannelOpen: this.dataChannel?.readyState === 'open',
+            mediaActive: !!this.localStream
+          });
+
+          this.showResults(`
+            <div class="success">✅ Connection test completed!</div>
+            <div><strong>Signal URL:</strong> ${signalUrl || 'Not configured'}</div>
+            <div><strong>TURN URL:</strong> ${turnUrl || 'Not configured'}</div>
+            <div><strong>Initialized:</strong> ${this.isInitialized}</div>
+            <div><strong>Data Channel:</strong> ${this.dataChannel?.readyState || 'Not created'}</div>
+            <div><strong>Media Stream:</strong> ${this.localStream ? 'Active' : 'Not active'}</div>
+          `);
+        } catch (error) {
+          this.showResults(`<div class="error">❌ Connection test failed: ${error.message}</div>`, true);
+        }
+      }
+    }
+
+    // Global functions for button clicks
+    function initializeWebRTC() {
+      window.webrtcTest.initializeWebRTC();
+    }
+
+    function createDataChannel() {
+      window.webrtcTest.createDataChannel();
+    }
+
+    function startAV() {
+      window.webrtcTest.startAV();
+    }
+
+    function closeWebRTC() {
+      window.webrtcTest.closeWebRTC();
+    }
+
+    function sendChatMessage() {
+      window.webrtcTest.sendChatMessage();
+    }
+
+    function handleChatKeyPress(event) {
+      window.webrtcTest.handleChatKeyPress(event);
+    }
+
+    function testDataChannel() {
+      window.webrtcTest.testDataChannel();
+    }
+
+    function testMediaStream() {
+      window.webrtcTest.testMediaStream();
+    }
+
+    function testE2EE() {
+      window.webrtcTest.testE2EE();
+    }
+
+    function testConnection() {
+      window.webrtcTest.testConnection();
+    }
+
+    // Initialize WebRTC Test Harness
+    document.addEventListener('DOMContentLoaded', () => {
+      window.webrtcTest = new WebRTCTestHarness();
+    });
+  </script>
+</body>
+</html>

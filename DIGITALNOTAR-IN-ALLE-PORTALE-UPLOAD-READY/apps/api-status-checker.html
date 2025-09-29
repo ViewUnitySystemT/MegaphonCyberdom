@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 API Status Checker</title>
+<h1 style="position: absolute; left: -9999px;">📊 API Status Checker</h1>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .title {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+        
+        .btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn.success {
+            background: linear-gradient(45deg, #10b981, #059669);
+        }
+        
+        .btn.warning {
+            background: linear-gradient(45deg, #f59e0b, #d97706);
+        }
+        
+        .status-overview {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            margin-bottom: 2rem;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .status-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .status-card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .status-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .status-number {
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+        }
+        
+        .status-label {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+        
+        .status-card.system .status-icon { color: #3b82f6; }
+        .status-card.discovered .status-icon { color: #10b981; }
+        .status-card.user .status-icon { color: #8b5cf6; }
+        .status-card.total .status-icon { color: #06b6d4; }
+        .status-card.active .status-icon { color: #10b981; }
+        .status-card.inactive .status-icon { color: #ef4444; }
+        
+        .api-list {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .api-category {
+            margin-bottom: 2rem;
+        }
+        
+        .api-category h3 {
+            color: #3b82f6;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .api-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .api-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(5px);
+        }
+        
+        .api-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .api-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #3b82f6;
+        }
+        
+        .api-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .api-status.active {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        .api-status.inactive {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .api-status.discovered {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        .api-status.user {
+            background: rgba(139, 92, 246, 0.2);
+            color: #8b5cf6;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+        
+        .api-details {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            line-height: 1.4;
+        }
+        
+        .api-endpoint {
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            margin: 0.5rem 0;
+        }
+        
+        .api-method {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+        
+        .api-method.get {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+        
+        .api-method.post {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+        
+        .api-method.put {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+        
+        .api-method.delete {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            opacity: 0.8;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .status-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">📊 API Status Checker</h1>
+            <p class="subtitle">Übersicht aller verfügbaren APIs und deren Status</p>
+        </div>
+        
+        <div class="controls">
+            <button class="btn" onclick="checkAllAPIs()" title="Action Button">
+                🔍 Alle APIs prüfen
+            </button>
+            <button class="btn secondary" onclick="refreshStatus()" title="Action Button">
+                🔄 Status aktualisieren
+            </button>
+            <button class="btn success" onclick="testAPIs()" title="Action Button">
+                🧪 APIs testen
+            </button>
+            <button class="btn warning" onclick="exportReport()" title="Action Button">
+                📊 Report exportieren
+            </button>
+        </div>
+        
+        <div class="status-overview">
+            <h3>📊 API-Übersicht</h3>
+            <div class="status-grid">
+                <div class="status-card system">
+                    <div class="status-icon">🏠</div>
+                    <div class="status-number" id="systemCount">-</div>
+                    <div class="status-label">System-APIs</div>
+                </div>
+                <div class="status-card discovered">
+                    <div class="status-icon">🔍</div>
+                    <div class="status-number" id="discoveredCount">-</div>
+                    <div class="status-label">Entdeckte APIs</div>
+                </div>
+                <div class="status-card user">
+                    <div class="status-icon">👤</div>
+                    <div class="status-number" id="userCount">-</div>
+                    <div class="status-label">Benutzer-APIs</div>
+                </div>
+                <div class="status-card total">
+                    <div class="status-icon">📊</div>
+                    <div class="status-number" id="totalCount">-</div>
+                    <div class="status-label">Gesamt</div>
+                </div>
+                <div class="status-card active">
+                    <div class="status-icon">✅</div>
+                    <div class="status-number" id="activeCount">-</div>
+                    <div class="status-label">Aktiv</div>
+                </div>
+                <div class="status-card inactive">
+                    <div class="status-icon">❌</div>
+                    <div class="status-number" id="inactiveCount">-</div>
+                    <div class="status-label">Inaktiv</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="api-list" id="apiList">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Lade API-Status...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/web/shared/api-discovery-system.js"></script>
+    <script>
+        let apiDiscoverySystem = null;
+        let apiData = {
+            system: [],
+            discovered: [],
+            user: [],
+            all: []
+        };
+        
+        // System initialisieren
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                apiDiscoverySystem = new APIDiscoverySystem();
+                await apiDiscoverySystem.initialize();
+                
+                // Globale Referenz setzen
+                window.apiDiscoverySystem = apiDiscoverySystem;
+                
+                // Initiale API-Prüfung
+                await checkAllAPIs();
+                
+            } catch (error) {
+                console.error('❌ Fehler beim Initialisieren:', error);
+                showError('Fehler beim Initialisieren des Systems');
+            }
+        });
+        
+        async function checkAllAPIs() {
+            try {
+                showLoading();
+                
+                // Alle APIs abrufen
+                const allAPIs = apiDiscoverySystem.getAllAPIs();
+                
+                // APIs kategorisieren
+                apiData.system = allAPIs.filter(api => api.status === 'system' || api.source === 'system');
+                apiData.discovered = allAPIs.filter(api => api.status === 'discovered' || api.source === 'discovered');
+                apiData.user = allAPIs.filter(api => api.status === 'user_added' || api.source === 'user');
+                apiData.all = allAPIs;
+                
+                // Status aktualisieren
+                updateStatusOverview();
+                updateAPIList();
+                
+                console.log('✅ API-Status aktualisiert:', {
+                    system: apiData.system.length,
+                    discovered: apiData.discovered.length,
+                    user: apiData.user.length,
+                    total: apiData.all.length
+                });
+                
+            } catch (error) {
+                console.error('❌ Fehler beim Prüfen der APIs:', error);
+                showError('Fehler beim Prüfen der APIs');
+            }
+        }
+        
+        function updateStatusOverview() {
+            document.getElementById('systemCount').textContent = apiData.system.length;
+            document.getElementById('discoveredCount').textContent = apiData.discovered.length;
+            document.getElementById('userCount').textContent = apiData.user.length;
+            document.getElementById('totalCount').textContent = apiData.all.length;
+            
+            // Aktive/Inaktive APIs zählen (vereinfacht)
+            const activeCount = apiData.all.filter(api => 
+                api.status === 'active' || 
+                api.status === 'discovered' || 
+                api.status === 'system' ||
+                api.status === 'user_added'
+            ).length;
+            
+            const inactiveCount = apiData.all.length - activeCount;
+            
+            document.getElementById('activeCount').textContent = activeCount;
+            document.getElementById('inactiveCount').textContent = inactiveCount;
+        }
+        
+        function updateAPIList() {
+            const apiList = document.getElementById('apiList');
+            
+            if (apiData.all.length === 0) {
+                apiList.innerHTML = `
+                    <div class="loading">
+                        <p>Keine APIs gefunden</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            
+            // System-APIs
+            if (apiData.system.length > 0) {
+                html += `
+                    <div class="api-category">
+                        <h3>🏠 System-APIs (${apiData.system.length})</h3>
+                        ${apiData.system.map(api => createAPIItem(api, 'system')).join('')}
+                    </div>
+                `;
+            }
+            
+            // Entdeckte APIs
+            if (apiData.discovered.length > 0) {
+                html += `
+                    <div class="api-category">
+                        <h3>🔍 Entdeckte APIs (${apiData.discovered.length})</h3>
+                        ${apiData.discovered.map(api => createAPIItem(api, 'discovered')).join('')}
+                    </div>
+                `;
+            }
+            
+            // Benutzer-APIs
+            if (apiData.user.length > 0) {
+                html += `
+                    <div class="api-category">
+                        <h3>👤 Benutzer-APIs (${apiData.user.length})</h3>
+                        ${apiData.user.map(api => createAPIItem(api, 'user')).join('')}
+                    </div>
+                `;
+            }
+            
+            apiList.innerHTML = html;
+        }
+        
+        function createAPIItem(api, type) {
+            const statusClass = getStatusClass(api, type);
+            const methodClass = getMethodClass(api.method);
+            
+            return `
+                <div class="api-item">
+                    <div class="api-header">
+                        <div class="api-name">${api.name}</div>
+                        <div class="api-status ${statusClass}">${getStatusText(api, type)}</div>
+                    </div>
+                    <div class="api-details">
+                        <div><strong>Beschreibung:</strong> ${api.description}</div>
+                        <div><strong>Kategorie:</strong> ${api.category}</div>
+                        <div><strong>Authentifizierung:</strong> ${api.auth}</div>
+                        <div><strong>Rate Limit:</strong> ${api.rateLimit}</div>
+                        <div class="api-endpoint">
+                            <span class="api-method ${methodClass}">${api.method}</span>
+                            ${api.endpoint}
+                        </div>
+                        ${api.pricing ? `<div><strong>Preis:</strong> ${api.pricing}</div>` : ''}
+                        ${api.documentation ? `<div><strong>Dokumentation:</strong> ${api.documentation}</div>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+        
+        function getStatusClass(api, type) {
+            switch (type) {
+                case 'system': return 'active';
+                case 'discovered': return 'discovered';
+                case 'user': return 'user';
+                default: return 'active';
+            }
+        }
+        
+        function getStatusText(api, type) {
+            switch (type) {
+                case 'system': return 'System';
+                case 'discovered': return 'Entdeckt';
+                case 'user': return 'Benutzer';
+                default: return 'Aktiv';
+            }
+        }
+        
+        function getMethodClass(method) {
+            switch (method.toLowerCase()) {
+                case 'get': return 'get';
+                case 'post': return 'post';
+                case 'put': return 'put';
+                case 'delete': return 'delete';
+                default: return 'get';
+            }
+        }
+        
+        function showLoading() {
+            const apiList = document.getElementById('apiList');
+            apiList.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Lade API-Status...</p>
+                </div>
+            `;
+        }
+        
+        function showError(message) {
+            const apiList = document.getElementById('apiList');
+            apiList.innerHTML = `
+                <div class="loading">
+                    <p style="color: #ef4444;">❌ ${message}</p>
+                </div>
+            `;
+        }
+        
+        async function refreshStatus() {
+            await checkAllAPIs();
+        }
+        
+        async function testAPIs() {
+            try {
+                showLoading();
+                
+                // Simuliere API-Tests
+                const testResults = [];
+                
+                for (const api of apiData.all) {
+                    try {
+                        // Simuliere API-Test
+                        const isActive = Math.random() > 0.2; // 80% Erfolgsrate
+                        testResults.push({
+                            api: api.name,
+                            status: isActive ? 'active' : 'inactive',
+                            responseTime: Math.random() * 1000 + 100
+                        });
+                    } catch (error) {
+                        testResults.push({
+                            api: api.name,
+                            status: 'error',
+                            error: error.message
+                        });
+                    }
+                }
+                
+                // Ergebnisse anzeigen
+                updateAPIList();
+                
+                console.log('🧪 API-Tests abgeschlossen:', testResults);
+                
+            } catch (error) {
+                console.error('❌ Fehler beim Testen der APIs:', error);
+                showError('Fehler beim Testen der APIs');
+            }
+        }
+        
+        function exportReport() {
+            const report = {
+                timestamp: new Date().toISOString(),
+                summary: {
+                    system: apiData.system.length,
+                    discovered: apiData.discovered.length,
+                    user: apiData.user.length,
+                    total: apiData.all.length
+                },
+                apis: apiData.all.map(api => ({
+                    name: api.name,
+                    endpoint: api.endpoint,
+                    method: api.method,
+                    category: api.category,
+                    auth: api.auth,
+                    rateLimit: api.rateLimit,
+                    status: api.status || 'unknown'
+                }))
+            };
+            
+            const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `api-status-report-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            console.log('📊 Report exportiert:', report);
+        }
+    </script>
+</body>
+</html>

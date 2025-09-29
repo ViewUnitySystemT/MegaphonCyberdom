@@ -1,0 +1,1090 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>🧭 Navigation & Geocaching - TELCO Hub</title>
+<h1 style="position: absolute; left: -9999px;">🧭 Navigation & Geocaching - TELCO Hub</h1>
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    :root {
+      --nav-primary: #2563eb;
+      --nav-success: #10b981;
+      --nav-warning: #f59e0b;
+      --nav-error: #ef4444;
+      --nav-info: #06b6d4;
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.2);
+    }
+    
+    .nav-container {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 0;
+      position: relative;
+      overflow: visible;
+    }
+    
+    .nav-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 1rem;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .nav-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--nav-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .nav-controls {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    
+    .nav-btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+      background: var(--glass-bg);
+      color: #e2e8f0;
+      border: 1px solid var(--glass-border);
+    }
+    
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+    
+    .nav-btn-primary {
+      background: linear-gradient(45deg, var(--nav-primary), #3b82f6);
+      color: white;
+      border: none;
+    }
+    
+    .nav-btn-primary:hover {
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+    
+    .map-container {
+      position: fixed;
+      top: 80px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #0b0f12;
+    }
+    
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+    
+    .compass-overlay {
+      position: fixed;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      width: 120px;
+      height: 120px;
+      background: var(--glass-bg);
+      border: 2px solid var(--glass-border);
+      border-radius: 50%;
+      backdrop-filter: blur(20px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1001;
+      transition: all 0.3s ease;
+    }
+    
+    .compass-needle {
+      width: 4px;
+      height: 50px;
+      background: linear-gradient(to bottom, #ef4444, #f59e0b);
+      border-radius: 2px;
+      position: absolute;
+      transform-origin: bottom center;
+      transition: transform 0.3s ease;
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+    }
+    
+    .compass-center {
+      width: 8px;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 50%;
+      position: absolute;
+      z-index: 2;
+    }
+    
+    .compass-directions {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #e2e8f0;
+    }
+    
+    .compass-n { position: absolute; top: 5px; left: 50%; transform: translateX(-50%); }
+    .compass-e { position: absolute; right: 5px; top: 50%; transform: translateY(-50%); }
+    .compass-s { position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); }
+    .compass-w { position: absolute; left: 5px; top: 50%; transform: translateY(-50%); }
+    
+    .navigation-panel {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--glass-border);
+      padding: 1rem;
+      z-index: 1000;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+    }
+    
+    .navigation-panel.show {
+      transform: translateY(0);
+    }
+    
+    .nav-input-group {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .nav-input {
+      flex: 1;
+      padding: 0.75rem;
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      background: var(--glass-bg);
+      color: #e2e8f0;
+      font-size: 0.9rem;
+    }
+    
+    .nav-input::placeholder {
+      color: rgba(226, 232, 240, 0.6);
+    }
+    
+    .nav-input:focus {
+      outline: none;
+      border-color: var(--nav-primary);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+    
+    .route-info {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .route-stat {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      padding: 0.75rem;
+      text-align: center;
+    }
+    
+    .route-stat-label {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-bottom: 0.25rem;
+    }
+    
+    .route-stat-value {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--nav-primary);
+    }
+    
+    .geocache-panel {
+      position: fixed;
+      top: 50%;
+      left: 20px;
+      transform: translateY(-50%);
+      width: 300px;
+      max-width: 90vw;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      backdrop-filter: blur(20px);
+      z-index: 1001;
+      display: block;
+    }
+    
+    .geocache-panel.show {
+      display: block;
+      animation: slideInLeft 0.3s ease-out;
+    }
+    
+    .geocache-item {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .geocache-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--nav-primary);
+    }
+    
+    .geocache-name {
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    
+    .geocache-distance {
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+    
+    .offline-indicator {
+      position: fixed;
+      top: 100px;
+      right: 20px;
+      background: var(--nav-success);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      z-index: 1001;
+      display: block;
+    }
+    
+    .offline-indicator.show {
+      display: block;
+    }
+    
+    .offline-indicator.offline {
+      background: var(--nav-error);
+    }
+    
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateY(-50%) translateX(-20px); }
+      to { opacity: 1; transform: translateY(-50%) translateX(0); }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .loading {
+      animation: pulse 2s infinite;
+    }
+    
+    .search-suggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      backdrop-filter: blur(20px);
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 1002;
+      display: block;
+    }
+    
+    .search-suggestions.show {
+      display: block;
+    }
+    
+    .suggestion-item {
+      padding: 0.75rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .suggestion-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .suggestion-item:last-child {
+      border-bottom: none;
+    }
+    
+    .suggestion-name {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    
+    .suggestion-address {
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <div class="nav-container">
+    <div class="nav-header">
+      <div class="nav-title">
+        🧭 Navigation & Geocaching
+      </div>
+      <div class="nav-controls">
+        <button class="nav-btn" onclick="toggleGeocachePanel()" title="Action Button">🎯 Geocaches</button>
+        <button class="nav-btn" onclick="toggleOfflineMode()" title="Action Button">📱 Offline</button>
+        <button class="nav-btn nav-btn-primary" onclick="startNavigation()" title="Action Button">🚀 Navigieren</button>
+      </div>
+    </div>
+
+    <div class="map-container">
+      <div id="map"></div>
+    </div>
+
+    <div class="compass-overlay" id="compassOverlay">
+      <div class="compass-directions">
+        <div class="compass-n">N</div>
+        <div class="compass-e">E</div>
+        <div class="compass-s">S</div>
+        <div class="compass-w">W</div>
+      </div>
+      <div class="compass-needle" id="compassNeedle"></div>
+      <div class="compass-center"></div>
+    </div>
+
+    <div class="offline-indicator" id="offlineIndicator">
+      📱 Offline-Modus aktiv
+    </div>
+
+    <div class="navigation-panel" id="navigationPanel">
+      <div class="nav-input-group">
+        <input type="text" class="nav-input" id="startInput" placeholder="Startpunkt eingeben..." aria-label="Input Field">
+        <input type="text" class="nav-input" id="endInput" placeholder="Ziel eingeben..." aria-label="Input Field">
+        <button class="nav-btn nav-btn-primary" onclick="calculateRoute()" title="Action Button">Route berechnen</button>
+      </div>
+      
+      <div class="search-suggestions" id="startSuggestions"></div>
+      <div class="search-suggestions" id="endSuggestions"></div>
+      
+      <div class="route-info" id="routeInfo" style="display: block;">
+        <div class="route-stat">
+          <div class="route-stat-label">Entfernung</div>
+          <div class="route-stat-value" id="routeDistance">-</div>
+        </div>
+        <div class="route-stat">
+          <div class="route-stat-label">Fahrzeit</div>
+          <div class="route-stat-value" id="routeDuration">-</div>
+        </div>
+        <div class="route-stat">
+          <div class="route-stat-label">Richtung</div>
+          <div class="route-stat-value" id="routeDirection">-</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="geocache-panel" id="geocachePanel">
+      <h3 style="margin-bottom: 1rem; color: var(--nav-primary);">🎯 Geocaches in der Nähe</h3>
+      <div id="geocacheList">
+        <!-- Geocaches werden hier dynamisch eingefügt -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MapLibre GL JS -->
+  <script src="https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js"></script>
+  <link href="https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css" rel="stylesheet" />
+  
+  <!-- PMTiles Protocol -->
+  <script type="module">
+    import {Protocol} from 'https://cdn.skypack.dev/pmtiles@latest';
+    
+    // PMTiles Protocol aktivieren
+    const protocol = new Protocol();
+    maplibregl.addProtocol('pmtiles', protocol.tile);
+    
+    // Navigation System initialisieren
+    window.navigationSystem = new NavigationSystem();
+  </script>
+
+  <script>
+    class NavigationSystem {
+      constructor() {
+        this.map = null;
+        this.currentLocation = null;
+        this.currentHeading = 0;
+        this.route = null;
+        this.geocaches = [];
+        this.offlineMode = false;
+        this.routingService = 'osrm'; // osrm, graphhopper, valhalla
+        
+        this.init();
+      }
+
+      async init() {
+        await this.initMap();
+        await this.initGeolocation();
+        await this.initCompass();
+        await this.loadGeocaches();
+        this.setupEventListeners();
+      }
+
+      async initMap() {
+        // MapLibre GL JS Map initialisieren
+        this.map = new maplibregl.Map({
+          container: 'map',
+          style: {
+            version: 8,
+            sources: {
+              'basemap': {
+                type: 'vector',
+                url: 'pmtiles://https://example.com/world.pmtiles'
+              }
+            },
+            layers: [
+              {
+                id: 'background',
+                type: 'background',
+                paint: {
+                  'background-color': '#0b0f12'
+                }
+              },
+              {
+                id: 'water',
+                type: 'fill',
+                source: 'basemap',
+                'source-layer': 'water',
+                paint: {
+                  'fill-color': '#1e40af'
+                }
+              },
+              {
+                id: 'roads',
+                type: 'line',
+                source: 'basemap',
+                'source-layer': 'roads',
+                paint: {
+                  'line-color': '#64748b',
+                  'line-width': 2
+                }
+              }
+            ]
+          },
+          center: [7.6, 51.96], // Dortmund, Deutschland
+          zoom: 12,
+          pitch: 0,
+          bearing: 0
+        });
+
+        // Map Events
+        this.map.on('load', () => {
+          console.log('🗺️ Map geladen');
+          this.addCurrentLocationMarker();
+        });
+
+        this.map.on('click', (e) => {
+          this.handleMapClick(e);
+        });
+      }
+
+      async initGeolocation() {
+        if ('geolocation' in navigator) {
+          const options = {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 30000
+          };
+
+          navigator.geolocation.watchPosition(
+            (position) => {
+              this.currentLocation = [position.coords.longitude, position.coords.latitude];
+              this.updateCurrentLocationMarker();
+              this.checkGeocacheProximity();
+            },
+            (error) => {
+              console.error('Geolocation Fehler:', error);
+            },
+            options
+          );
+        }
+      }
+
+      async initCompass() {
+        if ('DeviceOrientationEvent' in window) {
+          const permission = await this.requestCompassPermission();
+          if (permission) {
+            window.addEventListener('deviceorientation', (event) => {
+              this.updateCompass(event.alpha);
+            });
+          }
+        }
+      }
+
+      async requestCompassPermission() {
+        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+          return await DeviceOrientationEvent.requestPermission();
+        }
+        return true;
+      }
+
+      updateCompass(heading) {
+        this.currentHeading = heading || 0;
+        const needle = document.getElementById('compassNeedle');
+        needle.style.transform = `rotate(${this.currentHeading}deg)`;
+      }
+
+      addCurrentLocationMarker() {
+        if (this.currentLocation) {
+          this.map.addSource('current-location', {
+            type: 'geojson',
+            data: {
+              type: 'Feature',
+              geometry: {
+                type: 'Point',
+                coordinates: this.currentLocation
+              },
+              properties: {
+                name: 'Aktuelle Position'
+              }
+            }
+          });
+
+          this.map.addLayer({
+            id: 'current-location',
+            type: 'circle',
+            source: 'current-location',
+            paint: {
+              'circle-color': '#ef4444',
+              'circle-radius': 8,
+              'circle-stroke-color': '#ffffff',
+              'circle-stroke-width': 2
+            }
+          });
+
+          this.map.addLayer({
+            id: 'current-location-pulse',
+            type: 'circle',
+            source: 'current-location',
+            paint: {
+              'circle-color': '#ef4444',
+              'circle-radius': 20,
+              'circle-opacity': 0.3,
+              'circle-stroke-width': 0
+            }
+          });
+        }
+      }
+
+      updateCurrentLocationMarker() {
+        if (this.map.getSource('current-location')) {
+          this.map.getSource('current-location').setData({
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: this.currentLocation
+            },
+            properties: {
+              name: 'Aktuelle Position'
+            }
+          });
+        }
+      }
+
+      async loadGeocaches() {
+        // Beispiel-Geocaches laden (in echter Implementierung aus GPX/GeoJSON)
+        this.geocaches = [
+          {
+            id: 'gc1',
+            name: 'Dortmund Cache #1',
+            coordinates: [7.6123, 51.9651],
+            difficulty: 2,
+            terrain: 1,
+            type: 'Traditional',
+            description: 'Ein einfacher Cache im Stadtpark'
+          },
+          {
+            id: 'gc2',
+            name: 'Dortmund Cache #2',
+            coordinates: [7.5987, 51.9789],
+            difficulty: 3,
+            terrain: 2,
+            type: 'Multi',
+            description: 'Ein Multi-Cache durch die Innenstadt'
+          },
+          {
+            id: 'gc3',
+            name: 'Dortmund Cache #3',
+            coordinates: [7.6234, 51.9456],
+            difficulty: 1,
+            terrain: 1,
+            type: 'Traditional',
+            description: 'Ein einfacher Cache am Kanal'
+          }
+        ];
+
+        this.addGeocacheMarkers();
+        this.updateGeocacheList();
+      }
+
+      addGeocacheMarkers() {
+        this.map.addSource('geocaches', {
+          type: 'geojson',
+          data: {
+            type: 'FeatureCollection',
+            features: this.geocaches.map(cache => ({
+              type: 'Feature',
+              geometry: {
+                type: 'Point',
+                coordinates: cache.coordinates
+              },
+              properties: {
+                id: cache.id,
+                name: cache.name,
+                difficulty: cache.difficulty,
+                terrain: cache.terrain,
+                type: cache.type,
+                description: cache.description
+              }
+            }))
+          }
+        });
+
+        this.map.addLayer({
+          id: 'geocaches',
+          type: 'circle',
+          source: 'geocaches',
+          paint: {
+            'circle-color': [
+              'case',
+              ['==', ['get', 'difficulty'], 1], '#10b981',
+              ['==', ['get', 'difficulty'], 2], '#f59e0b',
+              ['==', ['get', 'difficulty'], 3], '#ef4444',
+              '#6b7280'
+            ],
+            'circle-radius': 6,
+            'circle-stroke-color': '#ffffff',
+            'circle-stroke-width': 2
+          }
+        });
+
+        this.map.addLayer({
+          id: 'geocaches-labels',
+          type: 'symbol',
+          source: 'geocaches',
+          layout: {
+            'text-field': ['get', 'name'],
+            'text-font': ['Open Sans Regular'],
+            'text-size': 12,
+            'text-offset': [0, 2],
+            'text-anchor': 'top'
+          },
+          paint: {
+            'text-color': '#ffffff',
+            'text-halo-color': '#000000',
+            'text-halo-width': 1
+          }
+        });
+      }
+
+      updateGeocacheList() {
+        const list = document.getElementById('geocacheList');
+        list.innerHTML = '';
+
+        this.geocaches.forEach(cache => {
+          const distance = this.calculateDistance(
+            this.currentLocation,
+            cache.coordinates
+          );
+
+          const item = document.createElement('div');
+          item.className = 'geocache-item';
+          item.innerHTML = `
+            <div class="geocache-name">${cache.name}</div>
+            <div class="geocache-distance">${distance.toFixed(0)}m • ${cache.type} • D${cache.difficulty}/T${cache.terrain}</div>
+          `;
+          
+          item.addEventListener('click', () => {
+            this.navigateToGeocache(cache);
+          });
+          
+          list.appendChild(item);
+        });
+      }
+
+      navigateToGeocache(cache) {
+        this.calculateRoute(this.currentLocation, cache.coordinates);
+        this.map.flyTo({
+          center: cache.coordinates,
+          zoom: 16
+        });
+      }
+
+      async calculateRoute(start, end) {
+        if (!start || !end) return;
+
+        try {
+          const route = await this.getRoute(start, end);
+          this.displayRoute(route);
+          this.updateRouteInfo(route);
+        } catch (error) {
+          console.error('Routing Fehler:', error);
+        }
+      }
+
+      async getRoute(start, end) {
+        const startStr = start.join(',');
+        const endStr = end.join(',');
+        
+        let url;
+        switch (this.routingService) {
+          case 'osrm':
+            url = `http://localhost:5000/route/v1/driving/${startStr};${endStr}?overview=full&geometries=geojson`;
+            break;
+          case 'graphhopper':
+            url = `http://localhost:8989/route?point=${start[1]},${start[0]}&point=${end[1]},${end[0]}&profile=car`;
+            break;
+          case 'valhalla':
+            url = `http://localhost:8002/route?json={"locations":[{"lat":${start[1]},"lon":${start[0]}},{"lat":${end[1]},"lon":${end[0]}}],"costing":"auto"}`;
+            break;
+        }
+
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        return this.parseRouteResponse(data);
+      }
+
+      parseRouteResponse(data) {
+        switch (this.routingService) {
+          case 'osrm':
+            return {
+              geometry: data.routes[0].geometry,
+              distance: data.routes[0].distance,
+              duration: data.routes[0].duration,
+              instructions: data.routes[0].legs[0].steps
+            };
+          case 'graphhopper':
+            return {
+              geometry: data.paths[0].points,
+              distance: data.paths[0].distance,
+              duration: data.paths[0].time,
+              instructions: data.paths[0].instructions
+            };
+          case 'valhalla':
+            return {
+              geometry: data.trip.legs[0].shape,
+              distance: data.trip.summary.length,
+              duration: data.trip.summary.time,
+              instructions: data.trip.legs[0].maneuvers
+            };
+        }
+      }
+
+      displayRoute(route) {
+        // Alte Route entfernen
+        if (this.map.getSource('route')) {
+          this.map.removeLayer('route');
+          this.map.removeSource('route');
+        }
+
+        // Neue Route hinzufügen
+        this.map.addSource('route', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            geometry: route.geometry
+          }
+        });
+
+        this.map.addLayer({
+          id: 'route',
+          type: 'line',
+          source: 'route',
+          paint: {
+            'line-color': '#00FFD1',
+            'line-width': 4,
+            'line-opacity': 0.8
+          }
+        });
+
+        this.route = route;
+      }
+
+      updateRouteInfo(route) {
+        const distance = (route.distance / 1000).toFixed(1);
+        const duration = Math.round(route.duration / 60);
+        const direction = this.calculateDirection(this.currentLocation, route.geometry.coordinates[0]);
+
+        document.getElementById('routeDistance').textContent = `${distance} km`;
+        document.getElementById('routeDuration').textContent = `${duration} min`;
+        document.getElementById('routeDirection').textContent = direction;
+        
+        document.getElementById('routeInfo').style.display = 'grid';
+      }
+
+      calculateDirection(from, to) {
+        const lat1 = from[1] * Math.PI / 180;
+        const lat2 = to[1] * Math.PI / 180;
+        const deltaLon = (to[0] - from[0]) * Math.PI / 180;
+
+        const y = Math.sin(deltaLon) * Math.cos(lat2);
+        const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(deltaLon);
+
+        let bearing = Math.atan2(y, x) * 180 / Math.PI;
+        bearing = (bearing + 360) % 360;
+
+        const directions = ['N', 'NO', 'O', 'SO', 'S', 'SW', 'W', 'NW'];
+        const index = Math.round(bearing / 45) % 8;
+        
+        return directions[index];
+      }
+
+      calculateDistance(point1, point2) {
+        const R = 6371000; // Erdradius in Metern
+        const toRad = (deg) => deg * Math.PI / 180;
+        
+        const dLat = toRad(point2[1] - point1[1]);
+        const dLon = toRad(point2[0] - point1[0]);
+        
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(toRad(point1[1])) * Math.cos(toRad(point2[1])) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        
+        return R * c;
+      }
+
+      checkGeocacheProximity() {
+        if (!this.currentLocation) return;
+
+        this.geocaches.forEach(cache => {
+          const distance = this.calculateDistance(this.currentLocation, cache.coordinates);
+          if (distance < 50) { // 50 Meter Radius
+            this.showGeocacheAlert(cache, distance);
+          }
+        });
+      }
+
+      showGeocacheAlert(cache, distance) {
+        const alert = document.createElement('div');
+        alert.style.cssText = `
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: rgba(15, 23, 42, 0.95);
+          border: 2px solid #10b981;
+          border-radius: 12px;
+          padding: 2rem;
+          backdrop-filter: blur(20px);
+          z-index: 10000;
+          text-align: center;
+          animation: popupIn 0.3s ease-out;
+        `;
+        
+        alert.innerHTML = `
+          <h3 style="color: #10b981; margin-bottom: 1rem;">🎯 Geocache gefunden!</h3>
+          <p style="margin-bottom: 1rem;"><strong>${cache.name}</strong></p>
+          <p style="margin-bottom: 1rem;">Entfernung: ${distance.toFixed(0)}m</p>
+          <p style="margin-bottom: 1.5rem; font-size: 0.9rem; opacity: 0.8;">${cache.description}</p>
+          <button onclick="this.parentElement.remove()" style="
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+          " title="Action Button">OK</button>
+        `;
+        
+        document.body.appendChild(alert);
+        
+        // Auto-remove nach 10 Sekunden
+        setTimeout(() => {
+          if (alert.parentElement) {
+            alert.remove();
+          }
+        }, 10000);
+      }
+
+      setupEventListeners() {
+        // Input Event Listeners
+        const startInput = document.getElementById('startInput');
+        const endInput = document.getElementById('endInput');
+
+        startInput.addEventListener('input', (e) => {
+          this.handleSearchInput(e.target.value, 'start');
+        });
+
+        endInput.addEventListener('input', (e) => {
+          this.handleSearchInput(e.target.value, 'end');
+        });
+
+        // Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            this.closePanels();
+          }
+        });
+      }
+
+      async handleSearchInput(query, type) {
+        if (query.length < 3) return;
+
+        try {
+          const suggestions = await this.searchLocation(query);
+          this.showSuggestions(suggestions, type);
+        } catch (error) {
+          console.error('Suche Fehler:', error);
+        }
+      }
+
+      async searchLocation(query) {
+        // Nominatim/Photon/Pelias Geocoding
+        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&countrycodes=de`;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        return data.map(item => ({
+          name: item.display_name,
+          coordinates: [parseFloat(item.lon), parseFloat(item.lat)]
+        }));
+      }
+
+      showSuggestions(suggestions, type) {
+        const container = document.getElementById(`${type}Suggestions`);
+        container.innerHTML = '';
+
+        suggestions.forEach(suggestion => {
+          const item = document.createElement('div');
+          item.className = 'suggestion-item';
+          item.innerHTML = `
+            <div class="suggestion-name">${suggestion.name}</div>
+          `;
+          
+          item.addEventListener('click', () => {
+            this.selectSuggestion(suggestion, type);
+            container.classList.remove('show');
+          });
+          
+          container.appendChild(item);
+        });
+
+        container.classList.add('show');
+      }
+
+      selectSuggestion(suggestion, type) {
+        const input = document.getElementById(`${type}Input`);
+        input.value = suggestion.name;
+        
+        if (type === 'start') {
+          this.startLocation = suggestion.coordinates;
+        } else {
+          this.endLocation = suggestion.coordinates;
+        }
+      }
+
+      handleMapClick(e) {
+        const coordinates = [e.lngLat.lng, e.lngLat.lat];
+        
+        // Marker für Klick-Position hinzufügen
+        this.map.addSource('click-marker', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: coordinates
+            }
+          }
+        });
+
+        this.map.addLayer({
+          id: 'click-marker',
+          type: 'circle',
+          source: 'click-marker',
+          paint: {
+            'circle-color': '#3b82f6',
+            'circle-radius': 8,
+            'circle-stroke-color': '#ffffff',
+            'circle-stroke-width': 2
+          }
+        });
+      }
+
+      closePanels() {
+        document.getElementById('geocachePanel').classList.remove('show');
+        document.getElementById('navigationPanel').classList.remove('show');
+      }
+    }
+
+    // Globale Funktionen
+    function toggleGeocachePanel() {
+      const panel = document.getElementById('geocachePanel');
+      panel.classList.toggle('show');
+    }
+
+    function toggleOfflineMode() {
+      const indicator = document.getElementById('offlineIndicator');
+      window.navigationSystem.offlineMode = !window.navigationSystem.offlineMode;
+      
+      if (window.navigationSystem.offlineMode) {
+        indicator.classList.add('show');
+        indicator.textContent = '📱 Offline-Modus aktiv';
+      } else {
+        indicator.classList.remove('show');
+      }
+    }
+
+    function startNavigation() {
+      const panel = document.getElementById('navigationPanel');
+      panel.classList.toggle('show');
+    }
+
+    function calculateRoute() {
+      const startInput = document.getElementById('startInput');
+      const endInput = document.getElementById('endInput');
+      
+      if (startInput.value && endInput.value) {
+        window.navigationSystem.calculateRoute(
+          window.navigationSystem.startLocation,
+          window.navigationSystem.endLocation
+        );
+      }
+    }
+
+    // Service Worker für Offline-Funktionalität
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').then(registration => {
+        console.log('Service Worker registriert:', registration);
+      }).catch(error => {
+        console.error('Service Worker Registrierung fehlgeschlagen:', error);
+      });
+    }
+  </script>
+</body>
+</html>

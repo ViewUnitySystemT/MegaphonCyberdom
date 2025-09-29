@@ -1,0 +1,10 @@
+cd public_html
+ls -la backend-health-check.js
+ls -la package.json
+pwd
+node --version
+npm install
+node backend-health-check.js &
+sleep 5
+curl -I http://localhost:3000/health
+exit

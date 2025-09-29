@@ -1,0 +1,1046 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>🌐 Provider Management - TELCO Hub</title>
+<h1 style="position: absolute; left: -9999px;">🌐 Provider Management - TELCO Hub</h1>
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    :root {
+      --provider-primary: #dc2626;
+      --provider-success: #10b981;
+      --provider-warning: #f59e0b;
+      --provider-error: #ef4444;
+      --provider-info: #06b6d4;
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.2);
+    }
+    
+    .provider-container {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 0;
+      position: relative;
+      overflow: visible;
+    }
+    
+    .provider-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 1rem;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .provider-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--provider-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .provider-controls {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    
+    .provider-btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+      background: var(--glass-bg);
+      color: #e2e8f0;
+      border: 1px solid var(--glass-border);
+    }
+    
+    .provider-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+    
+    .provider-btn-primary {
+      background: linear-gradient(45deg, var(--provider-primary), #ef4444);
+      color: white;
+      border: none;
+    }
+    
+    .provider-btn-primary:hover {
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    }
+    
+    .provider-content {
+      margin-top: 80px;
+      padding: 2rem;
+      max-width: 1400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .provider-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .provider-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      backdrop-filter: blur(20px);
+      transition: all 0.3s ease;
+    }
+    
+    .provider-card:hover {
+      border-color: var(--provider-primary);
+      box-shadow: 0 8px 25px rgba(220, 38, 38, 0.2);
+    }
+    
+    .provider-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .provider-name {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--provider-primary);
+    }
+    
+    .provider-type {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      background: rgba(220, 38, 38, 0.2);
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+    }
+    
+    .provider-info {
+      display: grid;
+      gap: 0.75rem;
+    }
+    
+    .info-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    
+    .info-label {
+      font-weight: 600;
+      min-width: 120px;
+      opacity: 0.8;
+    }
+    
+    .info-value {
+      color: #e2e8f0;
+      flex: 1;
+    }
+    
+    .info-value a {
+      color: var(--provider-info);
+      text-decoration: none;
+    }
+    
+    .info-value a:hover {
+      text-decoration: underline;
+    }
+    
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    
+    .status-active {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--provider-success);
+    }
+    
+    .status-inactive {
+      background: rgba(107, 114, 128, 0.2);
+      color: #6b7280;
+    }
+    
+    .status-testing {
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--provider-warning);
+    }
+    
+    .status-deprecated {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--provider-error);
+    }
+    
+    .provider-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .action-btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .action-btn-primary {
+      background: var(--provider-primary);
+      color: white;
+    }
+    
+    .action-btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #e2e8f0;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .action-btn:hover {
+      transform: translateY(-1px);
+    }
+    
+    .filter-section {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(20px);
+    }
+    
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .filter-label {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    
+    .filter-select {
+      padding: 0.5rem;
+      border: 1px solid var(--glass-border);
+      border-radius: 6px;
+      background: var(--glass-bg);
+      color: #e2e8f0;
+      font-size: 0.9rem;
+    }
+    
+    .filter-select:focus {
+      outline: none;
+      border-color: var(--provider-primary);
+      box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2);
+    }
+    
+    .stats-section {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(20px);
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+    }
+    
+    .stat-item {
+      text-align: center;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+    }
+    
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--provider-primary);
+      margin-bottom: 0.25rem;
+    }
+    
+    .stat-label {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+    
+    .search-section {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(20px);
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      background: var(--glass-bg);
+      color: #e2e8f0;
+      font-size: 1rem;
+    }
+    
+    .search-input::placeholder {
+      color: rgba(226, 232, 240, 0.6);
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: var(--provider-primary);
+      box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2);
+    }
+    
+    .config-snippet {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      padding: 0.75rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.8rem;
+      overflow-x: auto;
+      margin: 0.5rem 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="provider-container">
+    <div class="provider-header">
+      <div class="provider-title">
+        🌐 Provider Management
+      </div>
+      <div class="provider-controls">
+        <button class="provider-btn" onclick="exportProviders()" title="Action Button">📊 Export</button>
+        <button class="provider-btn" onclick="importProviders()" title="Action Button">📥 Import</button>
+        <button class="provider-btn provider-btn-primary" onclick="addProvider()" title="Action Button">➕ Hinzufügen</button>
+      </div>
+    </div>
+
+    <div class="provider-content">
+      <!-- Statistiken -->
+      <div class="stats-section">
+        <h3 style="margin-bottom: 1rem; color: var(--provider-primary);">📊 Statistiken</h3>
+        <div class="stats-grid" id="statsGrid">
+          <!-- Statistiken werden hier dynamisch eingefügt -->
+        </div>
+      </div>
+
+      <!-- Suche -->
+      <div class="search-section">
+        <h3 style="margin-bottom: 1rem; color: var(--provider-primary);">🔍 Suche</h3>
+        <input type="text" class="search-input" id="searchInput" placeholder="Provider suchen..." onkeyup="filterProviders()" aria-label="Input Field">
+      </div>
+
+      <!-- Filter -->
+      <div class="filter-section">
+        <h3 style="margin-bottom: 1rem; color: var(--provider-primary);">🔧 Filter</h3>
+        <div class="filter-grid">
+          <div class="filter-group">
+            <label class="filter-label">Typ</label>
+            <select class="filter-select" id="typeFilter" onchange="filterProviders()">
+              <option value="">Alle Typen</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Status</label>
+            <select class="filter-select" id="statusFilter" onchange="filterProviders()">
+              <option value="">Alle Status</option>
+              <option value="active">Aktiv</option>
+              <option value="inactive">Inaktiv</option>
+              <option value="testing">Testing</option>
+              <option value="deprecated">Veraltet</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Land</label>
+            <select class="filter-select" id="countryFilter" onchange="filterProviders()">
+              <option value="">Alle Länder</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Protokoll</label>
+            <select class="filter-select" id="protocolFilter" onchange="filterProviders()">
+              <option value="">Alle Protokolle</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Provider Liste -->
+      <div class="provider-grid" id="providerGrid">
+        <!-- Provider werden hier dynamisch eingefügt -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    class ProviderManager {
+      constructor() {
+        this.providers = [];
+        this.currentEditId = null;
+        this.init();
+      }
+
+      async init() {
+        await this.loadProviders();
+        this.renderProviders();
+        this.updateStats();
+        this.populateFilters();
+        this.setupEventListeners();
+      }
+
+      async loadProviders() {
+        try {
+          const stored = localStorage.getItem('telco-hub-providers');
+          if (stored) {
+            this.providers = JSON.parse(stored);
+          } else {
+            // Standard-Provider laden
+            this.providers = this.getDefaultProviders();
+            await this.saveProviders();
+          }
+        } catch (error) {
+          console.error('Provider-Loading Fehler:', error);
+          this.providers = this.getDefaultProviders();
+        }
+      }
+
+      getDefaultProviders() {
+        return [
+          {
+            id: 'provider_1',
+            name: 'FreeSIP',
+            type: 'SIP Provider',
+            description: 'Kostenloser SIP-Provider für VoIP-Kommunikation',
+            status: 'active',
+            country: 'International',
+            protocol: 'SIP/UDP',
+            server: 'sip.freesip.org',
+            port: 5060,
+            username: 'optional',
+            password: 'optional',
+            features: ['VoIP Calling', 'SMS', 'Video Calls'],
+            configuration: `const freeSipConfig = {
+  server: 'sip.freesip.org',
+  port: 5060,
+  protocol: 'udp',
+  username: 'optional',
+  password: 'optional'
+};`,
+            documentation: 'https://freesip.org/',
+            notes: 'Kostenloser SIP-Provider mit optionaler Registrierung',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: 'provider_2',
+            name: 'NL DID Provider',
+            type: 'SIP Provider',
+            description: 'Niederländische DID-Nummern für Business-Kommunikation',
+            status: 'active',
+            country: 'Netherlands',
+            protocol: 'SIP/TLS',
+            server: 'sip.nl-did-provider.com',
+            port: 5061,
+            username: 'required',
+            password: 'required',
+            features: ['DID Numbers', 'Business VoIP', 'E.164 Support'],
+            configuration: `const nlDidConfig = {
+  server: 'sip.nl-did-provider.com',
+  port: 5061,
+  protocol: 'tls',
+  username: 'your_username',
+  password: 'your_password',
+  e164: true
+};`,
+            documentation: 'https://nl-did-provider.com/',
+            notes: 'Niederländische DID-Nummern für Business-Kommunikation',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: 'provider_3',
+            name: 'German Business SIP',
+            type: 'SIP Provider',
+            description: 'Deutscher Business-SIP-Provider mit Notruf-Support',
+            status: 'active',
+            country: 'Germany',
+            protocol: 'SIP/TLS',
+            server: 'sip.german-business.com',
+            port: 5061,
+            username: 'required',
+            password: 'required',
+            features: ['Business VoIP', 'Emergency Services', 'E.164 Support'],
+            configuration: `const germanBusinessConfig = {
+  server: 'sip.german-business.com',
+  port: 5061,
+  protocol: 'tls',
+  username: 'your_username',
+  password: 'your_password',
+  emergency: true,
+  e164: true
+};`,
+            documentation: 'https://german-business-sip.com/',
+            notes: 'Deutscher Business-SIP-Provider mit Notruf-Support',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: 'provider_4',
+            name: 'MapLibre Tiles',
+            type: 'Map Provider',
+            description: 'FOSS Karten-Tiles für Offline-Navigation',
+            status: 'active',
+            country: 'Global',
+            protocol: 'HTTP/HTTPS',
+            server: 'tiles.maplibre.org',
+            port: 443,
+            username: 'none',
+            password: 'none',
+            features: ['Vector Tiles', 'Offline Support', 'FOSS'],
+            configuration: `const mapLibreConfig = {
+  server: 'tiles.maplibre.org',
+  protocol: 'https',
+  style: 'https://demotiles.maplibre.org/style.json',
+  attribution: '© MapLibre'
+};`,
+            documentation: 'https://maplibre.org/',
+            notes: 'FOSS Karten-Tiles für Offline-Navigation',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: 'provider_5',
+            name: 'OSRM Routing',
+            type: 'Routing Provider',
+            description: 'Open Source Routing Machine für Offline-Routing',
+            status: 'active',
+            country: 'Global',
+            protocol: 'HTTP',
+            server: 'localhost',
+            port: 5000,
+            username: 'none',
+            password: 'none',
+            features: ['Offline Routing', 'Turn-by-Turn', 'Multiple Profiles'],
+            configuration: `const osrmConfig = {
+  server: 'localhost',
+  port: 5000,
+  protocol: 'http',
+  profiles: ['car', 'foot', 'bicycle'],
+  algorithm: 'mld'
+};`,
+            documentation: 'https://project-osrm.org/',
+            notes: 'Lokaler Routing-Server für Offline-Navigation',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: 'provider_6',
+            name: 'Nominatim Geocoding',
+            type: 'Geocoding Provider',
+            description: 'Open Source Geocoding-Service für Adress-Suche',
+            status: 'active',
+            country: 'Global',
+            protocol: 'HTTP/HTTPS',
+            server: 'nominatim.openstreetmap.org',
+            port: 443,
+            username: 'none',
+            password: 'none',
+            features: ['Address Search', 'Reverse Geocoding', 'FOSS'],
+            configuration: `const nominatimConfig = {
+  server: 'nominatim.openstreetmap.org',
+  protocol: 'https',
+  endpoint: '/search',
+  format: 'json',
+  limit: 5
+};`,
+            documentation: 'https://nominatim.org/',
+            notes: 'Open Source Geocoding-Service für Adress-Suche',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: 'provider_7',
+            name: 'OpenCaching API',
+            type: 'Geocaching Provider',
+            description: 'Open Source Geocaching-API für Cache-Daten',
+            status: 'active',
+            country: 'Global',
+            protocol: 'HTTP/HTTPS',
+            server: 'www.opencaching.us',
+            port: 443,
+            username: 'none',
+            password: 'none',
+            features: ['Geocache Data', 'OKAPI', 'FOSS'],
+            configuration: `const openCachingConfig = {
+  server: 'www.opencaching.us',
+  protocol: 'https',
+  api: '/okapi/services/caches/search/nearest',
+  format: 'json'
+};`,
+            documentation: 'https://www.opencaching.us/okapi/',
+            notes: 'Open Source Geocaching-API für Cache-Daten',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: 'provider_8',
+            name: 'YouTube API',
+            type: 'Media Provider',
+            description: 'YouTube IFrame API für Video-Embedding',
+            status: 'active',
+            country: 'Global',
+            protocol: 'HTTPS',
+            server: 'www.youtube.com',
+            port: 443,
+            username: 'none',
+            password: 'none',
+            features: ['Video Embedding', 'IFrame API', 'CSP Compatible'],
+            configuration: `const youtubeConfig = {
+  server: 'www.youtube.com',
+  protocol: 'https',
+  embed: '/embed/',
+  csp: "frame-src 'self' https://www.youtube.com"
+};`,
+            documentation: 'https://developers.google.com/youtube/iframe_api_reference',
+            notes: 'YouTube IFrame API für Video-Embedding mit CSP-Support',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: 'provider_9',
+            name: 'Spotify Embed',
+            type: 'Media Provider',
+            description: 'Spotify Embed API für Musik-Integration',
+            status: 'active',
+            country: 'Global',
+            protocol: 'HTTPS',
+            server: 'open.spotify.com',
+            port: 443,
+            username: 'none',
+            password: 'none',
+            features: ['Music Embedding', 'Playlist Support', 'CSP Compatible'],
+            configuration: `const spotifyConfig = {
+  server: 'open.spotify.com',
+  protocol: 'https',
+  embed: '/embed/',
+  csp: "frame-src 'self' https://open.spotify.com"
+};`,
+            documentation: 'https://developer.spotify.com/documentation/widgets/',
+            notes: 'Spotify Embed API für Musik-Integration mit CSP-Support',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: 'provider_10',
+            name: 'WebRTC STUN/TURN',
+            type: 'WebRTC Provider',
+            description: 'STUN/TURN-Server für WebRTC-Verbindungen',
+            status: 'active',
+            country: 'Global',
+            protocol: 'UDP/TCP',
+            server: 'stun.l.google.com',
+            port: 19302,
+            username: 'none',
+            password: 'none',
+            features: ['STUN Server', 'NAT Traversal', 'P2P Support'],
+            configuration: `const webrtcConfig = {
+  iceServers: [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' }
+  ]
+};`,
+            documentation: 'https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API',
+            notes: 'STUN-Server für WebRTC NAT-Traversal',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          }
+        ];
+      }
+
+      async saveProviders() {
+        try {
+          localStorage.setItem('telco-hub-providers', JSON.stringify(this.providers));
+        } catch (error) {
+          console.error('Provider-Saving Fehler:', error);
+        }
+      }
+
+      renderProviders() {
+        const grid = document.getElementById('providerGrid');
+        grid.innerHTML = '';
+
+        this.providers.forEach(provider => {
+          const card = this.createProviderCard(provider);
+          grid.appendChild(card);
+        });
+      }
+
+      createProviderCard(provider) {
+        const card = document.createElement('div');
+        card.className = 'provider-card';
+        
+        const statusClass = `status-${provider.status}`;
+        const statusText = provider.status === 'active' ? 'Aktiv' :
+                          provider.status === 'inactive' ? 'Inaktiv' :
+                          provider.status === 'testing' ? 'Testing' : 'Veraltet';
+
+        card.innerHTML = `
+          <div class="provider-card-header">
+            <div class="provider-name">${provider.name}</div>
+            <div class="provider-type">${provider.type}</div>
+          </div>
+          
+          <div class="provider-info">
+            <div class="info-item">
+              <span class="info-label">Beschreibung:</span>
+              <span class="info-value">${provider.description}</span>
+            </div>
+            
+            <div class="info-item">
+              <span class="info-label">Status:</span>
+              <span class="info-value">
+                <span class="status-indicator ${statusClass}">
+                  ${statusText}
+                </span>
+              </span>
+            </div>
+            
+            <div class="info-item">
+              <span class="info-label">Land:</span>
+              <span class="info-value">${provider.country}</span>
+            </div>
+            
+            <div class="info-item">
+              <span class="info-label">Protokoll:</span>
+              <span class="info-value">${provider.protocol}</span>
+            </div>
+            
+            <div class="info-item">
+              <span class="info-label">Server:</span>
+              <span class="info-value">${provider.server}:${provider.port}</span>
+            </div>
+            
+            <div class="info-item">
+              <span class="info-label">Authentifizierung:</span>
+              <span class="info-value">${provider.username === 'none' ? 'Keine' : 'Erforderlich'}</span>
+            </div>
+            
+            <div class="info-item">
+              <span class="info-label">Features:</span>
+              <span class="info-value">${provider.features.join(', ')}</span>
+            </div>
+            
+            <div class="info-item">
+              <span class="info-label">Dokumentation:</span>
+              <span class="info-value">
+                <a href="${provider.documentation}" target="_blank">${provider.documentation}</a>
+              </span>
+            </div>
+            
+            ${provider.configuration ? `
+            <div class="info-item">
+              <span class="info-label">Konfiguration:</span>
+              <div class="config-snippet">${provider.configuration}</div>
+            </div>
+            ` : ''}
+            
+            ${provider.notes ? `
+            <div class="info-item">
+              <span class="info-label">Notizen:</span>
+              <span class="info-value">${provider.notes}</span>
+            </div>
+            ` : ''}
+          </div>
+          
+          <div class="provider-actions">
+            <button class="action-btn action-btn-primary" onclick="providerManager.editProvider('${provider.id}')" title="Action Button">✏️ Bearbeiten</button>
+            <button class="action-btn action-btn-secondary" onclick="providerManager.deleteProvider('${provider.id}')" title="Action Button">🗑️ Löschen</button>
+            <button class="action-btn action-btn-secondary" onclick="providerManager.testProvider('${provider.id}')" title="Action Button">🧪 Testen</button>
+            <button class="action-btn action-btn-secondary" onclick="providerManager.viewDocumentation('${provider.id}')" title="Action Button">📚 Docs</button>
+          </div>
+        `;
+        
+        return card;
+      }
+
+      updateStats() {
+        const statsGrid = document.getElementById('statsGrid');
+        
+        const total = this.providers.length;
+        const active = this.providers.filter(p => p.status === 'active').length;
+        const types = new Set(this.providers.map(p => p.type)).size;
+        const countries = new Set(this.providers.map(p => p.country)).size;
+        
+        statsGrid.innerHTML = `
+          <div class="stat-item">
+            <div class="stat-value">${total}</div>
+            <div class="stat-label">Gesamt</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">${active}</div>
+            <div class="stat-label">Aktiv</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">${types}</div>
+            <div class="stat-label">Typen</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">${countries}</div>
+            <div class="stat-label">Länder</div>
+          </div>
+        `;
+      }
+
+      populateFilters() {
+        const typeFilter = document.getElementById('typeFilter');
+        const countryFilter = document.getElementById('countryFilter');
+        const protocolFilter = document.getElementById('protocolFilter');
+        
+        // Typen
+        const types = [...new Set(this.providers.map(p => p.type))].sort();
+        types.forEach(type => {
+          const option = document.createElement('option');
+          option.value = type;
+          option.textContent = type;
+          typeFilter.appendChild(option);
+        });
+        
+        // Länder
+        const countries = [...new Set(this.providers.map(p => p.country))].sort();
+        countries.forEach(country => {
+          const option = document.createElement('option');
+          option.value = country;
+          option.textContent = country;
+          countryFilter.appendChild(option);
+        });
+        
+        // Protokolle
+        const protocols = [...new Set(this.providers.map(p => p.protocol))].sort();
+        protocols.forEach(protocol => {
+          const option = document.createElement('option');
+          option.value = protocol;
+          option.textContent = protocol;
+          protocolFilter.appendChild(option);
+        });
+      }
+
+      filterProviders() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const typeFilter = document.getElementById('typeFilter').value;
+        const statusFilter = document.getElementById('statusFilter').value;
+        const countryFilter = document.getElementById('countryFilter').value;
+        const protocolFilter = document.getElementById('protocolFilter').value;
+        
+        const filtered = this.providers.filter(provider => {
+          const matchesSearch = !searchTerm || 
+            provider.name.toLowerCase().includes(searchTerm) ||
+            provider.description.toLowerCase().includes(searchTerm) ||
+            provider.type.toLowerCase().includes(searchTerm) ||
+            provider.country.toLowerCase().includes(searchTerm);
+          
+          const matchesType = !typeFilter || provider.type === typeFilter;
+          const matchesStatus = !statusFilter || provider.status === statusFilter;
+          const matchesCountry = !countryFilter || provider.country === countryFilter;
+          const matchesProtocol = !protocolFilter || provider.protocol === protocolFilter;
+          
+          return matchesSearch && matchesType && matchesStatus && matchesCountry && matchesProtocol;
+        });
+        
+        this.renderFilteredProviders(filtered);
+      }
+
+      renderFilteredProviders(providers) {
+        const grid = document.getElementById('providerGrid');
+        grid.innerHTML = '';
+
+        providers.forEach(provider => {
+          const card = this.createProviderCard(provider);
+          grid.appendChild(card);
+        });
+      }
+
+      addProvider() {
+        this.currentEditId = null;
+        this.openModal();
+      }
+
+      editProvider(id) {
+        const provider = this.providers.find(p => p.id === id);
+        if (provider) {
+          this.currentEditId = id;
+          this.populateForm(provider);
+          this.openModal();
+        }
+      }
+
+      async deleteProvider(id) {
+        if (confirm('Sind Sie sicher, dass Sie diesen Provider löschen möchten?')) {
+          this.providers = this.providers.filter(p => p.id !== id);
+          await this.saveProviders();
+          this.renderProviders();
+          this.updateStats();
+          this.populateFilters();
+        }
+      }
+
+      testProvider(id) {
+        const provider = this.providers.find(p => p.id === id);
+        if (provider) {
+          alert(`🧪 Provider Test: ${provider.name}\\n\\nServer: ${provider.server}:${provider.port}\\nProtokoll: ${provider.protocol}\\nStatus: ${provider.status}`);
+        }
+      }
+
+      viewDocumentation(id) {
+        const provider = this.providers.find(p => p.id === id);
+        if (provider) {
+          window.open(provider.documentation, '_blank');
+        }
+      }
+
+      openModal() {
+        // Modal Implementation würde hier folgen
+        alert('Modal für Provider hinzufügen/bearbeiten wird implementiert');
+      }
+
+      closeModal() {
+        // Modal schließen
+      }
+
+      populateForm(provider) {
+        // Formular befüllen
+      }
+
+      clearForm() {
+        // Formular leeren
+      }
+
+      async saveProvider(formData) {
+        // Provider speichern
+      }
+
+      exportProviders() {
+        const data = {
+          providers: this.providers,
+          exportDate: new Date().toISOString(),
+          version: '1.0'
+        };
+        
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `telco-hub-providers-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        
+        URL.revokeObjectURL(url);
+      }
+
+      importProviders() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        
+        input.onchange = (event) => {
+          const file = event.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              try {
+                const data = JSON.parse(e.target.result);
+                if (data.providers && Array.isArray(data.providers)) {
+                  this.providers = data.providers;
+                  this.saveProviders();
+                  this.renderProviders();
+                  this.updateStats();
+                  this.populateFilters();
+                  alert('Provider erfolgreich importiert!');
+                } else {
+                  alert('Ungültiges Dateiformat!');
+                }
+              } catch (error) {
+                alert('Fehler beim Importieren der Datei!');
+              }
+            };
+            reader.readAsText(file);
+          }
+        };
+        
+        input.click();
+      }
+
+      setupEventListeners() {
+        // Event Listeners Setup
+      }
+    }
+
+    // Globale Funktionen
+    let providerManager;
+
+    function addProvider() {
+      providerManager.addProvider();
+    }
+
+    function exportProviders() {
+      providerManager.exportProviders();
+    }
+
+    function importProviders() {
+      providerManager.importProviders();
+    }
+
+    function filterProviders() {
+      providerManager.filterProviders();
+    }
+
+    // Initialisierung
+    document.addEventListener('DOMContentLoaded', () => {
+      providerManager = new ProviderManager();
+    });
+  </script>
+</body>
+</html>

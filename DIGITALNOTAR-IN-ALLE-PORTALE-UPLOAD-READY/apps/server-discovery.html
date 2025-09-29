@@ -1,0 +1,453 @@
+<!-- TODO: Replacement character detected () - verify source encoding -->
+<!DOCTYPE html>
+<html lang="de" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Server Discovery - TELCO Hub</title>
+<h1 style="position: absolute; left: -9999px;">Server Discovery - TELCO Hub</h1>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .server-discovery {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .discovery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .server-card {
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            padding: 1.5rem;
+            background: #fff;
+            transition: all 0.3s ease;
+        }
+        .server-card.online {
+            border-color: #333333;
+            background: #f0fff0;
+        }
+        .server-card.offline {
+            border-color: #333333;
+            background: #fff5f5;
+        }
+        .server-card.checking {
+            border-color: #333333;
+            background: #fffbf0;
+        }
+        .server-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        .server-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .server-url {
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin: 0.5rem 0;
+            word-break: break-all;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-indicator.online { background: #28a745; }
+        .status-indicator.offline { background: #dc3545; }
+        .status-indicator.checking { background: #ffc107; animation: pulse 1s infinite; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .scan-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin: 1rem 0;
+            width: 100%;
+        }
+        .scan-button:hover {
+            background: #0056b3;
+        }
+        .scan-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .server-info {
+            margin: 1rem 0;
+        }
+        .server-info h4 {
+            margin: 0.5rem 0;
+        }
+        .server-info ul {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+        .connection-test {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .test-result {
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+        .test-result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #333333;
+        }
+        .test-result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #333333;
+        }
+    </style>
+</head>
+<body>
+    <div class="server-discovery">
+        <header class="top-app-bar">
+            <div class="top-app-bar-content">
+                <button class="icon-button" onclick="window.history.back()" title="Action Button">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                    </svg>
+                </button>
+                <h1 class="app-title">🔍 Server Discovery</h1>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="connection-test">
+                <h3>🌐 Netzwerk-Scan</h3>
+                <p>Suche nach verfügbaren TELCO Hub Servern im lokalen Netzwerk:</p>
+                <button class="scan-button" id="scan-btn" onclick="startNetworkScan()" title="Action Button">
+                    🔍 Netzwerk scannen
+                </button>
+                <div id="scan-progress" class="optimized-style">
+                    <p><span class="status-indicator checking"></span> Scanne Netzwerk...</p>
+                </div>
+            </div>
+
+            <div class="discovery-grid" id="server-grid">
+                <!-- Servers werden hier dynamisch eingefügt -->
+            </div>
+
+            <!-- Manual Server Entry -->
+            <div class="server-card">
+                <div class="server-icon">➕</div>
+                <div class="server-title">Server manuell hinzufügen</div>
+                <p>Füge einen Server manuell hinzu, wenn er nicht automatisch gefunden wurde:</p>
+                
+                <div class="optimized-style">
+                    <label for="server-url">Server-URL:</label>
+                    <input type="text" id="server-url" placeholder="http://192.168.1.100:8080" 
+                           class="optimized-style" aria-label="Input Field">
+                </div>
+                
+                <button class="scan-button" onclick="addManualServer()" title="Action Button">
+                    ➕ Server hinzufügen
+                </button>
+            </div>
+
+            <!-- Connection Test Results -->
+            <div id="connection-results" class="optimized-style">
+                <h3>📊 Verbindungstests</h3>
+                <div id="test-results"></div>
+            </div>
+        </main>
+    </div>
+
+    <script async>
+        let discoveredServers = [];
+        let isScanning = false;
+
+        // Network Scan
+        async function startNetworkScan() {
+            if (isScanning) return;
+            
+            isScanning = true;
+            const scanBtn = document.getElementById('scan-btn');
+            const progressDiv = document.getElementById('scan-progress');
+            
+            scanBtn.disabled = true;
+            scanBtn.textContent = '🔍 Scanne...';
+            progressDiv.style.display = 'block';
+            
+            // Get local IP range
+            const localIP = await getLocalIP();
+            const ipRange = getIPRange(localIP);
+            
+            // Scan common ports
+            const ports = [8080, 8081, 3000, 5000, 8000];
+            const servers = [];
+            
+            // Simulate network scan (in real implementation, use WebRTC or similar)
+            for (let i = 0; i < ipRange.length && i < 10; i++) {
+                const ip = ipRange[i];
+                for (const port of ports) {
+                    const server = await testServerConnection(`http://${ip}:${port}`);
+                    if (server) {
+                        servers.push(server);
+                    }
+                }
+            }
+            
+            // Also check common localhost ports
+            for (const port of ports) {
+                const server = await testServerConnection(`http://127.0.0.1:${port}`);
+                if (server) {
+                    servers.push(server);
+                }
+            }
+            
+            discoveredServers = servers;
+            updateServerGrid();
+            
+            scanBtn.disabled = false;
+            scanBtn.textContent = '🔍 Netzwerk scannen';
+            progressDiv.style.display = 'none';
+            isScanning = false;
+        }
+
+        // Get Local IP
+        async function getLocalIP() {
+            return new Promise((resolve) => {
+                const pc = new RTCPeerConnection({
+                    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+                });
+                
+                pc.createDataChannel('');
+                pc.createOffer().then(offer => pc.setLocalDescription(offer));
+                
+                pc.onicecandidate = (ice) => {
+                    if (ice && ice.candidate && ice.candidate.candidate) {
+                        const candidate = ice.candidate.candidate;
+                        const ipMatch = candidate.match(/([0-9]{1,3}(\.[0-9]{1,3}){3})/);
+                        if (ipMatch) {
+                            pc.close();
+                            resolve(ipMatch[1]);
+                        }
+                    }
+                };
+                
+                setTimeout(() => {
+                    pc.close();
+                    resolve('192.168.1.1'); // Fallback
+                }, 3000);
+            });
+        }
+
+        // Get IP Range
+        function getIPRange(baseIP) {
+            const parts = baseIP.split('.');
+            const base = parts.slice(0, 3).join('.');
+            const ips = [];
+            
+            for (let i = 1; i <= 254; i++) {
+                ips.push(`${base}.${i}`);
+            }
+            
+            return ips;
+        }
+
+        // Test Server Connection
+        async function testServerConnection(url) {
+            try {
+                const response = await fetch(`${url}/healthz`, {
+                    method: 'GET',
+                    timeout: 2000
+                });
+                
+                if (response.ok) {
+                    const serverInfo = await getServerInfo(url);
+                    return {
+                        url: url,
+                        status: 'online',
+                        info: serverInfo,
+                        lastSeen: new Date()
+                    };
+                }
+            } catch (error) {
+                // Server not responding
+            }
+            
+            return null;
+        }
+
+        // Get Server Info
+        async function getServerInfo(url) {
+            try {
+                const response = await fetch(`${url}/api/info`, {
+                    method: 'GET',
+                    timeout: 2000
+                });
+                
+                if (response.ok) {
+                    return await response.json();
+                }
+            } catch (error) {
+                // API not available, return basic info
+            }
+            
+            return {
+                name: 'TELCO Hub Server',
+                version: 'Unknown',
+                type: 'Android Microsite Server',
+                uptime: 'Unknown'
+            };
+        }
+
+        // Update Server Grid
+        function updateServerGrid() {
+            const grid = document.getElementById('server-grid');
+            
+            if (discoveredServers.length === 0) {
+                grid.innerHTML = `
+                    <div class="server-card offline">
+                        <div class="server-icon">❌</div>
+                        <div class="server-title">Keine Server gefunden</div>
+                        <p>Keine TELCO Hub Server im lokalen Netzwerk gefunden.</p>
+                        <p>Stelle sicher, dass:</p>
+                        <ul>
+                            <li>Der Android Server läuft</li>
+                            <li>Beide Geräte im gleichen Netzwerk sind</li>
+                            <li>Die Firewall den Port nicht blockiert</li>
+                        </ul>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = discoveredServers.map(server => `
+                <div class="server-card ${server.status}">
+                    <div class="server-icon">${server.status === 'online' ? '✅' : '❌'}</div>
+                    <div class="server-title">${server.info.name}</div>
+                    <div class="server-url">${server.url}</div>
+                    <div class="server-info">
+                        <h4>Server-Informationen:</h4>
+                        <ul>
+                            <li><strong>Typ:</strong> ${server.info.type}</li>
+                            <li><strong>Version:</strong> ${server.info.version}</li>
+                            <li><strong>Uptime:</strong> ${server.info.uptime}</li>
+                            <li><strong>Letzter Check:</strong> ${server.lastSeen.toLocaleString('de-DE')}</li>
+                        </ul>
+                    </div>
+                    <button class="scan-button" onclick="connectToServer('${server.url}')" title="Action Button">
+                        🔗 Verbinden
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Add Manual Server
+        function addManualServer() {
+            const urlInput = document.getElementById('server-url');
+            const url = urlInput.value.trim();
+            
+            if (!url) {
+                alert('Bitte gib eine gültige Server-URL ein.');
+                return;
+            }
+            
+            // Test connection
+            testServerConnection(url).then(server => {
+                if (server) {
+                    discoveredServers.push(server);
+                    updateServerGrid();
+                    urlInput.value = '';
+                    alert('✅ Server erfolgreich hinzugefügt!');
+                } else {
+                    alert('❌ Server nicht erreichbar. Überprüfe die URL und stelle sicher, dass der Server läuft.');
+                }
+            });
+        }
+
+        // Connect to Server
+        function connectToServer(url) {
+            // Open server in new tab
+            window.open(url, '_blank');
+            
+            // Also show connection test
+            showConnectionTest(url);
+        }
+
+        // Show Connection Test
+        async function showConnectionTest(url) {
+            const resultsDiv = document.getElementById('connection-results');
+            const testResultsDiv = document.getElementById('test-results');
+            
+            resultsDiv.style.display = 'block';
+            testResultsDiv.innerHTML = `
+                <div class="test-result">
+                    <span class="status-indicator checking"></span>
+                    <span>Teste Verbindung zu ${url}...</span>
+                </div>
+            `;
+            
+            const tests = [
+                { name: 'Health Check', url: `${url}/healthz` },
+                { name: 'Main Page', url: url },
+                { name: 'API Info', url: `${url}/api/info` }
+            ];
+            
+            const results = [];
+            
+            for (const test of tests) {
+                try {
+                    const response = await fetch(test.url, { timeout: 5000 });
+                    results.push({
+                        name: test.name,
+                        success: response.ok,
+                        status: response.status,
+                        url: test.url
+                    });
+                } catch (error) {
+                    results.push({
+                        name: test.name,
+                        success: false,
+                        error: error.message,
+                        url: test.url
+                    });
+                }
+            }
+            
+            testResultsDiv.innerHTML = results.map(result => `
+                <div class="test-result ${result.success ? 'success' : 'error'}">
+                    <span class="status-indicator ${result.success ? 'online' : 'offline'}"></span>
+                    <strong>${result.name}:</strong> 
+                    ${result.success ? 
+                        `✅ Erfolgreich (${result.status})` : 
+                        `❌ Fehler: ${result.error || 'Unbekannter Fehler'}`
+                    }
+                    <br><small>${result.url}</small>
+                </div>
+            `).join('');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Auto-scan on load
+            setTimeout(() => {
+                startNetworkScan();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

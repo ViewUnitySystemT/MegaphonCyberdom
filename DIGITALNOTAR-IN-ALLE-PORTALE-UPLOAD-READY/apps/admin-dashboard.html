@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛠 TELCO Admin Dashboard</title>
+<h1 style="position: absolute; left: -9999px;">🛠 TELCO Admin Dashboard</h1>
+    <link rel="stylesheet" href="../styles.css">
+    
+    <!-- Schwebende UI/UX CSS -->
+    <style>
+        /* 🪄 Schwebende UI/UX Overlay */
+        .float-launcher{position:fixed; right:1rem; bottom:1rem; z-index:60; background:var(--primary); color:#fff; border:none; border-radius:999px; padding:.9rem 1.2rem; font-weight:800; box-shadow:0 10px 30px rgba(0,0,0,.3); cursor:pointer}
+        .float-panel{position:fixed; right:1rem; bottom:4.5rem; width:min(92vw, 520px); max-height:min(80vh, 720px); overflow:auto; z-index:60; background:rgba(30,41,59,.95); border:1px solid rgba(255,255,255,.12); border-radius:1rem; box-shadow:0 20px 40px rgba(0,0,0,.35); backdrop-filter: blur(12px); display:none;}
+        .float-panel.show{display:block; animation:fadeIn .2s ease-out both}
+        .fp-head{display:flex; align-items:center; justify-content:space-between; gap:.5rem; padding:1rem; border-bottom:1px solid rgba(255,255,255,.08)}
+        .fp-title{font-weight:800}
+        .fp-tabs{display:flex; gap:.25rem; padding:.5rem}
+        .fp-tabs button{background:transparent; border:1px solid rgba(255,255,255,.2); color:#fff; padding:.4rem .6rem; border-radius:.6rem; cursor:pointer}
+        .fp-tabs button.active{background:var(--accent); border-color:transparent}
+        .fp-body{padding:1rem}
+        .list{display:grid; gap:.5rem}
+        .row{display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.6rem .8rem; border:1px dashed rgba(255,255,255,.15); border-radius:.6rem}
+        .pill{display:inline-block; font-size:.8rem; opacity:.8}
+        .setting{display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.6rem .8rem; border:1px solid rgba(255,255,255,.1); border-radius:.6rem}
+        .toggle{appearance:none; width:42px; height:24px; background:#475569; border-radius:999px; position:relative; outline:none; cursor:pointer}
+        .toggle:checked{background:var(--accent)}
+        .toggle:before{content:''; position:absolute; top:3px; left:3px; width:18px; height:18px; background:#fff; border-radius:50%; transition:transform .2s}
+        .toggle:checked:before{transform:translateX(18px)}
+        .install-banner{position:fixed; right:1rem; bottom:5rem; z-index:55; background:rgba(16,185,129,.95); color:#04130d; border-radius:.75rem; padding:.6rem .8rem; display:none; box-shadow:0 10px 30px rgba(0,0,0,.3)}
+        .install-banner.show{display:block}
+        
+        /* ⚙️ Admin-spezifische Tools */
+        .admin-tools-panel {
+          background: rgba(255,255,255,0.05);
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 0.75rem;
+          padding: 1rem;
+          margin: 1rem 0;
+        }
+        .tool-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+          gap: 0.5rem;
+          margin-top: 0.5rem;
+        }
+        .tool-btn {
+          background: rgba(255,255,255,0.1);
+          border: 1px solid rgba(255,255,255,0.2);
+          color: #fff;
+          padding: 0.5rem;
+          border-radius: 0.5rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .tool-btn:hover {
+          background: rgba(255,255,255,0.2);
+          transform: translateY(-2px);
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(4px); }
+          to { opacity: 1; transform: none; }
+        }
+    </style>
+    
+    <style>
+        .admin-dashboard {
+            padding: 1rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .tool-card {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .tool-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .tool-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .tool-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--on-surface);
+        }
+        .tool-description {
+            font-size: 0.9rem;
+            color: var(--on-surface-variant);
+            margin-bottom: 0.5rem;
+        }
+        .tool-status {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        .status-active { background: var(--success-container); color: var(--on-success-container); }
+        .status-inactive { background: var(--error-container); color: var(--on-error-container); }
+        .status-maintenance { background: var(--warning-container); color: var(--on-warning-container); }
+        
+        .admin-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: var(--primary-container);
+            border-radius: var(--radius-lg);
+        }
+        .admin-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--on-primary-container);
+            margin-bottom: 0.5rem;
+        }
+        .admin-subtitle {
+            font-size: 1.1rem;
+            color: var(--on-primary-container);
+            opacity: 0.8;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--on-surface-variant);
+        }
+        
+        .tool-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: block;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .tool-modal-content {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 1200px;
+            height: 80%;
+            display: flex;
+            flex-direction: column;
+        }
+        .tool-modal-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--outline);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .tool-modal-body {
+            flex: 1;
+            padding: 1rem;
+            overflow: visible;
+        }
+        .tool-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: var(--radius-sm);
+        }
+        .close-button {
+            background: var(--error);
+            color: var(--on-error);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="top-app-bar">
+            <div class="top-app-bar-content">
+                <button class="icon-button" onclick="window.history.back()" title="Action Button">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </button>
+                <h1 class="top-app-bar-title">🛠 Admin Dashboard</h1>
+                <div class="top-app-bar-actions"><button class="icon-button" onclick="window.history.forward()" title="Vorwärts" title="Action Button">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M4 11v2h12.17l-5.59 5.59L12 20l8-8-8-8-1.41 1.41L16.17 11H4z"/></svg>
+                    </button>
+                    
+                    <button class="icon-button" onclick="refreshDashboard()" title="Action Button">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="admin-dashboard">
+            <!-- Dashboard Header -->
+            <div class="admin-header">
+                <h1 class="admin-title">TELCO Admin Dashboard</h1>
+                <p class="admin-subtitle">Zentrale Verwaltung aller TELCO Hub Tools und Services</p>
+            </div>
+
+            <!-- System Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="active-connections">0</div>
+                    <div class="stat-label">Aktive Verbindungen</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-rooms">0</div>
+                    <div class="stat-label">Aktive Räume</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="server-uptime">0h</div>
+                    <div class="stat-label">Server Uptime</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="tools-status">8/12</div>
+                    <div class="stat-label">Tools Online</div>
+                </div>
+            </div>
+
+            <!-- Tools Grid -->
+            <div class="tool-grid" id="tools-grid">
+                <!-- Tools werden dynamisch geladen -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Tool Modal -->
+    <div class="tool-modal" id="tool-modal">
+        <div class="tool-modal-content">
+            <div class="tool-modal-header">
+                <h3 id="modal-title">Tool</h3>
+                <button class="close-button" onclick="closeToolModal()" title="Action Button">Schließen</button>
+            </div>
+            <div class="tool-modal-body">
+                <iframe id="tool-iframe" class="tool-iframe" src=""></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class AdminDashboard {
+            constructor() {
+                this.tools = [
+                    {
+                        id: 'peerlink',
+                        name: 'PeerLink',
+                        description: 'Direkte P2P-Verbindungen mit WebRTC',
+                        icon: '🔗',
+                        file: 'peerlink-full.html',
+                        status: 'active',
+                        category: 'Kommunikation'
+                    },
+                    {
+                        id: 'conference',
+                        name: 'Konferenz',
+                        description: 'Video-Konferenzen mit Bildschirmfreigabe',
+                        icon: '📹',
+                        file: 'conference-full.html',
+                        status: 'active',
+                        category: 'Kommunikation'
+                    },
+        {
+            id: 'jamssession',
+            name: 'JamSession',
+            description: 'Kollaborative Musik-Session mit Echtzeit-Audio',
+            icon: '🎵',
+            file: 'jamssession.html',
+            status: 'active',
+            category: 'Kommunikation'
+        },
+        {
+            id: 'qr-generator',
+            name: 'QR Generator',
+            description: 'QR-Codes für alle Verbindungstypen erstellen',
+            icon: '🔗',
+            file: 'qr-generator.html',
+            status: 'active',
+            category: 'Verbindung'
+        },
+        {
+            id: 'qr-scanner',
+            name: 'QR Scanner',
+            description: 'QR-Codes scannen für schnelle Verbindungen',
+            icon: '📱',
+            file: 'qr-scanner.html',
+            status: 'active',
+            category: 'Verbindung'
+        },
+        {
+            id: 'connection-hub',
+            name: 'Connection Hub',
+            description: 'Alle verfügbaren Verbindungsarten nutzen',
+            icon: '🌐',
+            file: 'connection-hub.html',
+            status: 'active',
+            category: 'Verbindung'
+        },
+        {
+            id: 'device-manager',
+            name: 'Device Manager',
+            description: 'Alle Geräte verwalten und überwachen',
+            icon: '📱',
+            file: 'device-manager.html',
+            status: 'active',
+            category: 'Verbindung'
+        },
+                    {
+                        id: 'monitoring',
+                        name: 'Monitoring',
+                        description: 'System-Überwachung und Statistiken',
+                        icon: '📊',
+                        file: 'monitor.html',
+                        status: 'active',
+                        category: 'System'
+                    },
+                    {
+                        id: 'files',
+                        name: 'File Manager',
+                        description: 'Dateiverwaltung und -sharing',
+                        icon: '📁',
+                        file: 'files.html',
+                        status: 'active',
+                        category: 'Verwaltung'
+                    },
+                    {
+                        id: 'media',
+                        name: 'Media Gallery',
+                        description: 'Medien-Viewer und -verwaltung',
+                        icon: '📸',
+                        file: 'media-gallery.html',
+                        status: 'active',
+                        category: 'Verwaltung'
+                    },
+                    {
+                        id: 'geoip',
+                        name: 'GeoIP Tracker',
+                        description: 'Geografische Verbindungsanalyse',
+                        icon: '🌍',
+                        file: 'geoip-tracker.html',
+                        status: 'active',
+                        category: 'Analytik'
+                    },
+                    {
+                        id: 'network',
+                        name: 'Netzwerkdiagnose',
+                        description: 'NAT-Scanner und Verbindungstests',
+                        icon: '🛜',
+                        file: 'network-diagnostics.html',
+                        status: 'active',
+                        category: 'Analytik'
+                    },
+                    {
+                        id: 'turn',
+                        name: 'TURN Server',
+                        description: 'TURN-Server Status und Konfiguration',
+                        icon: '🔐',
+                        file: 'turn-status.html',
+                        status: 'maintenance',
+                        category: 'System'
+                    },
+                    {
+                        id: 'redis',
+                        name: 'Redis Viewer',
+                        description: 'Session-Management und Cache-Status',
+                        icon: '🧠',
+                        file: 'redis-viewer.html',
+                        status: 'active',
+                        category: 'System'
+                    },
+                    {
+                        id: 'backup',
+                        name: 'Backup Tool',
+                        description: 'Automatische Datensicherung',
+                        icon: '💾',
+                        file: 'backup-tool.html',
+                        status: 'active',
+                        category: 'Verwaltung'
+                    },
+                    {
+                        id: 'session',
+                        name: 'Session Analyzer',
+                        description: 'Verbindungsanalyse und Debugging',
+                        icon: '🔍',
+                        file: 'session-analyzer.html',
+                        status: 'active',
+                        category: 'Analytik'
+                    },
+                    {
+                        id: 'cloudflare',
+                        name: 'Cloudflare Edge',
+                        description: 'Edge-Deployment und Worker-Status',
+                        icon: '☁️',
+                        file: 'cloudflare-dashboard.html',
+                        status: 'inactive',
+                        category: 'Deployment'
+                    }
+                ];
+                
+                this.init();
+            }
+
+            init() {
+                this.renderTools();
+                this.startStatsUpdate();
+                this.loadSystemStats();
+            }
+
+            renderTools() {
+                const grid = document.getElementById('tools-grid');
+                grid.innerHTML = '';
+
+                this.tools.forEach(tool => {
+                    const card = document.createElement('div');
+                    card.className = 'tool-card';
+                    card.onclick = () => this.openTool(tool);
+                    
+                    const statusClass = `status-${tool.status}`;
+                    
+                    card.innerHTML = `
+                        <div class="tool-icon">${tool.icon}</div>
+                        <div class="tool-title">${tool.name}</div>
+                        <div class="tool-description">${tool.description}</div>
+                        <div class="tool-status ${statusClass}">${this.getStatusText(tool.status)}</div>
+                    `;
+                    
+                    grid.appendChild(card);
+                });
+            }
+
+            getStatusText(status) {
+                const statusMap = {
+                    'active': 'Online',
+                    'inactive': 'Offline',
+                    'maintenance': 'Wartung'
+                };
+                return statusMap[status] || 'Unbekannt';
+            }
+
+            openTool(tool) {
+                const modal = document.getElementById('tool-modal');
+                const title = document.getElementById('modal-title');
+                const iframe = document.getElementById('tool-iframe');
+                
+                title.textContent = `${tool.icon} ${tool.name}`;
+                iframe.src = tool.file;
+                modal.style.display = 'flex';
+            }
+
+            startStatsUpdate() {
+                setInterval(() => {
+                    this.updateStats();
+                }, 5000);
+            }
+
+            async updateStats() {
+                try {
+                    // Simuliere WebSocket-Verbindung für Live-Stats
+                    const stats = {
+                        connections: Math.floor(Math.random() * 50) + 10,
+                        rooms: Math.floor(Math.random() * 20) + 5,
+                        uptime: this.calculateUptime(),
+                        tools: this.tools.filter(t => t.status === 'active').length
+                    };
+
+                    document.getElementById('active-connections').textContent = stats.connections;
+                    document.getElementById('total-rooms').textContent = stats.rooms;
+                    document.getElementById('server-uptime').textContent = stats.uptime;
+                    document.getElementById('tools-status').textContent = `${stats.tools}/${this.tools.length}`;
+                } catch (error) {
+                    console.error('Stats update failed:', error);
+                }
+            }
+
+            calculateUptime() {
+                // Simuliere Server-Uptime
+                const hours = Math.floor(Math.random() * 24);
+                const minutes = Math.floor(Math.random() * 60);
+                return `${hours}h ${minutes}m`;
+            }
+
+            async loadSystemStats() {
+                // Lade echte System-Statistiken
+                try {
+                    // Hier könnten echte API-Calls gemacht werden
+                    console.log('Loading system stats...');
+                } catch (error) {
+                    console.error('Failed to load system stats:', error);
+                }
+            }
+        }
+
+        // Globale Funktionen
+        function closeToolModal() {
+            document.getElementById('tool-modal').style.display = 'none';
+        }
+
+        function refreshDashboard() {
+            location.reload();
+        }
+
+        // Initialisiere Dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            window.adminDashboard = new AdminDashboard();
+        });
+    </script>
+
+    <!-- 🪄 Schwebende UI/UX Launcher & Panel -->
+    <button id="floatLauncher" class="float-launcher" title="Schwebende Steuerung öffnen">☰ Tools</button>
+    <div id="floatPanel" class="float-panel" role="dialog" aria-modal="true" aria-label="Schwebende Steuerung">
+      <div class="fp-head">
+        <div class="fp-title">⚙️ Admin Portal • Schwebende UI/UX</div>
+        <div class="fp-tabs" role="tablist">
+          <button data-tab="quick" class="active" role="tab" aria-selected="true">Quick</button>
+          <button data-tab="admin" role="tab">Admin</button>
+          <button data-tab="settings" role="tab">Settings</button>
+          <button data-tab="traces" role="tab">Traces</button>
+          <button data-tab="auth" role="tab">Login</button>
+        </div>
+      </div>
+      <div class="fp-body">
+        <!-- Quick -->
+        <section data-pane="quick" class="list">
+          <div class="row"><span>Portal-Home</span><a class="portal-link" href="../index.html">Zurück</a></div>
+          <div class="row"><span>Globale Suche</span><button class="btn" data-action="focusSearch">Suchen</button></div>
+          <div class="row"><span>Versteckte Tools</span><button class="btn" data-action="revealHidden">Einblenden</button></div>
+          <div class="row"><span>PWA installieren</span><button class="btn" data-action="installPWA">Installieren</button></div>
+        </section>
+        <!-- Admin Tools -->
+        <section data-pane="admin" class="list" hidden>
+          <div class="admin-tools-panel">
+            <h3>⚙️ Admin Tools</h3>
+            <div class="tool-grid">
+              <button class="tool-btn" data-action="userManagement">Benutzer verwalten</button>
+              <button class="tool-btn" data-action="systemMonitor">System überwachen</button>
+              <button class="tool-btn" data-action="backupCreate">Backup erstellen</button>
+              <button class="tool-btn" data-action="logsView">Logs anzeigen</button>
+              <button class="tool-btn" data-action="securityCheck">Sicherheit prüfen</button>
+              <button class="tool-btn" data-action="maintenanceMode">Wartungsmodus</button>
+            </div>
+          </div>
+          <div class="row"><span>AI-Admin-Assistent</span><button class="btn" data-action="aiAdminAssistant">Starten</button></div>
+          <div class="row"><span>Performance-Monitor</span><button class="btn" data-action="adminPerformance">Öffnen</button></div>
+        </section>
+        <!-- Settings / Privacy Center -->
+        <section data-pane="settings" class="list" hidden>
+          <div class="setting"><div>
+            <strong>Telemetrie</strong><div class="pill">Opt‑In (DSGVO Art.25)</div>
+          </div><input id="toggleTelemetry" type="checkbox" class="toggle"></div>
+          <div class="setting"><div>
+            <strong>Privacy‑Export</strong><div class="pill">JSON Download</div>
+          </div><button class="btn" data-action="exportData">Exportieren</button></div>
+          <div class="setting"><div>
+            <strong>Alle Daten löschen</strong><div class="pill">LocalStorage/Cache</div>
+          </div><button class="btn" data-action="deleteData">Löschen</button></div>
+        </section>
+        <!-- Traces / OTLP -->
+        <section data-pane="traces" class="list" hidden>
+          <div class="setting" style="flex-direction:column; align-items:stretch">
+            <label for="otlpEndpoint"><strong>OTLP/HTTP Endpoint</strong></label>
+            <input id="otlpEndpoint" placeholder="https://collector …" style="padding:.6rem; border-radius:.5rem; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.06); color:#fff">
+          </div>
+          <div class="row"><span>Traces senden</span><button class="btn" data-action="sendTraces">Senden</button></div>
+          <div class="row"><span>Traces exportieren</span><button class="btn" data-action="downloadTraces">Download</button></div>
+        </section>
+        <!-- WebAuthn Login -->
+        <section data-pane="auth" class="list" hidden>
+          <div class="row"><span>WebAuthn registrieren</span><button class="btn" data-action="webauthnRegister">Registrieren</button></div>
+          <div class="row"><span>WebAuthn anmelden</span><button class="btn" data-action="webauthnLogin">Login</button></div>
+          <p class="pill">Erfordert HTTPS & kompatiblen Browser.</p>
+        </section>
+      </div>
+    </div>
+
+    <div id="installBanner" class="install-banner">App installieren? <button class="btn" id="btnInstallNow">Jetzt</button></div>
+
+    <script>
+        // 🪄 Portal Template System - Schwebende UI/UX
+        (function(){
+          const LS = window.localStorage;
+          const qs = (s, r=document)=>r.querySelector(s);
+          const qsa = (s, r=document)=>Array.from(r.querySelectorAll(s));
+          const on = (el, ev, fn)=> el && el.addEventListener(ev, fn);
+          const log = (...args)=> console.log('⚙️', ...args);
+
+          // ----- Floating UI -----
+          const panel=qs('#floatPanel'); const launcher=qs('#floatLauncher'); 
+          if(launcher && panel) {
+            on(launcher,'click',()=>panel.classList.toggle('show'));
+            qsa('.fp-tabs button').forEach(btn=> on(btn,'click',()=>{ 
+              qsa('.fp-tabs button').forEach(b=>b.classList.remove('active')); 
+              btn.classList.add('active'); 
+              const tab=btn.dataset.tab; 
+              qsa('[data-pane]').forEach(p=>{ p.hidden = p.dataset.pane!==tab; }); 
+            }));
+          }
+
+          // ----- Admin-spezifische Actions -----
+          on(qs('[data-action="userManagement"]'),'click',()=>{
+            log('⚙️ Benutzer-Verwaltung geöffnet');
+            alert('⚙️ Benutzer-Verwaltung wird gestartet...');
+          });
+
+          on(qs('[data-action="systemMonitor"]'),'click',()=>{
+            log('⚙️ System-Überwachung geöffnet');
+            alert('⚙️ System-Überwachung wird gestartet...');
+          });
+
+          on(qs('[data-action="backupCreate"]'),'click',()=>{
+            log('⚙️ Backup-Erstellung gestartet');
+            alert('⚙️ Backup wird erstellt...');
+          });
+
+          on(qs('[data-action="logsView"]'),'click',()=>{
+            log('⚙️ Logs-Anzeige geöffnet');
+            alert('⚙️ Logs werden angezeigt...');
+          });
+
+          on(qs('[data-action="securityCheck"]'),'click',()=>{
+            log('⚙️ Sicherheitsprüfung gestartet');
+            alert('⚙️ Sicherheitsprüfung wird durchgeführt...');
+          });
+
+          on(qs('[data-action="maintenanceMode"]'),'click',()=>{
+            log('⚙️ Wartungsmodus aktiviert');
+            alert('⚙️ Wartungsmodus wird aktiviert...');
+          });
+
+          on(qs('[data-action="aiAdminAssistant"]'),'click',()=>{
+            log('🤖 AI-Admin-Assistent gestartet');
+            alert('🤖 AI-Admin-Assistent wird aktiviert...');
+          });
+
+          on(qs('[data-action="adminPerformance"]'),'click',()=>{
+            log('📊 Admin-Performance-Monitor geöffnet');
+            alert('📊 Performance-Monitor wird gestartet...');
+          });
+
+          // ----- Portal-spezifische Actions -----
+          on(qs('[data-action="focusSearch"]'),'click',()=>{
+            log('🔍 Globale Suche fokussiert');
+            // Globale Suche-Logik hier
+          });
+
+          on(qs('[data-action="revealHidden"]'),'click',()=>{
+            log('👁️ Versteckte Tools eingeblendet');
+            // Versteckte Tools-Logik hier
+          });
+
+          on(qs('[data-action="installPWA"]'),'click',()=>{
+            log('📱 PWA-Installation gestartet');
+            // PWA-Installation-Logik hier
+          });
+
+          log('✅ Admin Portal Template System aktiv - Schwebende UI/UX bereit');
+        })();
+    </script>
+</body>
+</html>

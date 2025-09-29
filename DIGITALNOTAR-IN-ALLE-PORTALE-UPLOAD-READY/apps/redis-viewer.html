@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TELCO Hub - Redis Viewer</title>
+<h1 style="position: absolute; left: -9999px;">TELCO Hub - Redis Viewer</h1>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .redis-container {
+            padding: 1rem;
+        }
+        .redis-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .redis-stat-card {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            text-align: center;
+        }
+        .redis-stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+        .redis-stat-label {
+            font-size: 0.9rem;
+            color: var(--on-surface-variant);
+        }
+        .session-list {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+        .session-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-sm);
+            margin-bottom: 0.5rem;
+        }
+        .session-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .session-id {
+            font-family: monospace;
+            font-weight: 600;
+            color: var(--on-surface);
+        }
+        .session-details {
+            font-size: 0.9rem;
+            color: var(--on-surface-variant);
+        }
+        .session-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .action-button {
+            padding: 0.25rem 0.5rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .btn-view { background: var(--primary); color: var(--on-primary); }
+        .btn-delete { background: var(--error); color: var(--on-error); }
+        .redis-commands {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+        }
+        .command-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-sm);
+            margin-bottom: 1rem;
+            font-family: monospace;
+        }
+        .command-result {
+            background: var(--surface-variant);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="top-app-bar">
+            <div class="top-app-bar-content">
+                <button class="icon-button" onclick="window.history.back()" title="Action Button">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </button>
+                <h1 class="top-app-bar-title">🧠 Redis Viewer</h1>
+                <div class="top-app-bar-actions"><button class="icon-button" onclick="window.history.forward()" title="Vorwärts" title="Action Button">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M4 11v2h12.17l-5.59 5.59L12 20l8-8-8-8-1.41 1.41L16.17 11H4z"/></svg>
+                    </button>
+                    
+                    <button class="icon-button" onclick="refreshRedisData()" title="Action Button">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="redis-container">
+            <!-- Redis Statistics -->
+            <div class="redis-stats">
+                <div class="redis-stat-card">
+                    <div class="redis-stat-value" id="total-keys">1,247</div>
+                    <div class="redis-stat-label">Gesamte Keys</div>
+                </div>
+                <div class="redis-stat-card">
+                    <div class="redis-stat-value" id="active-sessions">23</div>
+                    <div class="redis-stat-label">Aktive Sessions</div>
+                </div>
+                <div class="redis-stat-card">
+                    <div class="redis-stat-value" id="memory-usage">45.2 MB</div>
+                    <div class="redis-stat-label">Speicherverbrauch</div>
+                </div>
+                <div class="redis-stat-card">
+                    <div class="redis-stat-value" id="hit-rate">98.5%</div>
+                    <div class="redis-stat-label">Cache Hit Rate</div>
+                </div>
+            </div>
+
+            <!-- Active Sessions -->
+            <div class="session-list">
+                <h3>📋 Aktive Sessions</h3>
+                <div id="sessions-list">
+                    <!-- Sessions werden hier dynamisch geladen -->
+                </div>
+            </div>
+
+            <!-- Redis Commands -->
+            <div class="redis-commands">
+                <h3>💻 Redis Commands</h3>
+                <input type="text" class="command-input" id="redis-command" placeholder="GET session:123 oder KEYS session:*" onkeypress="handleCommandKeypress(event)" aria-label="Input Field">
+                <button class="btn primary" onclick="executeRedisCommand()" title="Action Button">Ausführen</button>
+                <div class="command-result" id="command-result">
+                    <!-- Command results werden hier angezeigt -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        class RedisViewer {
+            constructor() {
+                this.sessions = [];
+                this.init();
+            }
+
+            init() {
+                this.loadSampleSessions();
+                this.renderSessions();
+                this.startAutoRefresh();
+            }
+
+            loadSampleSessions() {
+                this.sessions = [
+                    {
+                        id: 'session:abc123',
+                        userId: 'user:456',
+                        connectedAt: new Date(Date.now() - 300000),
+                        lastActivity: new Date(Date.now() - 60000),
+                        roomId: 'room:conference-001',
+                        ipAddress: '192.168.1.100',
+                        userAgent: 'Chrome/120.0.0.0',
+                        ttl: 3600
+                    },
+                    {
+                        id: 'session:def456',
+                        userId: 'user:789',
+                        connectedAt: new Date(Date.now() - 600000),
+                        lastActivity: new Date(Date.now() - 120000),
+                        roomId: 'room:peerlink-002',
+                        ipAddress: '10.0.0.50',
+                        userAgent: 'Firefox/121.0',
+                        ttl: 3600
+                    },
+                    {
+                        id: 'session:ghi789',
+                        userId: 'user:012',
+                        connectedAt: new Date(Date.now() - 900000),
+                        lastActivity: new Date(Date.now() - 180000),
+                        roomId: 'room:conference-003',
+                        ipAddress: '172.16.0.25',
+                        userAgent: 'Safari/17.0',
+                        ttl: 1800
+                    },
+                    {
+                        id: 'session:jkl012',
+                        userId: 'user:345',
+                        connectedAt: new Date(Date.now() - 1200000),
+                        lastActivity: new Date(Date.now() - 300000),
+                        roomId: 'room:monitoring',
+                        ipAddress: '203.0.113.45',
+                        userAgent: 'Edge/120.0.0.0',
+                        ttl: 7200
+                    }
+                ];
+            }
+
+            renderSessions() {
+                const sessionsList = document.getElementById('sessions-list');
+                sessionsList.innerHTML = '';
+
+                this.sessions.forEach(session => {
+                    const item = document.createElement('div');
+                    item.className = 'session-item';
+                    
+                    const connectedTime = this.getTimeAgo(session.connectedAt);
+                    const lastActivityTime = this.getTimeAgo(session.lastActivity);
+                    
+                    item.innerHTML = `
+                        <div class="session-info">
+                            <div class="session-id">${session.id}</div>
+                            <div class="session-details">
+                                User: ${session.userId} | Room: ${session.roomId} | 
+                                Connected: ${connectedTime} | Last Activity: ${lastActivityTime} | 
+                                TTL: ${session.ttl}s | IP: ${session.ipAddress}
+                            </div>
+                        </div>
+                        <div class="session-actions">
+                            <button class="action-button btn-view" onclick="viewSession('${session.id}')" title="Action Button">Anzeigen</button>
+                            <button class="action-button btn-delete" onclick="deleteSession('${session.id}')" title="Action Button">Löschen</button>
+                        </div>
+                    `;
+                    
+                    sessionsList.appendChild(item);
+                });
+            }
+
+            getTimeAgo(date) {
+                const now = new Date();
+                const diff = now - date;
+                const minutes = Math.floor(diff / 60000);
+                
+                if (minutes < 1) return 'Gerade eben';
+                if (minutes < 60) return `vor ${minutes}min`;
+                
+                const hours = Math.floor(minutes / 60);
+                if (hours < 24) return `vor ${hours}h`;
+                
+                const days = Math.floor(hours / 24);
+                return `vor ${days}d`;
+            }
+
+            startAutoRefresh() {
+                setInterval(() => {
+                    this.updateStats();
+                    this.updateSessions();
+                }, 5000);
+            }
+
+            updateStats() {
+                // Simuliere Statistik-Updates
+                const totalKeys = Math.floor(Math.random() * 500) + 1000;
+                const activeSessions = this.sessions.length;
+                const memoryUsage = (Math.random() * 20 + 40).toFixed(1);
+                const hitRate = (Math.random() * 5 + 95).toFixed(1);
+
+                document.getElementById('total-keys').textContent = totalKeys.toLocaleString();
+                document.getElementById('active-sessions').textContent = activeSessions;
+                document.getElementById('memory-usage').textContent = memoryUsage + ' MB';
+                document.getElementById('hit-rate').textContent = hitRate + '%';
+            }
+
+            updateSessions() {
+                // Simuliere Session-Updates
+                this.sessions.forEach(session => {
+                    if (Math.random() > 0.8) {
+                        session.lastActivity = new Date();
+                    }
+                });
+
+                this.renderSessions();
+            }
+
+            executeRedisCommand(command) {
+                const commandInput = document.getElementById('redis-command');
+                const resultDiv = document.getElementById('command-result');
+                
+                if (!command) {
+                    command = commandInput.value.trim();
+                }
+
+                if (!command) {
+                    resultDiv.textContent = 'Bitte geben Sie einen Redis-Befehl ein.';
+                    return;
+                }
+
+                // Simuliere Redis-Command-Ausführung
+                let result = '';
+                
+                if (command.startsWith('GET ')) {
+                    const key = command.split(' ')[1];
+                    result = `"${key}:value"`;
+                } else if (command.startsWith('KEYS ')) {
+                    const pattern = command.split(' ')[1];
+                    result = `1) "session:abc123"\n2) "session:def456"\n3) "session:ghi789"`;
+                } else if (command === 'INFO') {
+                    result = `# Server\nredis_version:7.0.12\nredis_mode:standalone\n\n# Memory\nused_memory:47185920\nused_memory_human:45.00M\n\n# Stats\ntotal_connections_received:1234\ntotal_commands_processed:5678`;
+                } else if (command === 'PING') {
+                    result = 'PONG';
+                } else {
+                    result = `(error) ERR unknown command '${command.split(' ')[0]}'`;
+                }
+
+                resultDiv.textContent = result;
+                commandInput.value = '';
+            }
+        }
+
+        // Globale Funktionen
+        function refreshRedisData() {
+            location.reload();
+        }
+
+        function executeRedisCommand() {
+            window.redisViewer.executeRedisCommand();
+        }
+
+        function handleCommandKeypress(event) {
+            if (event.key === 'Enter') {
+                executeRedisCommand();
+            }
+        }
+
+        function viewSession(sessionId) {
+            window.redisViewer.executeRedisCommand(`GET ${sessionId}`);
+        }
+
+        function deleteSession(sessionId) {
+            if (confirm(`Session ${sessionId} wirklich löschen?`)) {
+                window.redisViewer.executeRedisCommand(`DEL ${sessionId}`);
+                // Remove from local sessions array
+                window.redisViewer.sessions = window.redisViewer.sessions.filter(s => s.id !== sessionId);
+                window.redisViewer.renderSessions();
+            }
+        }
+
+        // Initialisiere Redis Viewer
+        document.addEventListener('DOMContentLoaded', () => {
+            window.redisViewer = new RedisViewer();
+        });
+    </script>
+</body>
+</html>
+
+
+

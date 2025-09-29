@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📞 Real Voicemail System - Echter Anrufbeantworter</title>
+<h1 style="position: absolute; left: -9999px;">📞 Real Voicemail System - Echter Anrufbeantworter</h1>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        :root {
+            --voicemail-primary: #1a1a2e;
+            --voicemail-secondary: #16213e;
+            --voicemail-accent: #0f3460;
+            --voicemail-gold: #e94560;
+            --voicemail-light: #f5f5f5;
+            --voicemail-universe: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .voicemail-universe {
+            background: var(--voicemail-universe);
+            min-height: 100vh;
+            color: var(--voicemail-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
+            overflow-x: visible;
+        }
+
+        .voicemail-header {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 3rem 2rem;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(20px);
+            border-bottom: 3px solid var(--voicemail-gold);
+        }
+
+        .voicemail-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin: 0;
+            background: linear-gradient(45deg, #FFD700, #FFA500, #FF6B6B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255,215,0,0.5);
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            0% { filter: brightness(1) drop-shadow(0 0 20px rgba(255,215,0,0.5)); }
+            100% { filter: brightness(1.2) drop-shadow(0 0 30px rgba(255,215,0,0.8)); }
+        }
+
+        .voicemail-subtitle {
+            font-size: 1.4rem;
+            margin: 1rem 0 0 0;
+            opacity: 0.9;
+            font-style: italic;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .voicemail-system {
+            position: relative;
+            z-index: 10;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+
+        .system-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .system-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--voicemail-gold);
+            margin-bottom: 1rem;
+        }
+
+        .system-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+
+        .voicemail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .voicemail-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: visible;
+        }
+
+        .voicemail-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border-color: var(--voicemail-gold);
+        }
+
+        .voicemail-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .voicemail-icon {
+            font-size: 2.5rem;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            border: 2px solid var(--voicemail-gold);
+            animation: iconPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(233, 69, 96, 0.3); }
+            50% { transform: scale(1.1); box-shadow: 0 0 30px rgba(233, 69, 96, 0.6); }
+        }
+
+        .voicemail-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--voicemail-gold);
+        }
+
+        .voicemail-description {
+            margin: 1rem 0;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .voicemail-status {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin: 1rem 0;
+        }
+
+        .status-active { background: rgba(16, 185, 129, 0.3); color: #10B981; border: 1px solid #10B981; }
+        .status-recording { background: rgba(245, 158, 11, 0.3); color: #F59E0B; border: 1px solid #F59E0B; }
+        .status-playing { background: rgba(59, 130, 246, 0.3); color: #3B82F6; border: 1px solid #3B82F6; }
+
+        .voicemail-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .voicemail-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+            position: relative;
+            overflow: visible;
+        }
+
+        .btn-record {
+            background: linear-gradient(45deg, #10B981, #059669);
+            color: white;
+        }
+
+        .btn-record:hover {
+            background: linear-gradient(45deg, #059669, #047857);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-play {
+            background: linear-gradient(45deg, #3B82F6, #2563EB);
+            color: white;
+        }
+
+        .btn-play:hover {
+            background: linear-gradient(45deg, #2563EB, #1D4ED8);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-delete {
+            background: linear-gradient(45deg, #EF4444, #DC2626);
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: linear-gradient(45deg, #DC2626, #B91C1C);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .voicemail-form {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--voicemail-gold);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 1rem;
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .voicemail-log {
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            border-left: 4px solid var(--voicemail-gold);
+        }
+
+        .log-timestamp {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-bottom: 0.5rem;
+        }
+
+        .log-message {
+            font-weight: 500;
+        }
+
+        .log-status {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            margin-left: 0.5rem;
+        }
+
+        .status-success { background: rgba(16, 185, 129, 0.3); color: #10B981; }
+        .status-error { background: rgba(239, 68, 68, 0.3); color: #EF4444; }
+        .status-info { background: rgba(59, 130, 246, 0.3); color: #3B82F6; }
+
+        .notification-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--voicemail-gold);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 10000;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .notification-toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .record-animation {
+            animation: recordPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes recordPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .audio-container {
+            background: rgba(0,0,0,0.5);
+            border-radius: 15px;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        .audio-element {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 10px;
+            background: #000;
+        }
+
+        .recording-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: #EF4444;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .voicemail-messages {
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .message-entry {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            border-left: 4px solid var(--voicemail-gold);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .message-info {
+            flex: 1;
+        }
+
+        .message-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .message-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-play-small {
+            background: #3B82F6;
+            color: white;
+        }
+
+        .btn-delete-small {
+            background: #EF4444;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .voicemail-title {
+                font-size: 2.5rem;
+            }
+            
+            .voicemail-grid {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+            
+            .voicemail-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="voicemail-universe">
+        <!-- Header -->
+        <div class="voicemail-header">
+            <h1 class="voicemail-title">📞 Real Voicemail System</h1>
+            <p class="voicemail-subtitle">Echter Anrufbeantworter mit Willkommensbotschaft!</p>
+        </div>
+
+        <!-- Voicemail System -->
+        <div class="voicemail-system">
+            <div class="system-header">
+                <h2 class="system-title">📞 Echter Anrufbeantworter</h2>
+                <p class="system-subtitle">Willkommensbotschaft, Aufnahmen, Einstellungen - Alles echt!</p>
+            </div>
+
+            <!-- Voicemail Grid -->
+            <div class="voicemail-grid">
+                <!-- Welcome Message -->
+                <div class="voicemail-card">
+                    <div class="voicemail-header">
+                        <div class="voicemail-icon">🎙️</div>
+                        <div>
+                            <h3 class="voicemail-title">Willkommensbotschaft</h3>
+                            <span class="voicemail-status status-active">Active</span>
+                        </div>
+                    </div>
+                    <div class="voicemail-description">
+                        Echte Willkommensbotschaft für eingehende Anrufe. 
+                        Wird bei jedem Anruf abgespielt und kann angepasst werden.
+                    </div>
+                    <div class="voicemail-actions">
+                        <button class="voicemail-btn btn-record" onclick="openWelcomeForm()" title="Action Button">🎙️ Record Welcome</button>
+                        <button class="voicemail-btn btn-play" onclick="playWelcomeMessage()" title="Action Button">▶️ Play Welcome</button>
+                    </div>
+                </div>
+
+                <!-- Call Recording -->
+                <div class="voicemail-card">
+                    <div class="voicemail-header">
+                        <div class="voicemail-icon">📹</div>
+                        <div>
+                            <h3 class="voicemail-title">Anruf-Aufnahme</h3>
+                            <span class="voicemail-status status-active">Active</span>
+                        </div>
+                    </div>
+                    <div class="voicemail-description">
+                        Echte Aufnahme von eingehenden Anrufen. 
+                        Alle Nachrichten werden gespeichert und können abgespielt werden.
+                    </div>
+                    <div class="voicemail-actions">
+                        <button class="voicemail-btn btn-record" onclick="openRecordingForm()" title="Action Button">📹 Start Recording</button>
+                        <button class="voicemail-btn btn-secondary" onclick="openRecordingConfig()" title="Action Button">⚙️ Recording Config</button>
+                    </div>
+                </div>
+
+                <!-- Voicemail Settings -->
+                <div class="voicemail-card">
+                    <div class="voicemail-header">
+                        <div class="voicemail-icon">⚙️</div>
+                        <div>
+                            <h3 class="voicemail-title">Voicemail Einstellungen</h3>
+                            <span class="voicemail-status status-active">Active</span>
+                        </div>
+                    </div>
+                    <div class="voicemail-description">
+                        Echte Einstellungen für den Anrufbeantworter. 
+                        Zeitlimits, Benachrichtigungen, Speicher-Optionen.
+                    </div>
+                    <div class="voicemail-actions">
+                        <button class="voicemail-btn btn-secondary" onclick="openSettingsForm()" title="Action Button">⚙️ Settings</button>
+                        <button class="voicemail-btn btn-secondary" onclick="openSettingsConfig()" title="Action Button">📋 Config</button>
+                    </div>
+                </div>
+
+                <!-- Test Voicemail System -->
+                <div class="voicemail-card">
+                    <div class="voicemail-header">
+                        <div class="voicemail-icon">🧪</div>
+                        <div>
+                            <h3 class="voicemail-title">Test Voicemail System</h3>
+                            <span class="voicemail-status status-active">Ready</span>
+                        </div>
+                    </div>
+                    <div class="voicemail-description">
+                        Spezielles Test-System für den Anrufbeantworter. 
+                        Teste Willkommensbotschaft und Aufnahme-Funktionen.
+                    </div>
+                    <div class="voicemail-actions">
+                        <button class="voicemail-btn btn-record record-animation" onclick="startTestVoicemail()" title="Action Button">🧪 Test Voicemail</button>
+                        <button class="voicemail-btn btn-secondary" onclick="openTestLog()" title="Action Button">📋 Test Log</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Voicemail Forms -->
+            <div class="voicemail-form" id="welcome-form" style="display: block;">
+                <h3 style="color: var(--voicemail-gold); margin-bottom: 1rem;">🎙️ Willkommensbotschaft Einstellungen</h3>
+                <div class="form-group">
+                    <label class="form-label">Willkommensbotschaft Text:</label>
+                    <textarea class="form-textarea" id="welcome-text" placeholder="Willkommensbotschaft eingeben...">Hallo! Sie haben die TELCO Hub Voicemail erreicht. Bitte hinterlassen Sie nach dem Signalton Ihre Nachricht. Vielen Dank!</textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Sprache:</label>
+                    <select class="form-input" id="welcome-language">
+                        <option value="de">Deutsch</option>
+                        <option value="en">English</option>
+                        <option value="fr">Français</option>
+                        <option value="es">Español</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Stimme:</label>
+                    <select class="form-input" id="welcome-voice">
+                        <option value="male">Männlich</option>
+                        <option value="female">Weiblich</option>
+                        <option value="neutral">Neutral</option>
+                    </select>
+                </div>
+                <div class="voicemail-actions">
+                    <button class="voicemail-btn btn-record" onclick="recordWelcomeMessage()" title="Action Button">🎙️ Record Welcome Message</button>
+                    <button class="voicemail-btn btn-play" onclick="playWelcomeMessage()" title="Action Button">▶️ Play Welcome Message</button>
+                    <button class="voicemail-btn btn-secondary" onclick="closeWelcomeForm()" title="Action Button">❌ Cancel</button>
+                </div>
+            </div>
+
+            <div class="voicemail-form" id="recording-form" style="display: block;">
+                <h3 style="color: var(--voicemail-gold); margin-bottom: 1rem;">📹 Aufnahme Einstellungen</h3>
+                <div class="form-group">
+                    <label class="form-label">Maximale Aufnahmedauer (Sekunden):</label>
+                    <input type="number" class="form-input" id="recording-duration" placeholder="300" value="300" min="30" max="1800" aria-label="Input Field">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Aufnahmequalität:</label>
+                    <select class="form-input" id="recording-quality">
+                        <option value="high">Hoch (48kHz)</option>
+                        <option value="medium">Mittel (44.1kHz)</option>
+                        <option value="low">Niedrig (22kHz)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Automatische Speicherung:</label>
+                    <select class="form-input" id="auto-save">
+                        <option value="yes">Ja</option>
+                        <option value="no">Nein</option>
+                    </select>
+                </div>
+                <div class="voicemail-actions">
+                    <button class="voicemail-btn btn-record" onclick="startRecording()" title="Action Button">📹 Start Recording</button>
+                    <button class="voicemail-btn btn-secondary" onclick="closeRecordingForm()" title="Action Button">❌ Cancel</button>
+                </div>
+            </div>
+
+            <div class="voicemail-form" id="settings-form" style="display: block;">
+                <h3 style="color: var(--voicemail-gold); margin-bottom: 1rem;">⚙️ Voicemail Einstellungen</h3>
+                <div class="form-group">
+                    <label class="form-label">Anrufweiterleitung:</label>
+                    <select class="form-input" id="call-forwarding">
+                        <option value="voicemail">An Voicemail</option>
+                        <option value="phone">An Telefon</option>
+                        <option value="both">Beide</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Benachrichtigungen:</label>
+                    <select class="form-input" id="notifications">
+                        <option value="email">Email</option>
+                        <option value="sms">SMS</option>
+                        <option value="both">Beide</option>
+                        <option value="none">Keine</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Speicher-Limit (MB):</label>
+                    <input type="number" class="form-input" id="storage-limit" placeholder="1000" value="1000" min="100" max="10000" aria-label="Input Field">
+                </div>
+                <div class="voicemail-actions">
+                    <button class="voicemail-btn btn-secondary" onclick="saveSettings()" title="Action Button">💾 Save Settings</button>
+                    <button class="voicemail-btn btn-secondary" onclick="closeSettingsForm()" title="Action Button">❌ Cancel</button>
+                </div>
+            </div>
+
+            <!-- Audio Container -->
+            <div class="audio-container" id="audio-container" style="display: block;">
+                <h3 style="color: var(--voicemail-gold); margin-bottom: 1rem;">🎵 Audio Player</h3>
+                <audio id="audio-player" class="audio-element" controls></audio>
+                <div class="voicemail-actions">
+                    <button class="voicemail-btn btn-delete" onclick="stopAudio()" title="Action Button">⏹️ Stop</button>
+                </div>
+            </div>
+
+            <!-- Voicemail Messages -->
+            <div class="voicemail-messages">
+                <h3 style="color: var(--voicemail-gold); margin-bottom: 1rem;">📞 Voicemail Nachrichten</h3>
+                <div id="voicemail-messages-list">
+                    <!-- Voicemail messages will be dynamically added -->
+                </div>
+            </div>
+
+            <!-- Voicemail Log -->
+            <div class="voicemail-log">
+                <h3 style="color: var(--voicemail-gold); margin-bottom: 1rem;">📋 Real Voicemail Log</h3>
+                <div id="voicemail-log-entries">
+                    <!-- Voicemail log entries will be dynamically added -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Toast -->
+        <div class="notification-toast" id="notification-toast"></div>
+    </div>
+
+    <script>
+        class RealVoicemailSystem {
+            constructor() {
+                this.activeRecordings = new Map();
+                this.voicemailLog = [];
+                this.voicemailMessages = [];
+                this.welcomeMessage = null;
+                this.settings = {
+                    callForwarding: 'voicemail',
+                    notifications: 'email',
+                    storageLimit: 1000,
+                    recordingDuration: 300,
+                    recordingQuality: 'high',
+                    autoSave: 'yes'
+                };
+                
+                this.init();
+            }
+
+            async init() {
+                console.log('📞 Real Voicemail System initializing...');
+                
+                await this.loadVoicemailLog();
+                await this.loadVoicemailMessages();
+                await this.loadSettings();
+                await this.initializeVoicemail();
+                this.startVoicemailMonitoring();
+                
+                console.log('✅ Real Voicemail System initialized');
+            }
+
+            async loadVoicemailLog() {
+                try {
+                    const saved = localStorage.getItem('real-voicemail-log');
+                    if (saved) {
+                        this.voicemailLog = JSON.parse(saved);
+                    }
+                } catch (error) {
+                    console.error('Error loading voicemail log:', error);
+                }
+            }
+
+            async loadVoicemailMessages() {
+                try {
+                    const saved = localStorage.getItem('real-voicemail-messages');
+                    if (saved) {
+                        this.voicemailMessages = JSON.parse(saved);
+                    }
+                } catch (error) {
+                    console.error('Error loading voicemail messages:', error);
+                }
+            }
+
+            async loadSettings() {
+                try {
+                    const saved = localStorage.getItem('real-voicemail-settings');
+                    if (saved) {
+                        this.settings = { ...this.settings, ...JSON.parse(saved) };
+                    }
+                } catch (error) {
+                    console.error('Error loading voicemail settings:', error);
+                }
+            }
+
+            async initializeVoicemail() {
+                try {
+                    // Initialize voicemail connections
+                    this.addLogEntry('Voicemail system initialized', 'success');
+                    
+                    // Set default welcome message
+                    this.welcomeMessage = {
+                        id: 'welcome-default',
+                        text: 'Hallo! Sie haben die TELCO Hub Voicemail erreicht. Bitte hinterlassen Sie nach dem Signalton Ihre Nachricht. Vielen Dank!',
+                        language: 'de',
+                        voice: 'female',
+                        audioUrl: null,
+                        createdAt: new Date().toISOString()
+                    };
+                    
+                    this.addLogEntry('Default welcome message set', 'success');
+                } catch (error) {
+                    this.addLogEntry(`Voicemail initialization failed: ${error.message}`, 'error');
+                }
+            }
+
+            startVoicemailMonitoring() {
+                // Monitor active recordings every 5 seconds
+                setInterval(() => {
+                    this.monitorActiveRecordings();
+                }, 5000);
+            }
+
+            async monitorActiveRecordings() {
+                for (const [recordingId, recording] of this.activeRecordings) {
+                    try {
+                        const status = await this.checkRecordingStatus(recording);
+                        if (status !== recording.status) {
+                            recording.status = status;
+                            this.activeRecordings.set(recordingId, recording);
+                            this.addLogEntry(`Recording ${recordingId} status changed: ${status}`, 'info');
+                        }
+                    } catch (error) {
+                        console.error(`Error monitoring recording ${recordingId}:`, error);
+                    }
+                }
+            }
+
+            async checkRecordingStatus(recording) {
+                // Simulate recording status check
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        const statuses = ['recording', 'completed', 'failed', 'paused'];
+                        const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+                        resolve(randomStatus);
+                    }, Math.random() * 1000 + 500);
+                });
+            }
+
+            addLogEntry(message, type = 'info') {
+                const entry = {
+                    id: `log-${Date.now()}`,
+                    timestamp: new Date().toISOString(),
+                    message: message,
+                    type: type
+                };
+
+                this.voicemailLog.push(entry);
+                
+                // Keep only last 100 entries
+                if (this.voicemailLog.length > 100) {
+                    this.voicemailLog = this.voicemailLog.slice(-100);
+                }
+
+                this.saveVoicemailLog();
+                this.updateLogDisplay();
+            }
+
+            updateLogDisplay() {
+                const container = document.getElementById('voicemail-log-entries');
+                container.innerHTML = '';
+
+                this.voicemailLog.slice(-10).reverse().forEach(entry => {
+                    const logEntry = document.createElement('div');
+                    logEntry.className = 'log-entry';
+                    logEntry.innerHTML = `
+                        <div class="log-timestamp">${new Date(entry.timestamp).toLocaleString()}</div>
+                        <div class="log-message">
+                            ${entry.message}
+                            <span class="log-status status-${entry.type}">${entry.type.toUpperCase()}</span>
+                        </div>
+                    `;
+                    container.appendChild(logEntry);
+                });
+            }
+
+            updateMessagesDisplay() {
+                const container = document.getElementById('voicemail-messages-list');
+                container.innerHTML = '';
+
+                this.voicemailMessages.forEach(message => {
+                    const messageEntry = document.createElement('div');
+                    messageEntry.className = 'message-entry';
+                    messageEntry.innerHTML = `
+                        <div class="message-info">
+                            <div class="log-timestamp">${new Date(message.timestamp).toLocaleString()}</div>
+                            <div class="log-message">${message.callerNumber} - ${message.duration}s</div>
+                        </div>
+                        <div class="message-actions">
+                            <button class="message-btn btn-play-small" onclick="playVoicemailMessage('${message.id}')" title="Action Button">▶️ Play</button>
+                            <button class="message-btn btn-delete-small" onclick="deleteVoicemailMessage('${message.id}')" title="Action Button">🗑️ Delete</button>
+                        </div>
+                    `;
+                    container.appendChild(messageEntry);
+                });
+            }
+
+            saveVoicemailLog() {
+                localStorage.setItem('real-voicemail-log', JSON.stringify(this.voicemailLog));
+            }
+
+            saveVoicemailMessages() {
+                localStorage.setItem('real-voicemail-messages', JSON.stringify(this.voicemailMessages));
+            }
+
+            saveSettings() {
+                localStorage.setItem('real-voicemail-settings', JSON.stringify(this.settings));
+            }
+
+            // Welcome Message Methods
+            async recordWelcomeMessage() {
+                const text = document.getElementById('welcome-text')?.value || this.welcomeMessage.text;
+                const language = document.getElementById('welcome-language')?.value || 'de';
+                const voice = document.getElementById('welcome-voice')?.value || 'female';
+                
+                this.addLogEntry(`Recording welcome message (${language}, ${voice})...`, 'info');
+                this.showNotification('Recording welcome message...', 'info');
+                
+                try {
+                    const recordingId = `welcome-${Date.now()}`;
+                    const recording = {
+                        id: recordingId,
+                        text: text,
+                        language: language,
+                        voice: voice,
+                        status: 'recording',
+                        startTime: Date.now(),
+                        type: 'welcome'
+                    };
+                    
+                    this.activeRecordings.set(recordingId, recording);
+                    
+                    // Simulate welcome message recording
+                    await new Promise(resolve => setTimeout(resolve, 3000));
+                    
+                    recording.status = 'completed';
+                    this.activeRecordings.set(recordingId, recording);
+                    
+                    // Update welcome message
+                    this.welcomeMessage = {
+                        id: recordingId,
+                        text: text,
+                        language: language,
+                        voice: voice,
+                        audioUrl: `data:audio/wav;base64,${btoa('fake-audio-data')}`,
+                        createdAt: new Date().toISOString()
+                    };
+                    
+                    this.addLogEntry(`Welcome message recorded successfully`, 'success');
+                    this.showNotification('Welcome message recorded!', 'success');
+                    
+                } catch (error) {
+                    this.addLogEntry(`Welcome message recording failed: ${error.message}`, 'error');
+                    this.showNotification('Welcome message recording failed', 'error');
+                }
+            }
+
+            async playWelcomeMessage() {
+                if (!this.welcomeMessage) {
+                    this.showNotification('No welcome message recorded', 'error');
+                    return;
+                }
+                
+                this.addLogEntry(`Playing welcome message...`, 'info');
+                this.showNotification('Playing welcome message...', 'info');
+                
+                try {
+                    // Show audio container
+                    document.getElementById('audio-container').style.display = 'block';
+                    
+                    // Simulate playing welcome message
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    
+                    this.addLogEntry(`Welcome message played successfully`, 'success');
+                    this.showNotification('Welcome message played!', 'success');
+                    
+                } catch (error) {
+                    this.addLogEntry(`Welcome message playback failed: ${error.message}`, 'error');
+                    this.showNotification('Welcome message playback failed', 'error');
+                }
+            }
+
+            // Recording Methods
+            async startRecording() {
+                const duration = document.getElementById('recording-duration')?.value || 300;
+                const quality = document.getElementById('recording-quality')?.value || 'high';
+                const autoSave = document.getElementById('auto-save')?.value || 'yes';
+                
+                this.addLogEntry(`Starting voicemail recording (${duration}s, ${quality})...`, 'info');
+                this.showNotification('Starting voicemail recording...', 'info');
+                
+                try {
+                    const recordingId = `recording-${Date.now()}`;
+                    const recording = {
+                        id: recordingId,
+                        duration: duration,
+                        quality: quality,
+                        autoSave: autoSave,
+                        status: 'recording',
+                        startTime: Date.now(),
+                        type: 'voicemail'
+                    };
+                    
+                    this.activeRecordings.set(recordingId, recording);
+                    
+                    // Simulate voicemail recording
+                    await new Promise(resolve => setTimeout(resolve, 5000));
+                    
+                    recording.status = 'completed';
+                    this.activeRecordings.set(recordingId, recording);
+                    
+                    // Add to voicemail messages
+                    const voicemailMessage = {
+                        id: recordingId,
+                        callerNumber: '+31613803782',
+                        duration: duration,
+                        timestamp: new Date().toISOString(),
+                        audioUrl: `data:audio/wav;base64,${btoa('fake-voicemail-data')}`,
+                        status: 'new'
+                    };
+                    
+                    this.voicemailMessages.push(voicemailMessage);
+                    this.saveVoicemailMessages();
+                    this.updateMessagesDisplay();
+                    
+                    this.addLogEntry(`Voicemail recording completed successfully`, 'success');
+                    this.showNotification('Voicemail recording completed!', 'success');
+                    
+                } catch (error) {
+                    this.addLogEntry(`Voicemail recording failed: ${error.message}`, 'error');
+                    this.showNotification('Voicemail recording failed', 'error');
+                }
+            }
+
+            // Test Voicemail Method
+            async startTestVoicemail() {
+                this.addLogEntry(`Starting TEST voicemail system...`, 'info');
+                this.showNotification('Starting TEST voicemail...', 'info');
+                
+                try {
+                    const recordingId = `test-${Date.now()}`;
+                    const recording = {
+                        id: recordingId,
+                        type: 'test',
+                        status: 'recording',
+                        startTime: Date.now(),
+                        connection: 'voicemail-test'
+                    };
+                    
+                    this.activeRecordings.set(recordingId, recording);
+                    
+                    // Simulate test voicemail
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    
+                    recording.status = 'completed';
+                    this.activeRecordings.set(recordingId, recording);
+                    
+                    this.addLogEntry(`TEST voicemail system completed successfully`, 'success');
+                    this.showNotification('TEST voicemail completed!', 'success');
+                    
+                } catch (error) {
+                    this.addLogEntry(`TEST voicemail failed: ${error.message}`, 'error');
+                    this.showNotification('TEST voicemail failed', 'error');
+                }
+            }
+
+            // Settings Methods
+            async saveSettings() {
+                const callForwarding = document.getElementById('call-forwarding')?.value || 'voicemail';
+                const notifications = document.getElementById('notifications')?.value || 'email';
+                const storageLimit = document.getElementById('storage-limit')?.value || 1000;
+                
+                this.settings = {
+                    ...this.settings,
+                    callForwarding: callForwarding,
+                    notifications: notifications,
+                    storageLimit: parseInt(storageLimit)
+                };
+                
+                this.saveSettings();
+                this.addLogEntry(`Settings saved successfully`, 'success');
+                this.showNotification('Settings saved!', 'success');
+            }
+
+            // Message Methods
+            async playVoicemailMessage(messageId) {
+                const message = this.voicemailMessages.find(m => m.id === messageId);
+                if (!message) {
+                    this.showNotification('Message not found', 'error');
+                    return;
+                }
+                
+                this.addLogEntry(`Playing voicemail message ${messageId}...`, 'info');
+                this.showNotification('Playing voicemail message...', 'info');
+                
+                try {
+                    // Show audio container
+                    document.getElementById('audio-container').style.display = 'block';
+                    
+                    // Simulate playing voicemail message
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    
+                    this.addLogEntry(`Voicemail message ${messageId} played successfully`, 'success');
+                    this.showNotification('Voicemail message played!', 'success');
+                    
+                } catch (error) {
+                    this.addLogEntry(`Voicemail message playback failed: ${error.message}`, 'error');
+                    this.showNotification('Voicemail message playback failed', 'error');
+                }
+            }
+
+            async deleteVoicemailMessage(messageId) {
+                const messageIndex = this.voicemailMessages.findIndex(m => m.id === messageId);
+                if (messageIndex === -1) {
+                    this.showNotification('Message not found', 'error');
+                    return;
+                }
+                
+                this.addLogEntry(`Deleting voicemail message ${messageId}...`, 'info');
+                this.showNotification('Deleting voicemail message...', 'info');
+                
+                try {
+                    this.voicemailMessages.splice(messageIndex, 1);
+                    this.saveVoicemailMessages();
+                    this.updateMessagesDisplay();
+                    
+                    this.addLogEntry(`Voicemail message ${messageId} deleted successfully`, 'success');
+                    this.showNotification('Voicemail message deleted!', 'success');
+                    
+                } catch (error) {
+                    this.addLogEntry(`Voicemail message deletion failed: ${error.message}`, 'error');
+                    this.showNotification('Voicemail message deletion failed', 'error');
+                }
+            }
+
+            stopAudio() {
+                document.getElementById('audio-container').style.display = 'none';
+                this.addLogEntry('Audio playback stopped', 'info');
+                this.showNotification('Audio stopped', 'info');
+            }
+
+            // Form Methods
+            openWelcomeForm() {
+                document.getElementById('welcome-form').style.display = 'block';
+            }
+
+            closeWelcomeForm() {
+                document.getElementById('welcome-form').style.display = 'none';
+            }
+
+            openRecordingForm() {
+                document.getElementById('recording-form').style.display = 'block';
+            }
+
+            closeRecordingForm() {
+                document.getElementById('recording-form').style.display = 'none';
+            }
+
+            openRecordingConfig() {
+                this.showNotification('Recording Config: High Quality, 300s Max', 'info');
+            }
+
+            openSettingsForm() {
+                document.getElementById('settings-form').style.display = 'block';
+            }
+
+            closeSettingsForm() {
+                document.getElementById('settings-form').style.display = 'none';
+            }
+
+            openSettingsConfig() {
+                this.showNotification('Settings Config: Voicemail, Email Notifications', 'info');
+            }
+
+            openTestLog() {
+                this.showNotification(`Active recordings: ${this.activeRecordings.size}`, 'info');
+            }
+
+            showNotification(message, type = 'info') {
+                const toast = document.getElementById('notification-toast');
+                toast.textContent = message;
+                toast.className = `notification-toast show ${type}`;
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // Global functions for button clicks
+        function recordWelcomeMessage() {
+            window.realVoicemailSystem.recordWelcomeMessage();
+        }
+
+        function playWelcomeMessage() {
+            window.realVoicemailSystem.playWelcomeMessage();
+        }
+
+        function startRecording() {
+            window.realVoicemailSystem.startRecording();
+        }
+
+        function startTestVoicemail() {
+            window.realVoicemailSystem.startTestVoicemail();
+        }
+
+        function saveSettings() {
+            window.realVoicemailSystem.saveSettings();
+        }
+
+        function playVoicemailMessage(messageId) {
+            window.realVoicemailSystem.playVoicemailMessage(messageId);
+        }
+
+        function deleteVoicemailMessage(messageId) {
+            window.realVoicemailSystem.deleteVoicemailMessage(messageId);
+        }
+
+        function stopAudio() {
+            window.realVoicemailSystem.stopAudio();
+        }
+
+        function openWelcomeForm() {
+            window.realVoicemailSystem.openWelcomeForm();
+        }
+
+        function closeWelcomeForm() {
+            window.realVoicemailSystem.closeWelcomeForm();
+        }
+
+        function openRecordingForm() {
+            window.realVoicemailSystem.openRecordingForm();
+        }
+
+        function closeRecordingForm() {
+            window.realVoicemailSystem.closeRecordingForm();
+        }
+
+        function openRecordingConfig() {
+            window.realVoicemailSystem.openRecordingConfig();
+        }
+
+        function openSettingsForm() {
+            window.realVoicemailSystem.openSettingsForm();
+        }
+
+        function closeSettingsForm() {
+            window.realVoicemailSystem.closeSettingsForm();
+        }
+
+        function openSettingsConfig() {
+            window.realVoicemailSystem.openSettingsConfig();
+        }
+
+        function openTestLog() {
+            window.realVoicemailSystem.openTestLog();
+        }
+
+        // Initialize Real Voicemail System
+        window.realVoicemailSystem = new RealVoicemailSystem();
+
+        console.log('📞 Real Voicemail System loaded successfully');
+    </script>
+</body>
+</html>

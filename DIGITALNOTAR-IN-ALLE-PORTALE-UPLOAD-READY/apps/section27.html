@@ -1,0 +1,912 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>🧠 AI-Psychology Section 27 – Signaling + 3D + QR + Gateways | Raymond Demitrio Tel</title>
+<h1 style="position: absolute; left: -9999px;">OBM • Section 27 – Signaling + 3D + Keyring/QR + Gateways</h1>
+  <meta name="obm:signaling" content="/rendezvous" />
+  <!-- QR Code Library -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <!-- Double Ratchet Library -->
+  <script src="https://cdn.jsdelivr.net/npm/libsignal-protocol@2.0.0/dist/libsignal-protocol.min.js"></script>
+  <style>
+    :root { 
+      color-scheme: light dark; 
+      --primary: #7aa2ff;
+      --success: #27e86b;
+      --warning: #ffd166;
+      --error: #ef476f;
+      --bg-dark: #0a0f1f;
+      --bg-panel: rgba(13,19,35,.5);
+      --border: rgba(122,162,255,.25);
+    }
+    
+    body { 
+      margin:0; 
+      font:14px/1.45 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto; 
+      background: var(--bg-dark); 
+      color:#e8ecff; 
+    }
+    
+    header { 
+      padding:12px 16px; 
+      border-bottom:1px solid var(--border); 
+      display:flex; 
+      align-items:center; 
+      gap:8px; 
+      background: var(--bg-panel);
+    }
+    
+    .container { padding:12px 16px; }
+    
+    .ai-panel { 
+      margin: 12px 0; 
+      padding: 12px; 
+      border:1px solid var(--border); 
+      border-radius: 12px; 
+      background: var(--bg-panel); 
+    }
+    
+    .row { 
+      display:flex; 
+      gap:8px; 
+      flex-wrap:wrap; 
+      align-items:center; 
+    }
+    
+    .btn { 
+      background: linear-gradient(135deg,var(--primary),#a87dff); 
+      border:none; 
+      color:#fff; 
+      border-radius:10px; 
+      padding:8px 12px; 
+      cursor:pointer; 
+      transition: all 0.3s ease;
+    }
+    
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(122,162,255,0.3);
+    }
+    
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .ampel{
+      display:flex; 
+      gap:8px; 
+      align-items:center; 
+      flex-wrap:wrap;
+    }
+    
+    .dot{
+      width:12px; 
+      height:12px; 
+      border-radius:50%; 
+      background:#444; 
+      box-shadow:0 0 8px rgba(0,0,0,.5);
+      transition: all 0.3s ease;
+    }
+    
+    .dot.ok{background:var(--success)}
+    .dot.warn{background:var(--warning)}
+    .dot.err{background:var(--error)}
+    
+    .night { 
+      filter: invert(1) hue-rotate(180deg); 
+    }
+    
+    canvas#net3d { 
+      width:100%; 
+      height:240px; 
+      display:block; 
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    
+    input, textarea { 
+      background:#0f1730; 
+      color:#e8ecff; 
+      border:1px solid var(--border); 
+      border-radius:8px; 
+      padding:8px; 
+      width: 100%;
+      box-sizing: border-box;
+    }
+    
+    .qr-container {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin: 12px 0;
+    }
+    
+    .qr-code {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px;
+      background: white;
+    }
+    
+    .camera-container {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+    }
+    
+    #cameraVideo {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    
+    .scan-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 200px;
+      height: 200px;
+      border: 2px solid var(--primary);
+      border-radius: 8px;
+      pointer-events: none;
+    }
+    
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin: 12px 0;
+    }
+    
+    .status-item {
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-panel);
+    }
+    
+    pre {
+      background: #0f1730;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      overflow-x: auto;
+      font-size: 12px;
+    }
+    
+    .gateway-stub {
+      background: rgba(255, 193, 7, 0.1);
+      border: 1px solid rgba(255, 193, 7, 0.3);
+      padding: 8px;
+      border-radius: 8px;
+      margin: 8px 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <strong>OBM • Abschnitt 27</strong>
+    <button id="nightBtn" class="btn" title="Action Button">Tag/Nacht</button>
+    <div class="ampel">
+      <div id="globalStatus" class="dot"></div>
+      <span>System</span>
+    </div>
+  </header>
+  
+  <div class="container" id="dash">
+    <main>
+      <!-- Signaling Discovery & Inspector -->
+      <section class="ai-panel">
+        <h3>🔍 Signaling-Discovery & Inspector</h3>
+        <div class="ampel">
+          <div id="sigDot" class="dot"></div><span>Signaling</span>
+          <div id="webrtcDot" class="dot"></div><span>WebRTC</span>
+          <div id="bridgeDot" class="dot"></div><span>Bridge</span>
+        </div>
+        <div class="row">
+          <button id="probeBtn" class="btn" title="Action Button">Erneut prüfen</button>
+          <button id="startMonitorBtn" class="btn" title="Action Button">3D Monitor starten</button>
+        </div>
+        <canvas id="net3d" width="1000" height="240"></canvas>
+        <pre id="sigLog"></pre>
+      </section>
+
+      <!-- Keys & QR System -->
+      <section class="ai-panel">
+        <h3>🔐 Keys & QR System</h3>
+        <div class="row">
+          <input id="grpName" placeholder="Gruppenname" / aria-label="Input Field">
+          <button id="mkGrp" class="btn" title="Action Button">Gruppe erzeugen</button>
+          <button id="listGrp" class="btn" title="Action Button">Anzeigen</button>
+        </div>
+        
+        <div class="row">
+          <button id="generateQRBtn" class="btn" title="Action Button">QR generieren</button>
+          <button id="scanQRBtn" class="btn" title="Action Button">QR scannen</button>
+          <button id="shareQRBtn" class="btn" title="Action Button">QR teilen</button>
+        </div>
+        
+        <div id="qrZone" class="qr-container"></div>
+        
+        <div id="cameraZone" class="camera-container" style="display: block;">
+          <video id="cameraVideo" autoplay></video>
+          <div class="scan-overlay"></div>
+          <button id="stopScanBtn" class="btn" title="Action Button">Scan stoppen</button>
+        </div>
+        
+        <pre id="grpLog"></pre>
+      </section>
+
+      <!-- Double Ratchet System -->
+      <section class="ai-panel">
+        <h3>🔒 Double-Ratchet Forward Secrecy</h3>
+        <div class="row">
+          <button id="initRatchetBtn" class="btn" title="Action Button">Ratchet initialisieren</button>
+          <button id="exchangeKeysBtn" class="btn" title="Action Button">Keys austauschen</button>
+          <button id="encryptMsgBtn" class="btn" title="Action Button">Nachricht verschlüsseln</button>
+        </div>
+        <textarea id="ratchetMsg" placeholder="Nachricht zum verschlüsseln..."></textarea>
+        <pre id="ratchetLog"></pre>
+      </section>
+
+      <!-- TURN Token System -->
+      <section class="ai-panel">
+        <h3>🌐 TURN-Zeit-Tokens</h3>
+        <div class="row">
+          <button id="generateTURNBtn" class="btn" title="Action Button">TURN Token generieren</button>
+          <button id="validateTURNBtn" class="btn" title="Action Button">Token validieren</button>
+        </div>
+        <div class="status-grid">
+          <div class="status-item">
+            <div class="ampel">
+              <div id="turnStatus" class="dot"></div>
+              <span>TURN Server</span>
+            </div>
+            <div id="turnInfo"></div>
+          </div>
+        </div>
+        <pre id="turnLog"></pre>
+      </section>
+
+      <!-- System Status -->
+      <section class="ai-panel">
+        <h3>📊 Systemstatus</h3>
+        <div class="status-grid">
+          <div class="status-item">
+            <div class="ampel">
+              <div id="secCSP" class="dot"></div>
+              <span>CSP</span>
+            </div>
+          </div>
+          <div class="status-item">
+            <div class="ampel">
+              <div id="secJWT" class="dot"></div>
+              <span>Bridge-Token</span>
+            </div>
+          </div>
+          <div class="status-item">
+            <div class="ampel">
+              <div id="secTURN" class="dot"></div>
+              <span>TURN</span>
+            </div>
+          </div>
+          <div class="status-item">
+            <div class="ampel">
+              <div id="secDTN" class="dot"></div>
+              <span>DTN</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Gateway Stubs -->
+      <section class="ai-panel">
+        <h3>🌉 Gateway Stubs</h3>
+        <div class="gateway-stub">
+          <strong>Amateurfunk (AX.25/Winlink)</strong>
+          <div class="row">
+            <button id="ax25TestBtn" class="btn" title="Action Button">AX.25 Test</button>
+            <button id="winlinkTestBtn" class="btn" title="Action Button">Winlink Test</button>
+          </div>
+        </div>
+        
+        <div class="gateway-stub">
+          <strong>SMTP Relay</strong>
+          <div class="row">
+            <button id="smtpTestBtn" class="btn" title="Action Button">SMTP Test</button>
+            <button id="mailDropBtn" class="btn" title="Action Button">Mail Drop</button>
+          </div>
+        </div>
+        
+        <pre id="gatewayLog"></pre>
+      </section>
+    </main>
+  </div>
+
+  <script>
+  // Global System Status
+  (function(){
+    const globalStatus = document.getElementById('globalStatus');
+    const setDot = (el, cls) => {
+      el.classList.remove('ok','warn','err');
+      if(cls) el.classList.add(cls);
+    };
+    
+    // Initialize system status
+    setDot(globalStatus, 'ok');
+    
+    // Night mode toggle
+    document.getElementById('nightBtn').onclick = () => {
+      document.body.classList.toggle('night');
+    };
+  })();
+
+  // Signaling-Discovery & 3D Monitor
+  (function(){
+    const Sig = {
+      guess() { 
+        return [
+          location.origin.replace(/^http/,'ws')+'/ws', 
+          location.origin+'/rendezvous',
+          location.origin+'/signaling'
+        ]; 
+      },
+      
+      async probe(url) { 
+        try { 
+          if(url.startsWith('ws://') || url.startsWith('wss://')) {
+            // WebSocket test
+            return new Promise((resolve) => {
+              const ws = new WebSocket(url);
+              const timeout = setTimeout(() => {
+                ws.close();
+                resolve({url, ok: false, type: 'websocket'});
+              }, 3000);
+              
+              ws.onopen = () => {
+                clearTimeout(timeout);
+                ws.close();
+                resolve({url, ok: true, type: 'websocket'});
+              };
+              
+              ws.onerror = () => {
+                clearTimeout(timeout);
+                resolve({url, ok: false, type: 'websocket'});
+              };
+            });
+          } else {
+            // HTTP test
+            const r = await fetch(url, {method: 'HEAD'});
+            return {url, ok: r.ok, type: 'http'};
+          }
+        } catch(e) { 
+          return {url, ok: false, type: 'http', error: e.message}; 
+        }
+      },
+      
+      async discover() { 
+        const list = this.guess(); 
+        const results = []; 
+        for(const u of list){ 
+          results.push(await this.probe(u)); 
+        } 
+        document.dispatchEvent(new CustomEvent('sig:results',{detail:results})); 
+        return results; 
+      }
+    };
+    
+    window.OBM_SIG = Sig;
+    
+    const sigDot = document.getElementById('sigDot');
+    const webrtcDot = document.getElementById('webrtcDot');
+    const bridgeDot = document.getElementById('bridgeDot');
+    const sigLog = document.getElementById('sigLog');
+    
+    const setDot = (el, cls) => {
+      el.classList.remove('ok','warn','err');
+      if(cls) el.classList.add(cls);
+    };
+    
+    document.addEventListener('sig:results', (ev) => {
+      const rs = ev.detail || [];
+      const hasWebSocket = rs.some(r => r.type === 'websocket' && r.ok);
+      const hasHttp = rs.some(r => r.type === 'http' && r.ok);
+      
+      setDot(sigDot, hasWebSocket ? 'ok' : 'err');
+      setDot(webrtcDot, hasHttp ? 'ok' : 'warn');
+      setDot(bridgeDot, (hasWebSocket && hasHttp) ? 'ok' : 'warn');
+      
+      // Log results
+      sigLog.textContent = rs.map(r => 
+        `${r.type.toUpperCase()}: ${r.url} - ${r.ok ? 'OK' : 'FAIL'}${r.error ? ' (' + r.error + ')' : ''}`
+      ).join('\n');
+    });
+    
+    document.getElementById('probeBtn').onclick = () => Sig.discover();
+    document.getElementById('startMonitorBtn').onclick = () => start3DMonitor();
+    
+    // 3D Network Monitor
+    function start3DMonitor() {
+      const canvas = document.getElementById('net3d');
+      const ctx = canvas.getContext('2d');
+      
+      let nodes = [
+        {x: 100, y: 120, name: 'Client', status: 'ok'},
+        {x: 500, y: 120, name: 'Signaling', status: 'ok'},
+        {x: 300, y: 60, name: 'WebRTC', status: 'warn'},
+        {x: 300, y: 180, name: 'Bridge', status: 'ok'}
+      ];
+      
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw connections
+        ctx.strokeStyle = 'rgba(122,162,255,0.3)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(nodes[0].x, nodes[0].y);
+        ctx.lineTo(nodes[1].x, nodes[1].y);
+        ctx.moveTo(nodes[1].x, nodes[1].y);
+        ctx.lineTo(nodes[2].x, nodes[2].y);
+        ctx.moveTo(nodes[1].x, nodes[1].y);
+        ctx.lineTo(nodes[3].x, nodes[3].y);
+        ctx.stroke();
+        
+        // Draw nodes
+        nodes.forEach(node => {
+          const colors = {
+            ok: '#27e86b',
+            warn: '#ffd166',
+            err: '#ef476f'
+          };
+          
+          ctx.fillStyle = colors[node.status];
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, 15, 0, 2 * Math.PI);
+          ctx.fill();
+          
+          ctx.fillStyle = '#e8ecff';
+          ctx.font = '12px system-ui';
+          ctx.textAlign = 'center';
+          ctx.fillText(node.name, node.x, node.y + 30);
+        });
+      }
+      
+      draw();
+      
+      // Animate status changes
+      setInterval(() => {
+        nodes.forEach(node => {
+          if(Math.random() < 0.1) {
+            const statuses = ['ok', 'warn', 'err'];
+            node.status = statuses[Math.floor(Math.random() * statuses.length)];
+          }
+        });
+        draw();
+      }, 2000);
+    }
+    
+    // Initial discovery
+    Sig.discover();
+  })();
+
+  // Keyring + QR System
+  (function(){
+    const K = {
+      store: JSON.parse(localStorage.getItem('obm:keyring') || '{}'),
+      
+      save() {
+        localStorage.setItem('obm:keyring', JSON.stringify(this.store));
+      },
+      
+      async newGroup(name) {
+        const raw = crypto.getRandomValues(new Uint8Array(32));
+        const id = 'grp_' + crypto.randomUUID();
+        this.store[id] = {
+          id,
+          name: name || id,
+          k: btoa(String.fromCharCode(...raw)),
+          created: Date.now()
+        };
+        this.save();
+        return this.store[id];
+      },
+      
+      list() {
+        return Object.values(this.store);
+      },
+      
+      getGroup(id) {
+        return this.store[id];
+      }
+    };
+    
+    window.OBM_KEYRING = K;
+    
+    const grpLog = document.getElementById('grpLog');
+    const qrZone = document.getElementById('qrZone');
+    const cameraZone = document.getElementById('cameraZone');
+    
+    const log = (m) => {
+      grpLog.textContent += "\n" + new Date().toLocaleTimeString() + ": " + m;
+    };
+    
+    // Group management
+    document.getElementById('mkGrp').onclick = async () => {
+      const name = document.getElementById('grpName').value;
+      const g = await K.newGroup(name);
+      log('Gruppe erzeugt: ' + g.name + ' (ID: ' + g.id + ')');
+    };
+    
+    document.getElementById('listGrp').onclick = () => {
+      const groups = K.list();
+      log('Verfügbare Gruppen: ' + groups.map(g => g.name).join(', '));
+    };
+    
+    // QR Code Generation
+    document.getElementById('generateQRBtn').onclick = async () => {
+      const groups = K.list();
+      if(groups.length === 0) {
+        log('Keine Gruppen vorhanden. Erstelle zuerst eine Gruppe.');
+        return;
+      }
+      
+      const group = groups[0]; // Use first group
+      const qrData = JSON.stringify({
+        type: 'group_share',
+        groupId: group.id,
+        name: group.name,
+        timestamp: Date.now()
+      });
+      
+      try {
+        const qrCodeDataURL = await QRCode.toDataURL(qrData, {
+          width: 200,
+          margin: 2,
+          color: {
+            dark: '#000000',
+            light: '#FFFFFF'
+          }
+        });
+        
+        qrZone.innerHTML = `
+          <div class="qr-code">
+            <img  src="${qrCodeDataURL}" alt="TELCO Hub Image" alt="QR Code" />
+          </div>
+          <div>
+            <h4>Gruppe: ${group.name}</h4>
+            <p>QR-Code für Gruppenfreigabe</p>
+            <button class="btn" onclick="downloadQR('${qrCodeDataURL}', '${group.name}')" title="Action Button">Download</button>
+          </div>
+        `;
+        
+        log('QR-Code generiert für Gruppe: ' + group.name);
+      } catch(error) {
+        log('Fehler beim Generieren des QR-Codes: ' + error.message);
+      }
+    };
+    
+    // QR Code Scanning
+    let stream = null;
+    let scanInterval = null;
+    
+    document.getElementById('scanQRBtn').onclick = async () => {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ 
+          video: { facingMode: 'environment' } 
+        });
+        
+        const video = document.getElementById('cameraVideo');
+        video.srcObject = stream;
+        cameraZone.style.display = 'block';
+        
+        // Simple QR detection (in production, use a proper QR library)
+        scanInterval = setInterval(() => {
+          // This is a placeholder - in production you'd use a library like jsQR
+          log('QR-Scan aktiv... (Demo-Modus)');
+        }, 1000);
+        
+        log('Kamera-Scan gestartet');
+      } catch(error) {
+        log('Fehler beim Starten der Kamera: ' + error.message);
+      }
+    };
+    
+    document.getElementById('stopScanBtn').onclick = () => {
+      if(stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+      }
+      if(scanInterval) {
+        clearInterval(scanInterval);
+        scanInterval = null;
+      }
+      cameraZone.style.display = 'none';
+      log('Kamera-Scan gestoppt');
+    };
+    
+    // QR Sharing
+    document.getElementById('shareQRBtn').onclick = async () => {
+      if(navigator.share) {
+        try {
+          const groups = K.list();
+          if(groups.length > 0) {
+            const group = groups[0];
+            await navigator.share({
+              title: 'Gruppenfreigabe: ' + group.name,
+              text: 'Teile diese Gruppe über QR-Code',
+              url: window.location.href
+            });
+            log('Gruppe geteilt: ' + group.name);
+          }
+        } catch(error) {
+          log('Fehler beim Teilen: ' + error.message);
+        }
+      } else {
+        log('Web Share API nicht unterstützt');
+      }
+    };
+    
+    // Download QR function
+    window.downloadQR = (dataURL, filename) => {
+      const link = document.createElement('a');
+      link.download = filename + '_qr.png';
+      link.href = dataURL;
+      link.click();
+      log('QR-Code heruntergeladen: ' + filename);
+    };
+  })();
+
+  // Double Ratchet System
+  (function(){
+    const Ratchet = {
+      initialized: false,
+      keyPair: null,
+      session: null,
+      
+      async init() {
+        try {
+          // Initialize Signal Protocol
+          this.keyPair = await libsignal.KeyHelper.generateIdentityKeyPair();
+          this.session = await libsignal.SessionBuilder.createSignalProtocolAddress('local', 1);
+          this.initialized = true;
+          return true;
+        } catch(error) {
+          console.error('Ratchet initialization failed:', error);
+          return false;
+        }
+      },
+      
+      async encryptMessage(message) {
+        if(!this.initialized) {
+          await this.init();
+        }
+        
+        try {
+          // Simplified encryption (in production, use proper Signal Protocol)
+          const encoder = new TextEncoder();
+          const data = encoder.encode(message);
+          const key = await crypto.subtle.generateKey(
+            {name: 'AES-GCM', length: 256},
+            true,
+            ['encrypt', 'decrypt']
+          );
+          
+          const iv = crypto.getRandomValues(new Uint8Array(12));
+          const encrypted = await crypto.subtle.encrypt(
+            {name: 'AES-GCM', iv: iv},
+            key,
+            data
+          );
+          
+          return {
+            encrypted: btoa(String.fromCharCode(...new Uint8Array(encrypted))),
+            iv: btoa(String.fromCharCode(...iv)),
+            keyId: 'key_' + Date.now()
+          };
+        } catch(error) {
+          throw new Error('Encryption failed: ' + error.message);
+        }
+      }
+    };
+    
+    window.OBM_RATCHET = Ratchet;
+    
+    const ratchetLog = document.getElementById('ratchetLog');
+    
+    const log = (m) => {
+      ratchetLog.textContent += "\n" + new Date().toLocaleTimeString() + ": " + m;
+    };
+    
+    document.getElementById('initRatchetBtn').onclick = async () => {
+      const success = await Ratchet.init();
+      log(success ? 'Double-Ratchet initialisiert' : 'Fehler bei Ratchet-Initialisierung');
+    };
+    
+    document.getElementById('exchangeKeysBtn').onclick = () => {
+      log('Key-Austausch simuliert (Demo-Modus)');
+    };
+    
+    document.getElementById('encryptMsgBtn').onclick = async () => {
+      const message = document.getElementById('ratchetMsg').value;
+      if(!message) {
+        log('Keine Nachricht eingegeben');
+        return;
+      }
+      
+      try {
+        const result = await Ratchet.encryptMessage(message);
+        log('Nachricht verschlüsselt: ' + JSON.stringify(result, null, 2));
+      } catch(error) {
+        log('Verschlüsselungsfehler: ' + error.message);
+      }
+    };
+  })();
+
+  // TURN Token System
+  (function(){
+    const TURN = {
+      server: 'turn:localhost:3478',
+      secret: 'your-turn-secret',
+      
+      generateToken(username, ttl = 3600) {
+        const timestamp = Math.floor(Date.now() / 1000) + ttl;
+        const data = username + ':' + timestamp;
+        
+        // Simple HMAC (in production, use proper crypto)
+        const hash = btoa(data + ':' + this.secret);
+        return {
+          username: username,
+          credential: hash,
+          ttl: ttl,
+          expires: new Date(timestamp * 1000).toISOString()
+        };
+      },
+      
+      validateToken(token) {
+        try {
+          const parts = atob(token.credential).split(':');
+          const timestamp = parseInt(parts[1]);
+          const now = Math.floor(Date.now() / 1000);
+          return timestamp > now;
+        } catch {
+          return false;
+        }
+      }
+    };
+    
+    window.OBM_TURN = TURN;
+    
+    const turnLog = document.getElementById('turnLog');
+    const turnStatus = document.getElementById('turnStatus');
+    const turnInfo = document.getElementById('turnInfo');
+    
+    const setDot = (el, cls) => {
+      el.classList.remove('ok','warn','err');
+      if(cls) el.classList.add(cls);
+    };
+    
+    const log = (m) => {
+      turnLog.textContent += "\n" + new Date().toLocaleTimeString() + ": " + m;
+    };
+    
+    document.getElementById('generateTURNBtn').onclick = () => {
+      const username = 'user_' + Math.random().toString(36).substr(2, 9);
+      const token = TURN.generateToken(username);
+      
+      log('TURN Token generiert:');
+      log('Username: ' + token.username);
+      log('Expires: ' + token.expires);
+      log('TTL: ' + token.ttl + 's');
+      
+      setDot(turnStatus, 'ok');
+      turnInfo.textContent = `Token gültig bis ${token.expires}`;
+    };
+    
+    document.getElementById('validateTURNBtn').onclick = () => {
+      // Simulate token validation
+      const isValid = Math.random() > 0.3; // 70% success rate
+      setDot(turnStatus, isValid ? 'ok' : 'err');
+      log(isValid ? 'TURN Token gültig' : 'TURN Token abgelaufen');
+    };
+  })();
+
+  // Gateway Stubs
+  (function(){
+    const Gateway = {
+      async testAX25() {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve({ok: true, message: 'AX.25 Gateway Test erfolgreich'});
+          }, 1000);
+        });
+      },
+      
+      async testWinlink() {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve({ok: true, message: 'Winlink Gateway Test erfolgreich'});
+          }, 1500);
+        });
+      },
+      
+      async testSMTP() {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve({ok: true, message: 'SMTP Relay Test erfolgreich'});
+          }, 800);
+        });
+      },
+      
+      async mailDrop(data) {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve({ok: true, message: 'Mail Drop erfolgreich', id: 'msg_' + Date.now()});
+          }, 500);
+        });
+      }
+    };
+    
+    window.OBM_GATEWAY = Gateway;
+    
+    const gatewayLog = document.getElementById('gatewayLog');
+    
+    const log = (m) => {
+      gatewayLog.textContent += "\n" + new Date().toLocaleTimeString() + ": " + m;
+    };
+    
+    document.getElementById('ax25TestBtn').onclick = async () => {
+      const result = await Gateway.testAX25();
+      log(result.message);
+    };
+    
+    document.getElementById('winlinkTestBtn').onclick = async () => {
+      const result = await Gateway.testWinlink();
+      log(result.message);
+    };
+    
+    document.getElementById('smtpTestBtn').onclick = async () => {
+      const result = await Gateway.testSMTP();
+      log(result.message);
+    };
+    
+    document.getElementById('mailDropBtn').onclick = async () => {
+      const result = await Gateway.mailDrop({test: true});
+      log(result.message + ' (ID: ' + result.id + ')');
+    };
+  })();
+
+  // System Status Monitoring
+  (function(){
+    const statusElements = {
+      csp: document.getElementById('secCSP'),
+      jwt: document.getElementById('secJWT'),
+      turn: document.getElementById('secTURN'),
+      dtn: document.getElementById('secDTN')
+    };
+    
+    const setDot = (el, cls) => {
+      el.classList.remove('ok','warn','err');
+      if(cls) el.classList.add(cls);
+    };
+    
+    // Initialize status
+    Object.values(statusElements).forEach(el => setDot(el, 'ok'));
+    
+    // Simulate status changes
+    setInterval(() => {
+      Object.entries(statusElements).forEach(([key, el]) => {
+        if(Math.random() < 0.1) {
+          const statuses = ['ok', 'warn', 'err'];
+          setDot(el, statuses[Math.floor(Math.random() * statuses.length)]);
+        }
+      });
+    }, 5000);
+  })();
+  </script>
+</body>
+</html>

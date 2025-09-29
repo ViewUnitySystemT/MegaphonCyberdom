@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Space Watcher System - Live Astronauten APIs & Hackathons</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0c1445 0%, #1a237e 50%, #283593 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      color: white;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .header p {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+
+    .status-bar {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 30px;
+      color: white;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .status-item {
+      background: rgba(255,255,255,0.1);
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .status-item h3 {
+      margin-bottom: 5px;
+      font-size: 1.1rem;
+    }
+
+    .status-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 8px;
+    }
+
+    .status-online { background: #4CAF50; }
+    .status-offline { background: #f44336; }
+    .status-warning { background: #ff9800; }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .panel h2 {
+      margin-bottom: 20px;
+      color: #333;
+      border-bottom: 2px solid #1a237e;
+      padding-bottom: 10px;
+    }
+
+    .api-section {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 10px;
+    }
+
+    .api-section h4 {
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .api-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .api-btn {
+      padding: 8px 15px;
+      background: #1a237e;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.3s ease;
+    }
+
+    .api-btn:hover {
+      background: #283593;
+    }
+
+    .api-btn.iss { background: #4CAF50; }
+    .api-btn.iss:hover { background: #45a049; }
+
+    .api-btn.nasa { background: #ff9800; color: #333; }
+    .api-btn.nasa:hover { background: #e68900; }
+
+    .api-btn.astronauts { background: #9C27B0; }
+    .api-btn.astronauts:hover { background: #7b1fa2; }
+
+    .results {
+      margin-top: 15px;
+      padding: 15px;
+      background: white;
+      border-radius: 10px;
+      border: 1px solid #e9ecef;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+    }
+
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+
+    .success {
+      background: #d4edda;
+      color: #155724;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+
+    .watcher-section {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    .watcher-section h4 {
+      color: #856404;
+      margin-bottom: 15px;
+    }
+
+    .watcher-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .watcher-btn {
+      padding: 8px 15px;
+      background: #ffc107;
+      color: #333;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.3s ease;
+    }
+
+    .watcher-btn:hover {
+      background: #e0a800;
+    }
+
+    .time-section {
+      background: #e3f2fd;
+      border: 1px solid #90caf9;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    .time-section h4 {
+      color: #1565c0;
+      margin-bottom: 15px;
+    }
+
+    .time-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .time-btn {
+      padding: 8px 15px;
+      background: #2196F3;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.3s ease;
+    }
+
+    .time-btn:hover {
+      background: #1976D2;
+    }
+
+    .footer {
+      text-align: center;
+      color: white;
+      margin-top: 30px;
+      opacity: 0.8;
+    }
+
+    .badge {
+      position: fixed;
+      right: 12px;
+      bottom: 12px;
+      background: #0d141c;
+      color: #eaf1ff;
+      border: 1px solid #2a3a4d;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font: 13px system-ui;
+      z-index: 99996;
+      box-shadow: 0 8px 24px rgba(0,0,0,.35);
+    }
+
+    @media (max-width: 768px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+      
+      .header h1 {
+        font-size: 2rem;
+      }
+      
+      .status-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🛰️ Space Watcher System</h1>
+      <p>Live Astronauten APIs, Hackathons & Forschungsnetzwerke</p>
+    </div>
+
+    <div class="status-bar">
+      <h3>Space System Status</h3>
+      <div class="status-grid">
+        <div class="status-item">
+          <h3><span class="status-indicator status-online"></span>ISS Tracking</h3>
+          <p id="iss-status">Operational</p>
+        </div>
+        <div class="status-item">
+          <h3><span class="status-indicator status-online"></span>Astronaut APIs</h3>
+          <p id="astronaut-status">Active</p>
+        </div>
+        <div class="status-item">
+          <h3><span class="status-indicator status-online"></span>NASA APIs</h3>
+          <p id="nasa-status">Connected</p>
+        </div>
+        <div class="status-item">
+          <h3><span class="status-indicator status-online"></span>Space Watcher</h3>
+          <p id="watcher-status">Monitoring</p>
+        </div>
+        <div class="status-item">
+          <h3><span class="status-indicator status-online"></span>Time Zones</h3>
+          <p id="time-status">Synchronized</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div class="panel">
+        <h2>🛰️ Space APIs</h2>
+        
+        <div class="api-section">
+          <h4>🌍 ISS Tracking</h4>
+          <div class="api-buttons">
+            <button class="api-btn iss" onclick="testISSLocation()" title="Action Button">ISS Location</button>
+            <button class="api-btn iss" onclick="testPeopleInSpace()" title="Action Button">People in Space</button>
+            <button class="api-btn iss" onclick="testISSPosition()" title="Action Button">ISS Position</button>
+          </div>
+          <div id="iss-results" class="results" style="display: block;"></div>
+        </div>
+
+        <div class="api-section">
+          <h4>🚀 NASA APIs</h4>
+          <div class="api-buttons">
+            <button class="api-btn nasa" onclick="testNASAAPOD()" title="Action Button">Astronomy Picture</button>
+            <button class="api-btn nasa" onclick="testNASAISSPosition()" title="Action Button">NASA ISS Position</button>
+          </div>
+          <div id="nasa-results" class="results" style="display: block;"></div>
+        </div>
+
+        <div class="api-section">
+          <h4>👨‍🚀 Astronauts</h4>
+          <div class="api-buttons">
+            <button class="api-btn astronauts" onclick="testAstronauts()" title="Action Button">Current Astronauts</button>
+          </div>
+          <div id="astronauts-results" class="results" style="display: block;"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>📡 Space Watcher</h2>
+        
+        <div class="watcher-section">
+          <h4>🏆 Hackathons</h4>
+          <div class="watcher-buttons">
+            <button class="watcher-btn" onclick="testHackathons()" title="Action Button">Space Apps</button>
+            <button class="watcher-btn" onclick="testHackathons()" title="Action Button">ActInSpace</button>
+            <button class="watcher-btn" onclick="testHackathons()" title="Action Button">Copernicus</button>
+          </div>
+          <div id="hackathons-results" class="results" style="display: block;"></div>
+        </div>
+
+        <div class="watcher-section">
+          <h4>💰 Funding Opportunities</h4>
+          <div class="watcher-buttons">
+            <button class="watcher-btn" onclick="testFunding()" title="Action Button">ISS National Lab</button>
+            <button class="watcher-btn" onclick="testFunding()" title="Action Button">TRISH</button>
+            <button class="watcher-btn" onclick="testFunding()" title="Action Button">ESA BIC</button>
+          </div>
+          <div id="funding-results" class="results" style="display: block;"></div>
+        </div>
+
+        <div class="time-section">
+          <h4>⏰ Universal Time Zones</h4>
+          <div class="time-buttons">
+            <button class="time-btn" onclick="testTimeZones()" title="Action Button">Earth UTC</button>
+            <button class="time-btn" onclick="testTimeZones()" title="Action Button">ISS Time</button>
+            <button class="time-btn" onclick="testTimeZones()" title="Action Button">Mars Time</button>
+            <button class="time-btn" onclick="testTimeZones()" title="Action Button">Deep Space</button>
+          </div>
+          <div id="time-results" class="results" style="display: block;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Space Watcher System v1.0.0 | Live Astronauten APIs & Space-Time Management</p>
+      <p>Powered by MAIPS Multi-AI-Platform-System</p>
+    </div>
+  </div>
+
+  <!-- Space Watcher Script -->
+  <script type="module">
+    // Space Watcher System
+    (async () => {
+      const $ = (q,r=document)=>r.querySelector(q);
+      const enc = new TextEncoder();
+      const K = 'astro:watcher:catalog';
+      const DEF = [
+        {id:'spaceapps',      url:'https://www.spaceappschallenge.org',            kind:'html', tag:'Hackathon'},
+        {id:'actinspace',     url:'https://actinspace.org',                         kind:'html', tag:'Hackathon'},
+        {id:'copernicus',     url:'https://www.copernicus.eu/en/opportunities',    kind:'html', tag:'Hackathon'},
+        {id:'issnl_funding',  url:'https://www.issnationallab.org/research-on-the-iss/funding-opportunities/', kind:'html', tag:'Funding'},
+        {id:'trish_funding',  url:'https://www.bcm.edu/centers/space-health/research/funding-opportunities',   kind:'html', tag:'Funding'},
+        {id:'esa_bic',        url:'https://www.esa-bic.org',                        kind:'html', tag:'Funding'},
+        {id:'open_notify',    url:'http://open-notify.org',                         kind:'html', tag:'API'},
+        {id:'wtia',           url:'https://wheretheiss.at',                         kind:'html', tag:'API'},
+        {id:'spacedevs',      url:'https://thespacedevs.com',                       kind:'html', tag:'API'}
+      ];
+
+      function load(){ try{ return JSON.parse(localStorage.getItem(K)||'{}'); }catch{ return {}; } }
+      function save(m){ localStorage.setItem(K, JSON.stringify(m)); }
+      async function sha256(s){ const h = await crypto.subtle.digest('SHA-256', enc.encode(s)); return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+
+      async function fetchSafe(u){
+        // 1) CORS‑Versuch (volle Inhalte)
+        try{ const r = await fetch(u, {mode:'cors'}); if(r.ok){ const t = await r.text(); return {ok:true, mode:'cors', text:t, status:r.status}; } }catch{}
+        // 2) no‑cors Reichweiten‑Probe (kein Textzugriff, aber Timestamp)
+        try{ const r = await fetch(u, {mode:'no-cors'}); return {ok:true, mode:'no-cors', text:'', status:r.status||0}; }catch(e){ return {ok:false, err:String(e)}; }
+      }
+
+      async function run(){
+        const db = load(); const changes = [];
+        for(const it of DEF){
+          const res = await fetchSafe(it.url);
+          const stamp = Date.now();
+          let hash = res.text ? await sha256(res.text.slice(0,50000)) : String(res.status)+'|'+it.url; // begrenzt für Performance
+          const prev = db[it.id]?.hash;
+          db[it.id] = { id:it.id, url:it.url, tag:it.tag, hash, mode:res.mode, status:res.status||0, ts:stamp };
+          if(prev && prev!==hash){ changes.push({id:it.id, url:it.url, tag:it.tag}); }
+          if(!prev){ changes.push({id:it.id, url:it.url, tag:it.tag}); }
+        }
+        save(db);
+        if(changes.length){
+          // UI‑Badge & RVC‑Eintrag (falls vorhanden)
+          mountBadge(changes.length);
+          if(window.TEL_RVC?.registerItem){
+            await window.TEL_RVC.registerItem({
+              id:'astro-watch-'+Date.now(),
+              title:'Astronaut Contacts – Watch '+new Date().toLocaleString(),
+              type:'application/json',
+              blobOrText: JSON.stringify({changes, snapshot: db}, null, 2),
+              links: { inline: JSON.stringify({changes}, null, 2) },
+              meta: { count:Object.keys(db).length }
+            });
+          }
+          document.dispatchEvent(new CustomEvent('astro:watcher:new', {detail:{n:changes.length}}));
+        }
+      }
+
+      function mountBadge(n){
+        let b = $('#astro-badge');
+        if(!b){ b=document.createElement('div'); b.id='astro-badge'; b.className='badge'; document.body.appendChild(b); }
+        b.textContent = `🔔 Updates: ${n}`;
+      }
+
+      // alle 30 Min neu prüfen
+      await run();
+      setInterval(run, 30*60*1000);
+    })();
+  </script>
+
+  <!-- QA Hook -->
+  <script>
+    (() => { if(!window.QA) return; const _syn=QA.synthesizeTests?.bind(QA)||(async()=>[]);
+      QA.synthesizeTests = async (h)=>{ const base = await _syn(h); return base.concat([
+        {name:'Watcher Snapshot vorhanden', run:()=> !!localStorage.getItem('astro:watcher:catalog')},
+        {name:'Watcher Event feuert', run:()=> new Promise(res=>{ const t=setTimeout(()=>res(false),2500); document.addEventListener('astro:watcher:new',()=>{clearTimeout(t);res(true)}, {once:true}); })}
+      ]); };
+    })();
+  </script>
+
+  <script>
+    // Space Watcher System JavaScript
+    class SpaceWatcherSystem {
+      constructor() {
+        this.init();
+      }
+
+      init() {
+        this.setupEventListeners();
+        this.checkOMNISTACKStatus();
+      }
+
+      setupEventListeners() {
+        // Listen for OMNISTACK ready event
+        document.addEventListener('omni:ready', (event) => {
+          console.log('🚀 OMNISTACK ready!', event.detail);
+        });
+
+        // Listen for Space Watcher events
+        document.addEventListener('astro:watcher:new', (event) => {
+          console.log('🔔 Space Watcher updates:', event.detail);
+          this.updateWatcherStatus(event.detail.n);
+        });
+      }
+
+      checkOMNISTACKStatus() {
+        // Check if OMNISTACK is available
+        if (window.Omni && window.Omni.adapters) {
+          this.updateStatus('iss-status', 'OMNISTACK Ready');
+          this.updateStatus('astronaut-status', 'OMNISTACK Ready');
+          this.updateStatus('nasa-status', 'OMNISTACK Ready');
+          this.updateStatus('watcher-status', 'OMNISTACK Ready');
+          this.updateStatus('time-status', 'OMNISTACK Ready');
+        }
+      }
+
+      updateStatus(elementId, status) {
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.textContent = status;
+        }
+      }
+
+      updateWatcherStatus(updates) {
+        this.updateStatus('watcher-status', `${updates} Updates`);
+      }
+
+      showResults(elementId, content, isError = false) {
+        const resultsDiv = document.getElementById(elementId);
+        resultsDiv.style.display = 'block';
+        resultsDiv.innerHTML = content;
+      }
+
+      async testISSLocation() {
+        this.showResults('iss-results', '<div class="loading">🛰️ Loading ISS location...</div>');
+
+        try {
+          const response = await fetch('/api/space/open-notify/iss-location');
+          const data = await response.json();
+
+          if (data.success) {
+            this.showResults('iss-results', `
+              <div class="success">✅ ISS location loaded successfully!</div>
+              <div><strong>Provider:</strong> ${data.provider}</div>
+              <div><strong>Source:</strong> ${data.metadata.source}</div>
+              <pre>${JSON.stringify(data.data, null, 2)}</pre>
+            `);
+          } else {
+            this.showResults('iss-results', `<div class="error">❌ Failed to load ISS location: ${data.error}</div>`, true);
+          }
+        } catch (error) {
+          this.showResults('iss-results', `<div class="error">❌ Network error: ${error.message}</div>`, true);
+        }
+      }
+
+      async testPeopleInSpace() {
+        this.showResults('iss-results', '<div class="loading">👨‍🚀 Loading people in space...</div>');
+
+        try {
+          const response = await fetch('/api/space/open-notify/people-in-space');
+          const data = await response.json();
+
+          if (data.success) {
+            this.showResults('iss-results', `
+              <div class="success">✅ People in space loaded successfully!</div>
+              <div><strong>Provider:</strong> ${data.provider}</div>
+              <div><strong>Astronaut Count:</strong> ${data.metadata.astronaut_count}</div>
+              <div><strong>Mission Status:</strong> ${data.metadata.mission_status}</div>
+              <pre>${JSON.stringify(data.data, null, 2)}</pre>
+            `);
+          } else {
+            this.showResults('iss-results', `<div class="error">❌ Failed to load people in space: ${data.error}</div>`, true);
+          }
+        } catch (error) {
+          this.showResults('iss-results', `<div class="error">❌ Network error: ${error.message}</div>`, true);
+        }
+      }
+
+      async testISSPosition() {
+        this.showResults('iss-results', '<div class="loading">🌍 Loading ISS position...</div>');
+
+        try {
+          const response = await fetch('/api/space/wheretheiss/iss-position');
+          const data = await response.json();
+
+          if (data.success) {
+            this.showResults('iss-results', `
+              <div class="success">✅ ISS position loaded successfully!</div>
+              <div><strong>Provider:</strong> ${data.provider}</div>
+              <div><strong>Altitude:</strong> ${data.metadata.altitude} km</div>
+              <div><strong>Velocity:</strong> ${data.metadata.velocity} km/h</div>
+              <div><strong>Visibility:</strong> ${data.metadata.visibility}</div>
+              <pre>${JSON.stringify(data.data, null, 2)}</pre>
+            `);
+          } else {
+            this.showResults('iss-results', `<div class="error">❌ Failed to load ISS position: ${data.error}</div>`, true);
+          }
+        } catch (error) {
+          this.showResults('iss-results', `<div class="error">❌ Network error: ${error.message}</div>`, true);
+        }
+      }
+
+      async testNASAAPOD() {
+        this.showResults('nasa-results', '<div class="loading">🌌 Loading NASA Astronomy Picture of the Day...</div>');
+
+        try {
+          const response = await fetch('/api/space/nasa/apod');
+          const data = await response.json();
+
+          if (data.success) {
+            this.showResults('nasa-results', `
+              <div class="success">✅ NASA APOD loaded successfully!</div>
+              <div><strong>Provider:</strong> ${data.provider}</div>
+              <div><strong>Date:</strong> ${data.metadata.date}</div>
+              <div><strong>Media Type:</strong> ${data.metadata.media_type}</div>
+              <div><strong>Title:</strong> ${data.data.title}</div>
+              <div><strong>Explanation:</strong> ${data.data.explanation}</div>
+              <pre>${JSON.stringify(data.data, null, 2)}</pre>
+            `);
+          } else {
+            this.showResults('nasa-results', `<div class="error">❌ Failed to load NASA APOD: ${data.error}</div>`, true);
+          }
+        } catch (error) {
+          this.showResults('nasa-results', `<div class="error">❌ Network error: ${error.message}</div>`, true);
+        }
+      }
+
+      async testNASAISSPosition() {
+        this.showResults('nasa-results', '<div class="loading">🛰️ Loading NASA ISS position...</div>');
+
+        try {
+          const response = await fetch('/api/space/nasa/iss-position');
+          const data = await response.json();
+
+          if (data.success) {
+            this.showResults('nasa-results', `
+              <div class="success">✅ NASA ISS position loaded successfully!</div>
+              <div><strong>Provider:</strong> ${data.provider}</div>
+              <div><strong>Source:</strong> ${data.metadata.source}</div>
+              <div><strong>Update Frequency:</strong> ${data.metadata.update_frequency}</div>
+              <pre>${JSON.stringify(data.data, null, 2)}</pre>
+            `);
+          } else {
+            this.showResults('nasa-results', `<div class="error">❌ Failed to load NASA ISS position: ${data.error}</div>`, true);
+          }
+        } catch (error) {
+          this.showResults('nasa-results', `<div class="error">❌ Network error: ${error.message}</div>`, true);
+        }
+      }
+
+      async testAstronauts() {
+        this.showResults('astronauts-results', '<div class="loading">👨‍🚀 Loading astronauts...</div>');
+
+        try {
+          const response = await fetch('/api/space/spacedevs/astronauts?limit=10');
+          const data = await response.json();
+
+          if (data.success) {
+            this.showResults('astronauts-results', `
+              <div class="success">✅ Astronauts loaded successfully!</div>
+              <div><strong>Provider:</strong> ${data.provider}</div>
+              <div><strong>Total Count:</strong> ${data.metadata.total_count}</div>
+              <div><strong>Astronaut Count:</strong> ${data.metadata.astronaut_count}</div>
+              <div><strong>Mission Status:</strong> ${data.metadata.mission_status}</div>
+              <pre>${JSON.stringify(data.data, null, 2)}</pre>
+            `);
+          } else {
+            this.showResults('astronauts-results', `<div class="error">❌ Failed to load astronauts: ${data.error}</div>`, true);
+          }
+        } catch (error) {
+          this.showResults('astronauts-results', `<div class="error">❌ Network error: ${error.message}</div>`, true);
+        }
+      }
+
+      async testHackathons() {
+        this.showResults('hackathons-results', '<div class="loading">🏆 Loading hackathons...</div>');
+
+        try {
+          const response = await fetch('/api/space/watcher/hackathons');
+          const data = await response.json();
+
+          if (data.success) {
+            this.showResults('hackathons-results', `
+              <div class="success">✅ Hackathons loaded successfully!</div>
+              <div><strong>Provider:</strong> ${data.provider}</div>
+              <div><strong>Total Hackathons:</strong> ${data.metadata.total_hackathons}</div>
+              <div><strong>Active Hackathons:</strong> ${data.metadata.active_hackathons}</div>
+              <div><strong>Next Deadline:</strong> ${data.metadata.next_deadline}</div>
+              <pre>${JSON.stringify(data.data, null, 2)}</pre>
+            `);
+          } else {
+            this.showResults('hackathons-results', `<div class="error">❌ Failed to load hackathons: ${data.error}</div>`, true);
+          }
+        } catch (error) {
+          this.showResults('hackathons-results', `<div class="error">❌ Network error: ${error.message}</div>`, true);
+        }
+      }
+
+      async testFunding() {
+        this.showResults('funding-results', '<div class="loading">💰 Loading funding opportunities...</div>');
+
+        try {
+          const response = await fetch('/api/space/watcher/funding');
+          const data = await response.json();
+
+          if (data.success) {
+            this.showResults('funding-results', `
+              <div class="success">✅ Funding opportunities loaded successfully!</div>
+              <div><strong>Provider:</strong> ${data.provider}</div>
+              <div><strong>Total Funding:</strong> ${data.metadata.total_funding}</div>
+              <div><strong>Active Funding:</strong> ${data.metadata.active_funding}</div>
+              <div><strong>Next Deadline:</strong> ${data.metadata.next_deadline}</div>
+              <pre>${JSON.stringify(data.data, null, 2)}</pre>
+            `);
+          } else {
+            this.showResults('funding-results', `<div class="error">❌ Failed to load funding opportunities: ${data.error}</div>`, true);
+          }
+        } catch (error) {
+          this.showResults('funding-results', `<div class="error">❌ Network error: ${error.message}</div>`, true);
+        }
+      }
+
+      async testTimeZones() {
+        this.showResults('time-results', '<div class="loading">⏰ Loading universal time zones...</div>');
+
+        try {
+          const response = await fetch('/api/space/time/universal-zones');
+          const data = await response.json();
+
+          if (data.success) {
+            this.showResults('time-results', `
+              <div class="success">✅ Universal time zones loaded successfully!</div>
+              <div><strong>Provider:</strong> ${data.provider}</div>
+              <div><strong>Total Zones:</strong> ${data.metadata.total_zones}</div>
+              <div><strong>Current Earth Time:</strong> ${data.metadata.current_earth_time}</div>
+              <div><strong>Relativistic Corrections:</strong> ${data.metadata.relativistic_corrections}</div>
+              <pre>${JSON.stringify(data.data, null, 2)}</pre>
+            `);
+          } else {
+            this.showResults('time-results', `<div class="error">❌ Failed to load time zones: ${data.error}</div>`, true);
+          }
+        } catch (error) {
+          this.showResults('time-results', `<div class="error">❌ Network error: ${error.message}</div>`, true);
+        }
+      }
+    }
+
+    // Global functions for button clicks
+    function testISSLocation() {
+      window.spaceWatcher.testISSLocation();
+    }
+
+    function testPeopleInSpace() {
+      window.spaceWatcher.testPeopleInSpace();
+    }
+
+    function testISSPosition() {
+      window.spaceWatcher.testISSPosition();
+    }
+
+    function testNASAAPOD() {
+      window.spaceWatcher.testNASAAPOD();
+    }
+
+    function testNASAISSPosition() {
+      window.spaceWatcher.testNASAISSPosition();
+    }
+
+    function testAstronauts() {
+      window.spaceWatcher.testAstronauts();
+    }
+
+    function testHackathons() {
+      window.spaceWatcher.testHackathons();
+    }
+
+    function testFunding() {
+      window.spaceWatcher.testFunding();
+    }
+
+    function testTimeZones() {
+      window.spaceWatcher.testTimeZones();
+    }
+
+    // Initialize Space Watcher System
+    document.addEventListener('DOMContentLoaded', () => {
+      window.spaceWatcher = new SpaceWatcherSystem();
+    });
+  </script>
+</body>
+</html>

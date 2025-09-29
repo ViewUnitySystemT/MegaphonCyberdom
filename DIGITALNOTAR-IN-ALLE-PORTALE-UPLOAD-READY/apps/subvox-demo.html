@@ -1,0 +1,677 @@
+<!-- TODO: Replacement character detected () - verify source encoding -->
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>SUBVOX WIRELESS BRIDGE - Demo</title>
+<h1 style="position: absolute; left: -9999px;">SUBVOX WIRELESS BRIDGE - Demo</h1>
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#FF6B35">
+  <meta name="description" content="SUBVOX WIRELESS BRIDGE - Live Demo mit UI-Overlay">
+  <style>
+    .demo-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .demo-header {
+      background: linear-gradient(135deg, #FF6F00, #FF8A33);
+      color: white;
+      padding: 2rem;
+      border-radius: var(--radius-lg);
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .demo-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .control-panel {
+      background: var(--surface);
+      border: 2px solid var(--outline);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      text-align: center;
+    }
+    
+    .control-panel.active {
+      border-color: #333333;
+      background: linear-gradient(135deg, var(--surface), #E8F5E8);
+    }
+    
+    .control-panel.error {
+      border-color: #333333;
+      background: linear-gradient(135deg, var(--surface), #FFEBEE);
+    }
+    
+    .status-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 0.5rem;
+    }
+    
+    .status-connected { background: #4CAF50; }
+    .status-connecting { background: #FF9800; }
+    .status-disconnected { background: #F44336; }
+    
+    .token-monitor {
+      background: var(--surface-variant);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin: 2rem 0;
+    }
+    
+    .token-display {
+      background: var(--background);
+      border: 2px solid var(--primary);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      margin: 1rem 0;
+      font-family: 'Courier New', monospace;
+      font-size: 1.2rem;
+      text-align: center;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .token-history {
+      max-height: 200px;
+      overflow-y: auto;
+      background: var(--background);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .token-entry {
+      padding: 0.5rem;
+      border-bottom: 1px solid var(--outline);
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+    }
+    
+    .token-entry:last-child {
+      border-bottom: none;
+    }
+    
+    .device-status {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    
+    .device-card {
+      background: var(--surface);
+      border: 1px solid var(--outline);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      text-align: center;
+    }
+    
+    .device-card.connected {
+      border-color: #333333;
+      background: #E8F5E8;
+    }
+    
+    .device-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .action-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 0.5rem;
+      margin: 1rem 0;
+    }
+    
+    .action-btn {
+      padding: 0.75rem;
+      border: none;
+      border-radius: var(--radius-md);
+      background: var(--primary);
+      color: var(--on-primary);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .action-btn:hover {
+      background: var(--secondary);
+      transform: translateY(-2px);
+    }
+    
+    .action-btn:disabled {
+      background: var(--outline);
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--outline);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      text-align: center;
+    }
+    
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary);
+      display: block;
+    }
+    
+    .stat-label {
+      font-size: 0.9rem;
+      color: var(--on-surface-variant);
+      margin-top: 0.5rem;
+    }
+    
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    
+    .overlay-content {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+    }
+    
+    .visible { display: block !important; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header class="top-app-bar">
+      <div class="top-app-bar-content">
+        <button class="icon-button" onclick="window.history.back()" title="Zurück" title="Action Button">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <h1 class="app-title">🧠 SUBVOX WIRELESS BRIDGE - Demo</h1>
+        <div class="top-app-bar-actions">
+          <button class="icon-button" onclick="showSettings()" title="Einstellungen" title="Action Button">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.3,4.82,11.61,4.82,11.94s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
+          </button>
+          <button class="icon-button" onclick="toggleFullscreen()" title="Vollbild" title="Action Button">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="demo-container">
+      <div class="demo-header">
+        <h2>🧠 SUBVOX WIRELESS BRIDGE - Live Demo</h2>
+        <p>Real-time Token-Monitoring und Geräte-Status</p>
+        <div class="badge">DEMO MODE</div>
+      </div>
+
+      <!-- Demo-Controls -->
+      <div class="demo-controls">
+        <div class="control-panel" id="start-stop-panel">
+          <h3>🎮 Start/Stop</h3>
+          <button aria-label="Demo starten" class="action-btn" id="start-btn" onclick="startDemo()" title="Action Button">Demo starten</button>
+          <button aria-label="Demo stoppen" class="action-btn" id="stop-btn" onclick="stopDemo()" disabled title="Action Button">Demo stoppen</button>
+        </div>
+
+        <div class="control-panel" id="simulator-panel">
+          <h3>🎯 Simulatoren</h3>
+          <button aria-label="EMG Sim" class="action-btn" onclick="toggleSimulator('emg')" title="Action Button">EMG Sim</button>
+          <button aria-label="EEG Sim" class="action-btn" onclick="toggleSimulator('eeg')" title="Action Button">EEG Sim</button>
+          <button aria-label="Switch Sim" class="action-btn" onclick="toggleSimulator('switch')" title="Action Button">Switch Sim</button>
+        </div>
+
+        <div class="control-panel" id="connection-panel">
+          <h3>🔗 Verbindungen</h3>
+          <button aria-label="Gateway verbinden" class="action-btn" onclick="connectGateway()" title="Action Button">Gateway verbinden</button>
+          <button aria-label="Verbindung trennen" class="action-btn" onclick="disconnectGateway()" title="Action Button">Verbindung trennen</button>
+        </div>
+      </div>
+
+      <!-- Token-Monitor -->
+      <div class="token-monitor">
+        <h3>📊 Token-Monitor</h3>
+        <div class="token-display" id="current-token">Warten auf Token...</div>
+        
+        <div class="action-buttons">
+          <button aria-label="YES" class="action-btn" onclick="simulateToken('YES')" title="Action Button">YES</button>
+          <button aria-label="NO" class="action-btn" onclick="simulateToken('NO')" title="Action Button">NO</button>
+          <button aria-label="LEFT" class="action-btn" onclick="simulateToken('LEFT')" title="Action Button">LEFT</button>
+          <button aria-label="RIGHT" class="action-btn" onclick="simulateToken('RIGHT')" title="Action Button">RIGHT</button>
+          <button aria-label="UP" class="action-btn" onclick="simulateToken('UP')" title="Action Button">UP</button>
+          <button aria-label="DOWN" class="action-btn" onclick="simulateToken('DOWN')" title="Action Button">DOWN</button>
+          <button aria-label="SELECT" class="action-btn" onclick="simulateToken('SELECT')" title="Action Button">SELECT</button>
+          <button aria-label="HELP" class="action-btn" onclick="simulateToken('HELP')" title="Action Button">HELP</button>
+          <button aria-label="SPEAK" class="action-btn" onclick="simulateToken('SPEAK')" title="Action Button">SPEAK</button>
+        </div>
+
+        <div class="token-history" id="token-history">
+          <div class="token-entry">Token-History wird hier angezeigt...</div>
+        </div>
+      </div>
+
+      <!-- Geräte-Status -->
+      <div class="device-status">
+        <div class="device-card" id="emg-status">
+          <div class="device-icon">💪</div>
+          <h4>EMG Sensor</h4>
+          <div class="status-indicator status-disconnected"></div>
+          <span>Nicht verbunden</span>
+        </div>
+
+        <div class="device-card" id="eeg-status">
+          <div class="device-icon">🧠</div>
+          <h4>OpenBCI/EEG</h4>
+          <div class="status-indicator status-disconnected"></div>
+          <span>Nicht verbunden</span>
+        </div>
+
+        <div class="device-card" id="switch-status">
+          <div class="device-icon">🎮</div>
+          <h4>BLE Switch</h4>
+          <div class="status-indicator status-disconnected"></div>
+          <span>Nicht verbunden</span>
+        </div>
+
+        <div class="device-card" id="gateway-status">
+          <div class="device-icon">🌐</div>
+          <h4>Gateway</h4>
+          <div class="status-indicator status-disconnected"></div>
+          <span>Nicht verbunden</span>
+        </div>
+      </div>
+
+      <!-- Statistiken -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-number" id="total-tokens">0</span>
+          <div class="stat-label">Gesamt Tokens</div>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-number" id="tokens-per-minute">0</span>
+          <div class="stat-label">Tokens/Minute</div>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-number" id="avg-latency">0ms</span>
+          <div class="stat-label">Durchschn. Latenz</div>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-number" id="success-rate">100%</span>
+          <div class="stat-label">Erfolgsrate</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Settings Overlay -->
+    <div class="overlay visible" id="settings-overlay">
+      <div class="overlay-content">
+        <h3>⚙️ Demo-Einstellungen</h3>
+        
+        <div class="optimized-style">
+          <label>Gateway URL:</label>
+          <input type="text" id="gateway-url" value="ws://localhost:8080" class="optimized-style" aria-label="Input Field">
+          
+          <label>Token-Rate (ms):</label>
+          <input type="number" id="token-rate" value="1000" min="100" max="10000" class="optimized-style" aria-label="Input Field">
+          
+          <label>Simulator aktivieren:</label>
+          <div class="optimized-style">
+            <input type="checkbox" id="emg-sim" checked aria-label="Input Field"> EMG Simulator<br>
+            <input type="checkbox" id="eeg-sim" checked aria-label="Input Field"> EEG Simulator<br>
+            <input type="checkbox" id="switch-sim" checked aria-label="Input Field"> Switch Simulator
+          </div>
+        </div>
+        
+        <button aria-label="Speichern" class="action-btn" onclick="saveSettings()" title="Action Button">Speichern</button>
+        <button aria-label="Abbrechen" class="action-btn" onclick="hideSettings()" class="optimized-style" title="Action Button">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUBVOX WIRELESS BRIDGE Script -->
+  <script async type="module">
+// Demo-State
+let demoState = {
+  running: false,
+  connected: false,
+  ws: null,
+  simulators: {
+    emg: false,
+    eeg: false,
+    switch: false
+  },
+  stats: {
+    totalTokens: 0,
+    tokensPerMinute: 0,
+    avgLatency: 0,
+    successRate: 100,
+    startTime: null,
+    tokenHistory: []
+  }
+};
+
+// Demo-Funktionen
+function startDemo() {
+  demoState.running = true;
+  demoState.stats.startTime = Date.now();
+  
+  document.getElementById('start-btn').disabled = true;
+  document.getElementById('stop-btn').disabled = false;
+  document.getElementById('start-stop-panel').classList.add('active');
+  
+  // Simulatoren starten
+  if (demoState.simulators.emg) startEMGSimulator();
+  if (demoState.simulators.eeg) startEEGSimulator();
+  if (demoState.simulators.switch) startSwitchSimulator();
+  
+  logEvent('Demo gestartet', 'info');
+}
+
+function stopDemo() {
+  demoState.running = false;
+  
+  document.getElementById('start-btn').disabled = false;
+  document.getElementById('stop-btn').disabled = true;
+  document.getElementById('start-stop-panel').classList.remove('active');
+  
+  // Simulatoren stoppen
+  stopAllSimulators();
+  
+  logEvent('Demo gestoppt', 'info');
+}
+
+function toggleSimulator(type) {
+  demoState.simulators[type] = !demoState.simulators[type];
+  
+  const btn = event.target;
+  if (demoState.simulators[type]) {
+    btn.style.background = '#4CAF50';
+    btn.textContent = `${type.toUpperCase()} ON`;
+  } else {
+    btn.style.background = 'var(--primary)';
+    btn.textContent = `${type.toUpperCase()} OFF`;
+  }
+}
+
+function connectGateway() {
+  const url = document.getElementById('gateway-url').value;
+  
+  try {
+    demoState.ws = new WebSocket(url);
+    
+    demoState.ws.onopen = () => {
+      demoState.connected = true;
+      updateGatewayStatus('connected');
+      logEvent('Gateway verbunden', 'success');
+    };
+    
+    demoState.ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      handleGatewayMessage(data);
+    };
+    
+    demoState.ws.onclose = () => {
+      demoState.connected = false;
+      updateGatewayStatus('disconnected');
+      logEvent('Gateway getrennt', 'warning');
+    };
+    
+    demoState.ws.onerror = (error) => {
+      logEvent('Gateway-Fehler: ' + error.message, 'error');
+    };
+    
+  } catch (error) {
+    logEvent('Verbindungsfehler: ' + error.message, 'error');
+  }
+}
+
+function disconnectGateway() {
+  if (demoState.ws) {
+    demoState.ws.close();
+    demoState.ws = null;
+  }
+}
+
+function handleGatewayMessage(data) {
+  if (data.type === 'token') {
+    updateTokenDisplay(data.token);
+    updateStats(data);
+  } else if (data.type === 'status') {
+    logEvent(`Status: ${data.status}`, 'info');
+  }
+}
+
+function simulateToken(token) {
+  updateTokenDisplay(token);
+  updateStats({ token, timestamp: Date.now() });
+  
+  // An Gateway senden
+  if (demoState.ws && demoState.ws.readyState === WebSocket.OPEN) {
+    demoState.ws.send(JSON.stringify({
+      type: 'token',
+      token: token,
+      timestamp: Date.now()
+    }));
+  }
+}
+
+function updateTokenDisplay(token) {
+  const display = document.getElementById('current-token');
+  display.textContent = token;
+  display.style.background = 'linear-gradient(135deg, var(--primary), var(--secondary))';
+  display.style.color = 'white';
+  
+  setTimeout(() => {
+    display.style.background = 'var(--background)';
+    display.style.color = 'var(--on-background)';
+  }, 1000);
+  
+  // Token-History aktualisieren
+  addToTokenHistory(token);
+}
+
+function addToTokenHistory(token) {
+  const history = document.getElementById('token-history');
+  const entry = document.createElement('div');
+  entry.className = 'token-entry';
+  entry.textContent = `[${new Date().toLocaleTimeString()}] ${token}`;
+  
+  history.insertBefore(entry, history.firstChild);
+  
+  // Nur die letzten 50 Einträge behalten
+  while (history.children.length > 50) {
+    history.removeChild(history.lastChild);
+  }
+}
+
+function updateStats(data) {
+  demoState.stats.totalTokens++;
+  
+  // Tokens pro Minute berechnen
+  const now = Date.now();
+  const elapsed = (now - demoState.stats.startTime) / 60000; // Minuten
+  demoState.stats.tokensPerMinute = Math.round(demoState.stats.totalTokens / elapsed);
+  
+  // UI aktualisieren
+  document.getElementById('total-tokens').textContent = demoState.stats.totalTokens;
+  document.getElementById('tokens-per-minute').textContent = demoState.stats.tokensPerMinute;
+}
+
+function updateGatewayStatus(status) {
+  const card = document.getElementById('gateway-status');
+  const indicator = card.querySelector('.status-indicator');
+  const text = card.querySelector('span');
+  
+  card.classList.remove('connected', 'error');
+  indicator.className = 'status-indicator';
+  
+  switch(status) {
+    case 'connected':
+      card.classList.add('connected');
+      indicator.classList.add('status-connected');
+      text.textContent = 'Verbunden';
+      break;
+    case 'connecting':
+      indicator.classList.add('status-connecting');
+      text.textContent = 'Verbinde...';
+      break;
+    case 'disconnected':
+      indicator.classList.add('status-disconnected');
+      text.textContent = 'Nicht verbunden';
+      break;
+    case 'error':
+      card.classList.add('error');
+      indicator.classList.add('status-disconnected');
+      text.textContent = 'Fehler';
+      break;
+  }
+}
+
+function startEMGSimulator() {
+  if (!demoState.simulators.emg) return;
+  
+  const interval = setInterval(() => {
+    if (!demoState.running) {
+      clearInterval(interval);
+      return;
+    }
+    
+    // Simuliere EMG-Token
+    const tokens = ['SELECT', 'YES', 'NO'];
+    const token = tokens[Math.floor(Math.random() * tokens.length)];
+    simulateToken(token);
+  }, 2000);
+}
+
+function startEEGSimulator() {
+  if (!demoState.simulators.eeg) return;
+  
+  const interval = setInterval(() => {
+    if (!demoState.running) {
+      clearInterval(interval);
+      return;
+    }
+    
+    // Simuliere EEG-Token
+    const tokens = ['LEFT', 'RIGHT', 'UP', 'DOWN'];
+    const token = tokens[Math.floor(Math.random() * tokens.length)];
+    simulateToken(token);
+  }, 3000);
+}
+
+function startSwitchSimulator() {
+  if (!demoState.simulators.switch) return;
+  
+  const interval = setInterval(() => {
+    if (!demoState.running) {
+      clearInterval(interval);
+      return;
+    }
+    
+    // Simuliere Switch-Token
+    const tokens = ['HELP', 'SPEAK'];
+    const token = tokens[Math.floor(Math.random() * tokens.length)];
+    simulateToken(token);
+  }, 4000);
+}
+
+function stopAllSimulators() {
+  // Simulatoren werden durch clearInterval gestoppt
+  demoState.simulators = { emg: false, eeg: false, switch: false };
+}
+
+function logEvent(message, type = 'info') {
+  console.log(`[${type.toUpperCase()}] ${message}`);
+}
+
+function showSettings() {
+  document.getElementById('settings-overlay').classList.remove('visible');
+}
+
+function hideSettings() {
+  document.getElementById('settings-overlay').classList.add('visible');
+}
+
+function saveSettings() {
+  const gatewayUrl = document.getElementById('gateway-url').value;
+  const tokenRate = parseInt(document.getElementById('token-rate').value);
+  
+  demoState.simulators.emg = document.getElementById('emg-sim').checked;
+  demoState.simulators.eeg = document.getElementById('eeg-sim').checked;
+  demoState.simulators.switch = document.getElementById('switch-sim').checked;
+  
+  // Einstellungen speichern
+  localStorage.setItem('subvox-demo-settings', JSON.stringify({
+    gatewayUrl,
+    tokenRate,
+    simulators: demoState.simulators
+  }));
+  
+  hideSettings();
+  logEvent('Einstellungen gespeichert', 'success');
+}
+
+function loadSettings() {
+  const settings = JSON.parse(localStorage.getItem('subvox-demo-settings') || '{}');
+  
+  if (settings.gatewayUrl) document.getElementById('gateway-url').value = settings.gatewayUrl;
+  if (settings.tokenRate) document.getElementById('token-rate').value = settings.tokenRate;
+  if (settings.simulators) {
+    demoState.simulators = settings.simulators;
+    document.getElementById('emg-sim').checked = settings.simulators.emg;
+    document.getElementById('eeg-sim').checked = settings.simulators.eeg;
+    document.getElementById('switch-sim').checked = settings.simulators.switch;
+  }
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+}
+
+// Initialisierung
+document.addEventListener('DOMContentLoaded', function() {
+  loadSettings();
+  logEvent('SUBVOX Demo geladen', 'info');
+});
+  </script>
+</body>
+</html>

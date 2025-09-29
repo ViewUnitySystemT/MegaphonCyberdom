@@ -1,0 +1,13 @@
+open
+45.87.81.214
+user
+u972026836
+Werner8/Werner8/
+binary
+cd
+public_html
+put
+package.json
+ls
+-la
+quit

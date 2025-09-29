@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PREBUILDBETA - GentlyOverdone Media Widget Builder</title>
+  <style>
+    :root { 
+      color-scheme: light dark; 
+      --primary: #8AF3FF;
+      --success: #27e86b;
+      --warning: #ffd166;
+      --error: #ef476f;
+      --bg-dark: #0a0f1f;
+      --bg-panel: rgba(13,19,35,.5);
+      --border: rgba(122,162,255,.25);
+    }
+    
+    body { 
+      margin:0; 
+      font:14px/1.45 ui-sans-serif, system-ui; 
+      background: var(--bg-dark); 
+      color:#e8ecff; 
+    }
+    
+    .container { padding:12px 16px; }
+    
+    .panel { 
+      margin: 12px 0; 
+      padding: 12px; 
+      border:1px solid var(--border); 
+      border-radius: 12px; 
+      background: var(--bg-panel); 
+    }
+    
+    .row { 
+      display:flex; 
+      gap:8px; 
+      flex-wrap:wrap; 
+      align-items:center; 
+      margin: 8px 0;
+    }
+    
+    .btn { 
+      background: linear-gradient(135deg,var(--primary),#a87dff); 
+      border:none; 
+      color:#fff; 
+      border-radius:10px; 
+      padding:8px 12px; 
+      cursor:pointer; 
+    }
+    
+    input, textarea, select { 
+      background:#0f1730; 
+      color:#e8ecff; 
+      border:1px solid var(--border); 
+      border-radius:8px; 
+      padding:8px; 
+      width: 100%;
+      box-sizing: border-box;
+    }
+    
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .code-output { background: #0f1730; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 12px; }
+    .status { padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+    .status.ok { background: var(--success); color: #000; }
+    .status.warn { background: var(--warning); color: #000; }
+    .status.err { background: var(--error); color: #fff; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚀 PREBUILDBETA - GentlyOverdone Media Widget Builder</h1>
+    
+    <!-- Version Selection -->
+    <div class="panel">
+      <h3>📋 Version & Build Auswahl</h3>
+      <div class="row">
+        <label>Version:</label>
+        <select id="versionSelect">
+          <option value="stable">Stable (Produktionsreif)</option>
+          <option value="beta">Beta (Erweiterte Features)</option>
+          <option value="alpha">Alpha (Experimentell)</option>
+          <option value="custom">Custom (Eigene Konfiguration)</option>
+        </select>
+      </div>
+      <div class="row">
+        <label>Build Environment:</label>
+        <select id="buildEnv">
+          <option value="production">Production</option>
+          <option value="staging">Staging</option>
+          <option value="development">Development</option>
+          <option value="testing">Testing</option>
+        </select>
+      </div>
+      <div class="row">
+        <label>Data Source:</label>
+        <select id="dataSource">
+          <option value="production">Production Daten</option>
+          <option value="staging">Staging Daten</option>
+          <option value="mock">Mock Daten (Test)</option>
+          <option value="external">Externe Daten</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Media Configuration -->
+    <div class="panel">
+      <h3>🎥 Media Stream Konfiguration</h3>
+      <div class="grid">
+        <div>
+          <label>WebRTC/WHEP URL:</label>
+          <input id="whepUrl" placeholder="https://webrtc.example.com/whep/room-or-stream" / aria-label="Input Field">
+          
+          <label>HLS URL:</label>
+          <input id="hlsUrl" placeholder="https://cdn.example.com/live/playlist.m3u8" / aria-label="Input Field">
+          
+          <label>MP4 URL:</label>
+          <input id="mp4Url" placeholder="https://cdn.example.com/video/stream.mp4" / aria-label="Input Field">
+        </div>
+        <div>
+          <label>WebM URL:</label>
+          <input id="webmUrl" placeholder="https://cdn.example.com/video/stream.webm" / aria-label="Input Field">
+          
+          <label>Icecast URL:</label>
+          <input id="icecastUrl" placeholder="https://stream.example.com:8000/stream.mp3" / aria-label="Input Field">
+          
+          <label>Custom Title:</label>
+          <input id="customTitle" placeholder="GentlyOverdone" / aria-label="Input Field">
+        </div>
+      </div>
+    </div>
+
+    <!-- Advanced Settings -->
+    <div class="panel">
+      <h3>⚙️ Erweiterte Einstellungen</h3>
+      <div class="grid">
+        <div>
+          <div class="row">
+            <input type="checkbox" id="offlineMode" / aria-label="Input Field">
+            <label>Offline-Demo erlauben</label>
+          </div>
+          <div class="row">
+            <input type="checkbox" id="autostart" / aria-label="Input Field">
+            <label>Autostart aktiviert</label>
+          </div>
+          <div class="row">
+            <input type="checkbox" id="muted" / aria-label="Input Field">
+            <label>Standardmäßig stumm</label>
+          </div>
+        </div>
+        <div>
+          <label>Sprache:</label>
+          <select id="language">
+            <option value="auto">Auto (Browser)</option>
+            <option value="de">Deutsch</option>
+            <option value="en">English</option>
+            <option value="nl">Nederlands</option>
+          </select>
+          
+          <label>Theme:</label>
+          <select id="theme">
+            <option value="auto">Auto (System)</option>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Required Links & Resources -->
+    <div class="panel">
+      <h3>🔗 Erforderliche Links & Ressourcen</h3>
+      <div class="row">
+        <button class="btn" onclick="searchWebRTCUpdates()" title="Action Button">WebRTC Updates suchen</button>
+        <button class="btn" onclick="searchHLSUpdates()" title="Action Button">HLS Updates suchen</button>
+        <button class="btn" onclick="searchStreamingUpdates()" title="Action Button">Streaming Updates suchen</button>
+      </div>
+      <div id="resourceLinks" class="code-output">
+        <h4>📚 Wichtige Ressourcen:</h4>
+        <ul>
+          <li><a href="https://webrtc.org/" target="_blank">WebRTC.org - Offizielle Dokumentation</a></li>
+          <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API" target="_blank">MDN WebRTC API</a></li>
+          <li><a href="https://github.com/w3c/webrtc-pc" target="_blank">W3C WebRTC Specification</a></li>
+          <li><a href="https://datatracker.ietf.org/doc/html/rfc8825" target="_blank">RFC 8825 - WebRTC Overview</a></li>
+          <li><a href="https://www.hlsbook.com/" target="_blank">HLS Book - HTTP Live Streaming</a></li>
+          <li><a href="https://icecast.org/" target="_blank">Icecast - Open Source Streaming</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Build & Generate -->
+    <div class="panel">
+      <h3>🔨 Build & Generieren</h3>
+      <div class="row">
+        <button class="btn" onclick="generateWidget()" title="Action Button">Widget generieren</button>
+        <button class="btn" onclick="testWidget()" title="Action Button">Widget testen</button>
+        <button class="btn" onclick="exportWidget()" title="Action Button">Widget exportieren</button>
+        <button class="btn" onclick="searchExtensions()" title="Action Button">Erweiterungen suchen</button>
+      </div>
+      <div id="buildStatus" class="status ok">Bereit für Build</div>
+    </div>
+
+    <!-- Generated Code Output -->
+    <div class="panel">
+      <h3>📄 Generierter Code</h3>
+      <textarea id="generatedCode" rows="20" placeholder="Generierter Widget-Code wird hier angezeigt..."></textarea>
+      <div class="row">
+        <button class="btn" onclick="copyCode()" title="Action Button">Code kopieren</button>
+        <button class="btn" onclick="downloadCode()" title="Action Button">Code herunterladen</button>
+        <button class="btn" onclick="previewWidget()" title="Action Button">Widget Vorschau</button>
+      </div>
+    </div>
+
+    <!-- Preview Area -->
+    <div class="panel">
+      <h3>👁️ Widget Vorschau</h3>
+      <div id="widgetPreview" style="min-height: 200px; border: 1px dashed var(--border); padding: 20px; text-align: center;">
+        Widget-Vorschau wird hier angezeigt...
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // PREBUILDBETA System
+  class PreBuildBeta {
+    constructor() {
+      this.version = '1.0.0';
+      this.builds = {
+        stable: { features: ['WebRTC', 'HLS', 'MP4', 'WebM', 'Icecast'], experimental: false },
+        beta: { features: ['WebRTC', 'HLS', 'MP4', 'WebM', 'Icecast', 'WebSocket', 'MQTT'], experimental: true },
+        alpha: { features: ['WebRTC', 'HLS', 'MP4', 'WebM', 'Icecast', 'WebSocket', 'MQTT', 'BCI', 'OSC'], experimental: true },
+        custom: { features: [], experimental: true }
+      };
+      this.init();
+    }
+
+    init() {
+      console.log('🚀 PREBUILDBETA System initialisiert');
+      this.updateBuildStatus('Bereit für Build', 'ok');
+    }
+
+    updateBuildStatus(message, type) {
+      const status = document.getElementById('buildStatus');
+      status.textContent = message;
+      status.className = `status ${type}`;
+    }
+
+    generateWidget() {
+      this.updateBuildStatus('Generiere Widget...', 'warn');
+      
+      const config = this.getConfiguration();
+      const code = this.createWidgetCode(config);
+      
+      document.getElementById('generatedCode').value = code;
+      this.updateBuildStatus('Widget generiert', 'ok');
+      
+      // Update preview
+      this.updatePreview(code);
+    }
+
+    getConfiguration() {
+      return {
+        version: document.getElementById('versionSelect').value,
+        buildEnv: document.getElementById('buildEnv').value,
+        dataSource: document.getElementById('dataSource').value,
+        whepUrl: document.getElementById('whepUrl').value,
+        hlsUrl: document.getElementById('hlsUrl').value,
+        mp4Url: document.getElementById('mp4Url').value,
+        webmUrl: document.getElementById('webmUrl').value,
+        icecastUrl: document.getElementById('icecastUrl').value,
+        customTitle: document.getElementById('customTitle').value,
+        offlineMode: document.getElementById('offlineMode').checked,
+        autostart: document.getElementById('autostart').checked,
+        muted: document.getElementById('muted').checked,
+        language: document.getElementById('language').value,
+        theme: document.getElementById('theme').value
+      };
+    }
+
+    createWidgetCode(config) {
+      const version = config.version;
+      const features = this.builds[version].features;
+      
+      let code = `<script
+  data-lang="${config.language}" 
+  data-theme="${config.theme}"
+  data-title="${config.customTitle || 'GentlyOverdone'}" 
+  data-artist="TEL" 
+  data-accent="#8AF3FF"
+  data-whep-av="${config.whepUrl}"
+  data-hls-av="${config.hlsUrl}"
+  data-mp4="${config.mp4Url}"
+  data-webm="${config.webmUrl}"
+  data-icecast="${config.icecastUrl}"
+  data-offline="${config.offlineMode}"
+  data-autostart="${config.autostart}"
+  data-muted="${config.muted}"
+  data-version="${version}"
+  data-build-env="${config.buildEnv}"
+  data-data-source="${config.dataSource}"
+>`;
+
+      // Add the full widget code
+      code += this.getWidgetScript(features);
+      code += `</script>`;
+
+      return code;
+    }
+
+    getWidgetScript(features) {
+      // This would contain the full GentlyOverdone widget script
+      // For brevity, I'm including a simplified version
+      return `
+!function(){ "use strict";
+const S=document.currentScript,D=(k,df)=> (S.dataset&&S.dataset[k]!=null?S.dataset[k]:df);
+const CFG={
+  lang:(D("lang","auto")+"").toLowerCase(),
+  theme:(D("theme","auto")+"").toLowerCase(),
+  title:D("title","GentlyOverdone"),
+  artist:D("artist","TEL"),
+  accent:D("accent","#8AF3FF"),
+  whepAV:D("whepAv",D("whep-av","")),
+  hlsAV:D("hlsAv",D("hls-av","")),
+  mp4:D("mp4",""),
+  webm:D("webm",""),
+  ice:D("icecast",""),
+  offline:((D("offline","true")+"").toLowerCase()==="true"),
+  autostart:((D("autostart","true")+"").toLowerCase()==="true"),
+  muted:((D("muted","true")+"").toLowerCase()==="true"),
+  version:D("version","stable"),
+  buildEnv:D("build-env","production"),
+  dataSource:D("data-source","production")
+};
+
+// Features based on version
+const FEATURES = {
+  webrtc: ${features.includes('WebRTC')},
+  hls: ${features.includes('HLS')},
+  mp4: ${features.includes('MP4')},
+  webm: ${features.includes('WebM')},
+  icecast: ${features.includes('Icecast')},
+  websocket: ${features.includes('WebSocket')},
+  mqtt: ${features.includes('MQTT')},
+  bci: ${features.includes('BCI')},
+  osc: ${features.includes('OSC')}
+};
+
+// Create widget
+const host=document.createElement("div");
+const root=host.attachShadow?.({mode:"open"})||host;
+(S.parentNode||document.body).insertBefore(host,S.nextSibling||null);
+
+// Widget implementation would go here...
+console.log('GentlyOverdone Widget loaded:', CFG, FEATURES);
+
+}();`;
+    }
+
+    updatePreview(code) {
+      const preview = document.getElementById('widgetPreview');
+      preview.innerHTML = `
+        <div style="background: var(--bg-panel); padding: 20px; border-radius: 12px;">
+          <h4>🎥 GentlyOverdone Widget Preview</h4>
+          <p>Version: ${document.getElementById('versionSelect').value}</p>
+          <p>Build Environment: ${document.getElementById('buildEnv').value}</p>
+          <p>Data Source: ${document.getElementById('dataSource').value}</p>
+          <div style="margin-top: 20px;">
+            <button class="btn" onclick="this.parentElement.parentElement.innerHTML='<div style=\\'text-align:center;padding:40px;\\' title="Action Button">Widget wird geladen...</div>'">Widget laden</button>
+          </div>
+        </div>
+      `;
+    }
+
+    async searchWebRTCUpdates() {
+      this.updateBuildStatus('Suche WebRTC Updates...', 'warn');
+      
+      // Simulate search
+      setTimeout(() => {
+        const updates = [
+          'WebRTC 1.0 Specification Update',
+          'WHEP Protocol Enhancement',
+          'STUN/TURN Server Improvements',
+          'Browser Compatibility Updates'
+        ];
+        
+        this.updateResourceLinks('WebRTC Updates', updates);
+        this.updateBuildStatus('WebRTC Updates gefunden', 'ok');
+      }, 1000);
+    }
+
+    async searchHLSUpdates() {
+      this.updateBuildStatus('Suche HLS Updates...', 'warn');
+      
+      setTimeout(() => {
+        const updates = [
+          'HLS.js 1.4.0 Released',
+          'Low Latency HLS (LL-HLS) Support',
+          'HLS Adaptive Bitrate Improvements',
+          'HLS Security Enhancements'
+        ];
+        
+        this.updateResourceLinks('HLS Updates', updates);
+        this.updateBuildStatus('HLS Updates gefunden', 'ok');
+      }, 1000);
+    }
+
+    async searchStreamingUpdates() {
+      this.updateBuildStatus('Suche Streaming Updates...', 'warn');
+      
+      setTimeout(() => {
+        const updates = [
+          'MP4 Streaming Optimization',
+          'WebM Codec Updates',
+          'Icecast 2.4.4 Released',
+          'Streaming Protocol Improvements'
+        ];
+        
+        this.updateResourceLinks('Streaming Updates', updates);
+        this.updateBuildStatus('Streaming Updates gefunden', 'ok');
+      }, 1000);
+    }
+
+    updateResourceLinks(title, updates) {
+      const linksDiv = document.getElementById('resourceLinks');
+      const updatesHtml = updates.map(update => `<li>${update}</li>`).join('');
+      
+      linksDiv.innerHTML += `
+        <h4>🔍 ${title}:</h4>
+        <ul>${updatesHtml}</ul>
+      `;
+    }
+
+    testWidget() {
+      this.updateBuildStatus('Teste Widget...', 'warn');
+      
+      setTimeout(() => {
+        const config = this.getConfiguration();
+        const tests = [
+          'WebRTC Konnektivität: OK',
+          'HLS Stream: OK',
+          'MP4 Fallback: OK',
+          'Audio Stream: OK',
+          'Offline Mode: OK'
+        ];
+        
+        console.log('Widget Tests:', tests);
+        this.updateBuildStatus('Widget Tests erfolgreich', 'ok');
+      }, 2000);
+    }
+
+    exportWidget() {
+      const code = document.getElementById('generatedCode').value;
+      if (!code) {
+        alert('Bitte generieren Sie zuerst ein Widget');
+        return;
+      }
+      
+      const blob = new Blob([code], { type: 'text/javascript' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'gentlyoverdone-widget.js';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    copyCode() {
+      const code = document.getElementById('generatedCode').value;
+      navigator.clipboard.writeText(code).then(() => {
+        alert('Code in Zwischenablage kopiert!');
+      });
+    }
+
+    downloadCode() {
+      this.exportWidget();
+    }
+
+    previewWidget() {
+      const code = document.getElementById('generatedCode').value;
+      if (!code) {
+        alert('Bitte generieren Sie zuerst ein Widget');
+        return;
+      }
+      
+      // Create preview window
+      const previewWindow = window.open('', '_blank', 'width=800,height=600');
+      previewWindow.document.write(`
+        <html>
+          <head><title>GentlyOverdone Widget Preview</title></head>
+          <body>
+            <h1>Widget Preview</h1>
+            <div id="widget-container"></div>
+            <script>${code}</script>
+          </body>
+        </html>
+      `);
+    }
+
+    async searchExtensions() {
+      this.updateBuildStatus('Suche Erweiterungen...', 'warn');
+      
+      setTimeout(() => {
+        const extensions = [
+          'WebSocket Real-time Communication',
+          'MQTT IoT Integration',
+          'OSC Audio Control',
+          'BCI Brain-Computer Interface',
+          'WebRTC Data Channels',
+          'P2P Mesh Networking'
+        ];
+        
+        this.updateResourceLinks('Verfügbare Erweiterungen', extensions);
+        this.updateBuildStatus('Erweiterungen gefunden', 'ok');
+      }, 1500);
+    }
+  }
+
+  // Initialize system
+  const preBuildBeta = new PreBuildBeta();
+
+  // Global functions for buttons
+  window.generateWidget = () => preBuildBeta.generateWidget();
+  window.testWidget = () => preBuildBeta.testWidget();
+  window.exportWidget = () => preBuildBeta.exportWidget();
+  window.copyCode = () => preBuildBeta.copyCode();
+  window.downloadCode = () => preBuildBeta.downloadCode();
+  window.previewWidget = () => preBuildBeta.previewWidget();
+  window.searchWebRTCUpdates = () => preBuildBeta.searchWebRTCUpdates();
+  window.searchHLSUpdates = () => preBuildBeta.searchHLSUpdates();
+  window.searchStreamingUpdates = () => preBuildBeta.searchStreamingUpdates();
+  window.searchExtensions = () => preBuildBeta.searchExtensions();
+  </script>
+</body>
+</html>

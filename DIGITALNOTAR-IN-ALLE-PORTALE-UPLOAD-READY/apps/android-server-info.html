@@ -1,0 +1,567 @@
+<!-- TODO: Replacement character detected () - verify source encoding -->
+<!DOCTYPE html>
+<html lang="de" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Android Microsite Server - Information & Entscheidung</title>
+<h1 style="position: absolute; left: -9999px;">Android Microsite Server - Information & Entscheidung</h1>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .info-page {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .info-section {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+        }
+        .info-section h2 {
+            color: #333333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .info-section h3 {
+            color: #333333;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 1rem 0;
+        }
+        .pros, .cons {
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        .pros {
+            background: #f0fff0;
+            border: 1px solid #28a745;
+        }
+        .cons {
+            background: #fff5f5;
+            border: 1px solid #dc3545;
+        }
+        .pros h4, .cons h4 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+        .pros h4 {
+            color: #333333;
+        }
+        .cons h4 {
+            color: #333333;
+        }
+        .pros ul, .cons ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+        .pros li, .cons li {
+            margin: 0.5rem 0;
+        }
+        .use-cases {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .use-case {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        .use-case h4 {
+            color: #333333;
+            margin-top: 0;
+        }
+        .tech-comparison {
+            overflow-x: auto;
+        }
+        .tech-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        .tech-table th, .tech-table td {
+            border: 1px solid #ddd;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        .tech-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+        .tech-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        .decision-section {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+        .decision-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+        .decision-btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 200px;
+        }
+        .decision-btn.yes {
+            background: #28a745;
+            color: white;
+        }
+        .decision-btn.yes:hover {
+            background: #218838;
+        }
+        .decision-btn.no {
+            background: #dc3545;
+            color: white;
+        }
+        .decision-btn.no:hover {
+            background: #c82333;
+        }
+        .decision-btn.maybe {
+            background: #ffc107;
+            color: #333333;
+        }
+        .decision-btn.maybe:hover {
+            background: #e0a800;
+        }
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .warning-box h4 {
+            color: #333333;
+            margin-top: 0;
+        }
+        .info-box {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .info-box h4 {
+            color: #333333;
+            margin-top: 0;
+        }
+        .code-example {
+            background: #1e1e1e;
+            color: #333333;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333333;
+        }
+        .stat-label {
+            color: #333333;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="info-page">
+        <header class="top-app-bar">
+            <div class="top-app-bar-content">
+                <button class="icon-button" onclick="window.history.back()" title="Action Button">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                    </svg>
+                </button>
+                <h1 class="app-title">📱 Android Microsite Server - Information</h1>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Einführung -->
+            <div class="info-section">
+                <h2>🤔 Was ist ein Android Microsite Server?</h2>
+                <p>Ein <strong>Android Microsite Server</strong> verwandelt Ihr Android-Smartphone in einen voll funktionsfähigen Webserver. Dies ermöglicht es Ihnen, Webseiten direkt von Ihrem Gerät aus zu hosten und zu verwalten, ohne zusätzliche Hardware oder Hosting-Kosten.</p>
+                
+                <div class="info-box">
+                    <h4>💡 Einfach erklärt:</h4>
+                    <p>Stellen Sie sich vor, Ihr Smartphone wird zu einem kleinen Computer, der Webseiten bereitstellt - genau wie ein großer Server in einem Rechenzentrum, nur viel kleiner und tragbarer.</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">Verfügbarkeit möglich</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">0€</div>
+                        <div class="stat-label">Zusätzliche Kosten</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">5min</div>
+                        <div class="stat-label">Setup-Zeit</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">Mobil & tragbar</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wie es funktioniert -->
+            <div class="info-section">
+                <h2>⚙️ Wie funktioniert das technisch?</h2>
+                
+                <h3>1. Termux - Linux auf Android</h3>
+                <p><strong>Termux</strong> ist eine spezielle App, die eine vollständige Linux-Umgebung auf Ihrem Android-Gerät bereitstellt. Es ermöglicht die Installation und Ausführung von Server-Software direkt auf dem Smartphone.</p>
+
+                <h3>2. Caddy Webserver</h3>
+                <p><strong>Caddy</strong> ist ein moderner, leistungsstarker Webserver, der speziell für Einfachheit und Sicherheit entwickelt wurde. Im Vergleich zu traditionellen Servern wie Apache oder Nginx bietet Caddy:</p>
+                
+                <div class="code-example">
+# Automatisches HTTPS (SSL/TLS)
+# Keine komplexe Konfiguration
+# Moderne Web-Standards (HTTP/2, HTTP/3)
+# Eingebaute Sicherheitsfeatures
+                </div>
+
+                <h3>3. Tunnel-Technologien</h3>
+                <p>Da Android-Geräte normalerweise keine öffentliche IP-Adresse haben, verwenden wir <strong>Tunnel-Technologien</strong>, um Ihren Server öffentlich zugänglich zu machen:</p>
+                
+                <ul>
+                    <li><strong>SSH Reverse Proxy:</strong> Verbindung zu Ihrem eigenen Server</li>
+                    <li><strong>Cloudflare Tunnel:</strong> Sichere Verbindung über Cloudflare-Netzwerk</li>
+                    <li><strong>ngrok/localtunnel:</strong> Sofortiger öffentlicher Zugriff</li>
+                    <li><strong>LAN Only:</strong> Nur im lokalen Netzwerk verfügbar</li>
+                </ul>
+            </div>
+
+            <!-- Anwendungsfälle -->
+            <div class="info-section">
+                <h2>🎯 Wofür kann ich das verwenden?</h2>
+                
+                <div class="use-cases">
+                    <div class="use-case">
+                        <h4>🚀 Entwicklung & Testing</h4>
+                        <p>Testen Sie Webseiten und Apps lokal auf dem Smartphone, bevor Sie sie live schalten. Perfekt für Entwickler und Designer.</p>
+                    </div>
+                    
+                    <div class="use-case">
+                        <h4>📁 Dateifreigabe</h4>
+                        <p>Teilen Sie Dateien sicher im lokalen Netzwerk oder weltweit, ohne Cloud-Dienste zu verwenden.</p>
+                    </div>
+                    
+                    <div class="use-case">
+                        <h4>📚 Lernprojekte</h4>
+                        <p>Lernen Sie Webtechnologien praktisch kennen, ohne teure Server-Hardware zu benötigen.</p>
+                    </div>
+                    
+                    <div class="use-case">
+                        <h4>🌐 Persönliche Websites</h4>
+                        <p>Hosting für kleine persönliche Projekte, Blogs oder Portfolio-Websites.</p>
+                    </div>
+                    
+                    <div class="use-case">
+                        <h4>📱 IoT & Smart Home</h4>
+                        <p>Steuerung von Smart-Home-Geräten oder IoT-Projekten direkt vom Smartphone aus.</p>
+                    </div>
+                    
+                    <div class="use-case">
+                        <h4>🎮 Gaming Server</h4>
+                        <p>Kleine Multiplayer-Spiele oder Game-Server für Freunde und Familie.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vor- und Nachteile -->
+            <div class="info-section">
+                <h2>⚖️ Vor- und Nachteile</h2>
+                
+                <div class="pros-cons">
+                    <div class="pros">
+                        <h4>✅ Vorteile</h4>
+                        <ul>
+                            <li><strong>Kosteneffizienz:</strong> Keine zusätzlichen Hardware- oder Hosting-Kosten</li>
+                            <li><strong>Mobilität:</strong> Server überallhin mitnehmen</li>
+                            <li><strong>Energieeffizienz:</strong> Geringerer Stromverbrauch als traditionelle Server</li>
+                            <li><strong>Einfachheit:</strong> Automatische Installation und Konfiguration</li>
+                            <li><strong>Flexibilität:</strong> Verschiedene Tunnel-Optionen verfügbar</li>
+                            <li><strong>Lernmöglichkeit:</strong> Praktische Erfahrung mit Server-Technologien</li>
+                            <li><strong>Sicherheit:</strong> Caddy bietet automatisches HTTPS</li>
+                            <li><strong>Kontrolle:</strong> Vollständige Kontrolle über Ihren Server</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="cons">
+                        <h4>❌ Nachteile</h4>
+                        <ul>
+                            <li><strong>Leistungsbegrenzung:</strong> Smartphones haben begrenzte CPU/RAM-Ressourcen</li>
+                            <li><strong>Akkulaufzeit:</strong> Dauerbetrieb kann Akku schnell entladen</li>
+                            <li><strong>Netzwerkstabilität:</strong> Abhängig von WLAN/Mobile-Daten-Qualität</li>
+                            <li><strong>Skalierbarkeit:</strong> Nicht für große, kommerzielle Websites geeignet</li>
+                            <li><strong>Wartung:</strong> Regelmäßige Updates erforderlich</li>
+                            <li><strong>Sicherheitsrisiken:</strong> Öffentlicher Zugriff erfordert Sicherheitsmaßnahmen</li>
+                            <li><strong>Verfügbarkeit:</strong> Server offline, wenn Smartphone ausgeschaltet</li>
+                            <li><strong>Datenvolumen:</strong> Mobile Daten können bei intensiver Nutzung teuer werden</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Technologie-Vergleich -->
+            <div class="info-section">
+                <h2>🔧 Technologie-Vergleich</h2>
+                
+                <div class="tech-comparison">
+                    <table class="tech-table">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Caddy (unser System)</th>
+                                <th>Apache (traditionell)</th>
+                                <th>Nginx (traditionell)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Setup-Zeit</strong></td>
+                                <td>✅ 5 Minuten</td>
+                                <td>❌ 30+ Minuten</td>
+                                <td>❌ 20+ Minuten</td>
+                            </tr>
+                            <tr>
+                                <td><strong>HTTPS automatisch</strong></td>
+                                <td>✅ Ja</td>
+                                <td>❌ Manuell</td>
+                                <td>❌ Manuell</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Konfiguration</strong></td>
+                                <td>✅ Einfach</td>
+                                <td>❌ Komplex</td>
+                                <td>❌ Komplex</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Performance</strong></td>
+                                <td>✅ Sehr gut</td>
+                                <td>✅ Gut</td>
+                                <td>✅ Sehr gut</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Speicherverbrauch</strong></td>
+                                <td>✅ Niedrig</td>
+                                <td>❌ Hoch</td>
+                                <td>✅ Niedrig</td>
+                            </tr>
+                            <tr>
+                                <td><strong>HTTP/3 Support</strong></td>
+                                <td>✅ Ja</td>
+                                <td>❌ Nein</td>
+                                <td>⚠️ Experimental</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sicherheit -->
+            <div class="info-section">
+                <h2>🔒 Sicherheitsaspekte</h2>
+                
+                <div class="warning-box">
+                    <h4>⚠️ Wichtige Sicherheitshinweise</h4>
+                    <p>Ein öffentlich zugänglicher Webserver auf Ihrem Smartphone kann Sicherheitsrisiken bergen. Hier sind die wichtigsten Punkte:</p>
+                </div>
+
+                <h3>🛡️ Sicherheitsmaßnahmen in unserem System:</h3>
+                <ul>
+                    <li><strong>Automatisches HTTPS:</strong> Alle Verbindungen sind verschlüsselt</li>
+                    <li><strong>Sicherheits-Headers:</strong> Schutz vor XSS, Clickjacking und anderen Angriffen</li>
+                    <li><strong>Logging:</strong> Alle Zugriffe werden protokolliert</li>
+                    <li><strong>Firewall-kompatibel:</strong> Nur notwendige Ports werden geöffnet</li>
+                    <li><strong>Regelmäßige Updates:</strong> Termux-Pakete werden automatisch aktualisiert</li>
+                </ul>
+
+                <h3>🔐 Empfohlene zusätzliche Maßnahmen:</h3>
+                <ul>
+                    <li>Verwenden Sie starke Passwörter für SSH-Zugänge</li>
+                    <li>Aktivieren Sie 2FA wo möglich</li>
+                    <li>Überwachen Sie regelmäßig die Logs</li>
+                    <li>Verwenden Sie VPN für zusätzliche Sicherheit</li>
+                    <li>Backup wichtiger Daten regelmäßig</li>
+                </ul>
+            </div>
+
+            <!-- Performance & Limits -->
+            <div class="info-section">
+                <h2>📊 Performance & Grenzen</h2>
+                
+                <h3>🚀 Was können Sie erwarten?</h3>
+                <ul>
+                    <li><strong>Gleichzeitige Benutzer:</strong> 10-50 (je nach Gerät)</li>
+                    <li><strong>Datenübertragung:</strong> Bis zu 100 MB/s (je nach Netzwerk)</li>
+                    <li><strong>Verfügbarkeit:</strong> 99%+ (bei stabiler Stromversorgung)</li>
+                    <li><strong>Latenz:</strong> 10-50ms (lokales Netzwerk)</li>
+                </ul>
+
+                <h3>⚠️ Grenzen beachten:</h3>
+                <ul>
+                    <li>Nicht für kommerzielle Hochlast-Anwendungen geeignet</li>
+                    <li>Begrenzte Speicherkapazität für große Dateien</li>
+                    <li>Abhängig von Akku- und Netzwerkqualität</li>
+                    <li>Keine professionelle Server-Hardware</li>
+                </ul>
+            </div>
+
+            <!-- Kosten -->
+            <div class="info-section">
+                <h2>💰 Kostenübersicht</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">0€</div>
+                        <div class="stat-label">Setup-Kosten</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">0€</div>
+                        <div class="stat-label">Monatliche Kosten</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">~5€</div>
+                        <div class="stat-label">Stromkosten/Jahr</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">0€</div>
+                        <div class="stat-label">Wartungskosten</div>
+                    </div>
+                </div>
+
+                <h3>💡 Vergleich mit traditionellem Hosting:</h3>
+                <ul>
+                    <li><strong>Shared Hosting:</strong> 5-20€/Monat</li>
+                    <li><strong>VPS:</strong> 10-50€/Monat</li>
+                    <li><strong>Dedicated Server:</strong> 50-200€/Monat</li>
+                    <li><strong>Cloud Hosting:</strong> 20-100€/Monat</li>
+                </ul>
+            </div>
+
+            <!-- Entscheidung -->
+            <div class="decision-section">
+                <h2>🤔 Ihre Entscheidung</h2>
+                <p>Nachdem Sie alle Informationen gelesen haben, können Sie eine fundierte Entscheidung treffen:</p>
+                
+                <div class="decision-buttons">
+                    <button class="decision-btn yes" onclick="proceedWithInstallation()" title="Action Button">
+                        ✅ Ja, ich möchte das installieren
+                    </button>
+                    <button class="decision-btn maybe" onclick="showMoreInfo()" title="Action Button">
+                        🤔 Ich brauche mehr Informationen
+                    </button>
+                    <button class="decision-btn no" onclick="declineInstallation()" title="Action Button">
+                        ❌ Nein, das ist nichts für mich
+                    </button>
+                </div>
+                
+                <p><small>Ihre Entscheidung wird nicht gespeichert und Sie können jederzeit Ihre Meinung ändern.</small></p>
+            </div>
+
+            <!-- Zusätzliche Ressourcen -->
+            <div class="info-section">
+                <h2>📚 Weitere Informationen</h2>
+                
+                <h3>🔗 Nützliche Links:</h3>
+                <ul>
+                    <li><a href="https://termux.com/" target="_blank">Termux Offizielle Website</a></li>
+                    <li><a href="https://caddyserver.com/" target="_blank">Caddy Webserver Dokumentation</a></li>
+                    <li><a href="https://ngrok.com/" target="_blank">ngrok Tunnel Service</a></li>
+                    <li><a href="https://www.cloudflare.com/products/tunnel/" target="_blank">Cloudflare Tunnel</a></li>
+                </ul>
+
+                <h3>📖 Weiterführende Themen:</h3>
+                <ul>
+                    <li>Webserver-Sicherheit</li>
+                    <li>HTTPS und SSL-Zertifikate</li>
+                    <li>Netzwerk-Konfiguration</li>
+                    <li>Linux-Terminal-Befehle</li>
+                    <li>Web-Entwicklung</li>
+                </ul>
+            </div>
+        </main>
+    </div>
+
+    <script async>
+        function proceedWithInstallation() {
+            // Weiterleitung zur Installation
+            window.location.href = './android-microsite-server.html';
+        }
+
+        function showMoreInfo() {
+            // Zeige zusätzliche Informationen
+            alert('Weitere Informationen:\n\n' +
+                  '• Sie können jederzeit mit der Installation beginnen\n' +
+                  '• Die Installation kann jederzeit rückgängig gemacht werden\n' +
+                  '• Es fallen keine Kosten an\n' +
+                  '• Sie behalten die volle Kontrolle über Ihren Server\n\n' +
+                  'Möchten Sie trotzdem fortfahren?');
+        }
+
+        function declineInstallation() {
+            // Zurück zur Hauptseite
+            if (confirm('Sind Sie sicher, dass Sie die Installation ablehnen möchten?\n\nSie können jederzeit zurückkommen und die Installation starten.')) {
+                window.location.href = '../index.html';
+            }
+        }
+
+        // Smooth scrolling für bessere UX
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add smooth scrolling to all links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

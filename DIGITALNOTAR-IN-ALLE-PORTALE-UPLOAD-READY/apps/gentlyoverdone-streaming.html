@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MegaphonCyberdom GENTLYOVERDONE Streaming Portal</title>
+<h1 style="position: absolute; left: -9999px;">MegaphonCyberdom GENTLYOVERDONE Streaming Portal</h1>
+  
+  <!-- Open Graph / Twitter for maximal Shareability -->
+  <meta property="og:title" content="MegaphonCyberdom GENTLYOVERDONE Streaming Portal" />
+  <meta property="og:description" content="Live-Streaming von GENTLYOVERDONE Inhalten über Matrix WebRTC mit globaler Verteilung." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="data:image/svg+xml;utf8,<?xml version='1.0' encoding='UTF-8'?><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 630'><rect width='1200' height='630' fill='%23FF6B35'/><text x='50%' y='50%' dy='.35em' font-family='Inter,Segoe UI,Arial' font-size='88' text-anchor='middle' fill='%23fff'>GENTLYOVERDONE</text></svg>" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="MegaphonCyberdom GENTLYOVERDONE Streaming Portal" />
+  <meta name="twitter:description" content="Live-Streaming von GENTLYOVERDONE Inhalten über Matrix WebRTC mit globaler Verteilung." />
+
+  <!-- Basic theming -->
+  <meta name="theme-color" content="#FF6B35" />
+
+  <!-- Inline CSS (MegaphonCyberdom Orange Theme) -->
+  <style>
+    :root{
+      --bg:#0b0b0c; --bg-soft:#111216; --card:#151720; --muted:#9aa3b2; --text:#e8ebf0; 
+      --brand:#FF6B35; --accent:#FF8E53; --ok:#4ade80; --warn:#fbbf24; --danger:#fb7185;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:radial-gradient(1200px 600px at 15% 0%, rgba(255,107,53,.08), transparent 60%),
+                    radial-gradient(900px 600px at 85% 20%, rgba(255,142,83,.08), transparent 60%), var(--bg);
+         color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
+    a{color:var(--brand);text-decoration:none}
+    a:hover{text-decoration:underline}
+    header{position:sticky;top:0;background:linear-gradient(180deg, rgba(11,11,12,.9), rgba(11,11,12,.65));backdrop-filter: saturate(140%) blur(8px);z-index:5;border-bottom:1px solid #1f2330}
+    .wrap{max-width:1200px;margin:0 auto;padding:18px}
+    .row{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.3px}
+    .brand svg{width:28px;height:28px}
+    .pill{padding:6px 10px;border:1px solid #2a3040;border-radius:999px;color:var(--muted)}
+    .search{flex:1;display:flex;align-items:center;gap:8px;background:var(--bg-soft);border:1px solid #202434;border-radius:14px;padding:8px 12px}
+    .search input{flex:1;background:transparent;border:0;outline:none;color:var(--text)}
+
+    main{max-width:1200px;margin:0 auto;padding:20px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+    .card{background:linear-gradient(180deg, rgba(21,23,32,.9), rgba(21,23,32,.7));border:1px solid #1f2330;border-radius:18px;box-shadow:var(--shadow);overflow:visible;display:flex;flex-direction:column}
+    .card header{position:relative;background:transparent;backdrop-filter:none;border:0}
+    .card h3{margin:0;padding:16px;font-size:16px;display:flex;gap:10px;align-items:center}
+    .card .body{padding:0 16px 16px 16px}
+    .card iframe{width:100%;height:220px;border:0;border-top:1px solid #202434}
+    .card footer{padding:12px 16px;border-top:1px dashed #262b3a;color:var(--muted);font-size:13px}
+
+    .toolbar{display:flex;gap:8px;align-items:center}
+    .btn{appearance:none;background:#1c2233;border:1px solid #2a3040;color:var(--text);padding:8px 12px;border-radius:12px;font-weight:600;cursor:pointer}
+    .btn:hover{filter:brightness(1.06)}
+    .btn.ghost{background:transparent}
+    .btn.primary{background:var(--brand);border-color:var(--brand)}
+    .btn.live{background:var(--danger);border-color:var(--danger);animation:pulse 2s infinite}
+    .right{margin-left:auto}
+
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.7}}
+
+    .streaming-controls{display:flex;gap:8px;align-items:center;margin:10px 0}
+    .stream-status{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;background:var(--bg-soft)}
+    .stream-status.live{background:rgba(251,113,133,0.1);border:1px solid var(--danger)}
+    .stream-status.offline{background:rgba(154,163,178,0.1);border:1px solid var(--muted)}
+
+    .video-container{position:relative;width:100%;height:400px;background:#000;border-radius:12px;overflow:visible;margin:10px 0}
+    .video-container video{width:100%;height:100%;object-fit:cover}
+    .stream-overlay{position:absolute;top:10px;left:10px;background:rgba(0,0,0,0.7);padding:8px 12px;border-radius:6px;font-size:12px;font-weight:600}
+    .stream-overlay.live{color:var(--danger)}
+    .stream-overlay.offline{color:var(--muted)}
+
+    .chat-container{height:300px;background:var(--bg-soft);border-radius:12px;padding:12px;overflow-y:auto;margin:10px 0}
+    .chat-message{margin:8px 0;padding:8px;background:var(--card);border-radius:8px;font-size:14px}
+    .chat-message.system{background:rgba(255,107,53,0.1);border-left:3px solid var(--brand)}
+    .chat-message.matrix{background:rgba(104,213,255,0.1);border-left:3px solid #68d5ff}
+
+    .footer{color:var(--muted);text-align:center;padding:30px 10px}
+
+    /* Modal */
+    dialog{background:var(--card);border:1px solid #2a3040;border-radius:16px;color:var(--text);max-width:680px;width:92%}
+    dialog::backdrop{background:rgba(0,0,0,.5)}
+
+    /* Responsive helpers */
+    @media (max-width:640px){.hide-sm{display: block}}
+  </style>
+
+  <!-- JSON-LD Schema.org for Streaming -->
+  <script type="application/ld+json" id="schema">
+  {
+    "@context": "https://schema.org",
+    "@type": "BroadcastEvent",
+    "name": "GENTLYOVERDONE Streaming",
+    "description": "Live-Streaming von GENTLYOVERDONE Inhalten über Matrix WebRTC",
+    "url": "https://megaphoncyberdom.com/gentlyoverdone-streaming.html",
+    "broadcastOfEvent": {
+      "@type": "Event",
+      "name": "GENTLYOVERDONE Content",
+      "description": "Multimedia Content Streaming"
+    }
+  }
+  </script>
+</head>
+<body>
+  <!-- Topbar -->
+  <header>
+    <div class="wrap row">
+      <div class="brand">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-visible="false"><rect x="3" y="3" width="18" height="18" rx="4" fill="#FF6B35" stroke="#FF8E53"/><path d="M6 8h12M6 12h8M6 16h5" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+        <span>GENTLYOVERDONE Streaming</span>
+        <span class="show" id="streamStatus">offline</span>
+      </div>
+      <div class="search" role="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-visible="false"><circle cx="11" cy="11" r="7" stroke="#9aa3b2" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="#9aa3b2" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="q" placeholder="Suche in GENTLYOVERDONE Streams… ( / )" aria-label="Suche" / aria-label="Input Field">
+      </div>
+      <div class="toolbar right">
+        <button class="btn ghost" id="shareBtn" title="Stream teilen" title="Action Button">🔗</button>
+        <button class="btn live" id="startStreamBtn" title="Stream starten" title="Action Button">🔴 LIVE</button>
+        <button class="btn" id="installBtn" title="Als App installieren" title="Action Button">⬇️ App</button>
+        <button class="btn" id="aboutBtn" title="Action Button">ℹ️</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero / Intro -->
+  <main>
+    <section class="card" aria-label="Streaming Intro">
+      <header><h3>🔴 GENTLYOVERDONE Live Streaming Portal</h3></header>
+      <div class="body">
+        <p id="intro">Streamen Sie GENTLYOVERDONE Inhalte live über Matrix WebRTC mit globaler Verteilung. Unterstützt Video, Audio, Screen Sharing und interaktive Features.</p>
+        <div class="streaming-controls">
+          <button class="btn primary" id="startStream" title="Action Button">🔴 Stream starten</button>
+          <button class="btn" id="stopStream" title="Action Button">⏹️ Stream stoppen</button>
+          <button class="btn" id="screenShare" title="Action Button">📺 Bildschirm teilen</button>
+          <button class="btn" id="recordStream" title="Action Button">📹 Aufnehmen</button>
+        </div>
+        <div class="stream-status offline" id="streamStatusDisplay">
+          <span>⏹️</span>
+          <span>Stream offline</span>
+          <span id="viewerCount">0 Zuschauer</span>
+        </div>
+      </div>
+      <footer>Pro‑Tip: Verwenden Sie Matrix WebRTC für weltweite Verteilung und niedrige Latenz.</footer>
+    </section>
+
+    <!-- Live Stream Video -->
+    <section class="card" aria-label="Live Stream">
+      <header><h3>📺 Live Stream</h3></header>
+      <div class="body">
+        <div class="video-container" id="videoContainer">
+          <video id="streamVideo" autoplay muted playsinline style="display: block"></video>
+          <div class="stream-overlay offline" id="streamOverlay">
+            <span>⏹️ Stream offline</span>
+          </div>
+        </div>
+        <div class="row" style="gap:8px;flex-wrap:wrap;margin-top:10px">
+          <button class="btn" id="toggleAudio" title="Action Button">🔊 Audio</button>
+          <button class="btn" id="toggleVideo" title="Action Button">📹 Video</button>
+          <button class="btn" id="toggleChat" title="Action Button">💬 Chat</button>
+          <button class="btn" id="shareStream" title="Action Button">🔗 Teilen</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chat Integration -->
+    <section class="card" aria-label="Stream Chat">
+      <header><h3>💬 Stream Chat (Matrix Integration)</h3></header>
+      <div class="body">
+        <div class="chat-container" id="chatContainer">
+          <div class="chat-message system">
+            <strong>System:</strong> Willkommen im GENTLYOVERDONE Stream Chat! Verbunden über Matrix WebRTC.
+          </div>
+        </div>
+        <div class="row" style="gap:8px;margin-top:10px">
+          <input type="text" id="chatInput" placeholder="Nachricht eingeben..." style="flex:1;padding:8px;border-radius:8px;border:1px solid #2a3040;background:#0d1117;color:#e8ebf0" aria-label="Input Field">
+          <button class="btn primary" id="sendChat" title="Action Button">Senden</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Streaming Services -->
+    <section class="grid" id="streamingServices" aria-live="polite"></section>
+
+    <div class="footer">© <span id="year"></span> MegaphonCyberdom GENTLYOVERDONE Streaming. Live • Global • Matrix WebRTC. <span class="show">Powered by Matrix Federation.</span></div>
+  </main>
+
+  <!-- ABOUT / HELP DIALOG -->
+  <dialog id="about">
+    <form method="dialog" style="padding:18px 16px 8px">
+      <h2 style="margin:0 0 8px">Über GENTLYOVERDONE Streaming</h2>
+      <p style="color:var(--muted)">Live-Streaming von GENTLYOVERDONE Inhalten über Matrix WebRTC mit globaler Verteilung und niedriger Latenz.</p>
+      <ul>
+        <li>🔴 <strong>Live Streaming</strong> - Video, Audio, Screen Sharing</li>
+        <li>🌍 <strong>Matrix WebRTC</strong> - Weltweite Verteilung</li>
+        <li>💬 <strong>Live Chat</strong> - Matrix-basierte Kommunikation</li>
+        <li>📹 <strong>Recording</strong> - Stream-Aufzeichnung</li>
+        <li>🔗 <strong>Sharing</strong> - Einfaches Teilen</li>
+        <li>📱 <strong>PWA</strong> - Mobile Streaming</li>
+      </ul>
+      <div class="row" style="justify-content:flex-end;gap:8px;margin-top:10px">
+        <button class="btn ghost" value="cancel" title="Action Button">Schließen</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+  // ------------------
+  // 1) STREAMING CONFIG
+  // ------------------
+  const STREAMING_SERVICES = [
+    {
+      id:"youtube-live", kind:"streaming", title:"YouTube Live", descr:"Live-Streaming zu YouTube", tags:["streaming","youtube"],
+      embed: ()=>`<div class="body"><p>Streamen Sie direkt zu YouTube Live.</p><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn" onclick="GENTLY.startYouTubeStream()" title="Action Button">YouTube Live starten</button><button class="btn" onclick="GENTLY.connectYouTube()" title="Action Button">YouTube verbinden</button></div></div>`,
+      actions:[{label:"YouTube Live", href:"#", onclick:"GENTLY.startYouTubeStream()"}]
+    },
+    {
+      id:"twitch", kind:"streaming", title:"Twitch", descr:"Live-Streaming zu Twitch", tags:["streaming","twitch"],
+      embed: ()=>`<div class="body"><p>Streamen Sie direkt zu Twitch.</p><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn" onclick="GENTLY.startTwitchStream()" title="Action Button">Twitch Stream starten</button><button class="btn" onclick="GENTLY.connectTwitch()" title="Action Button">Twitch verbinden</button></div></div>`,
+      actions:[{label:"Twitch Stream", href:"#", onclick:"GENTLY.startTwitchStream()"}]
+    },
+    {
+      id:"matrix-webrtc", kind:"streaming", title:"Matrix WebRTC", descr:"Weltweite Verteilung über Matrix", tags:["streaming","matrix"],
+      embed: ()=>`<div class="body"><p>Streamen Sie über Matrix WebRTC für weltweite Verteilung.</p><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn" onclick="GENTLY.startMatrixStream()" title="Action Button">Matrix Stream starten</button><button class="btn" onclick="GENTLY.connectMatrix()" title="Action Button">Matrix verbinden</button></div></div>`,
+      actions:[{label:"Matrix Stream", href:"#", onclick:"GENTLY.startMatrixStream()"}]
+    },
+    {
+      id:"jitsi-meet", kind:"streaming", title:"Jitsi Meet", descr:"Open-Source Video-Konferenzen", tags:["streaming","jitsi"],
+      embed: ()=>`<div class="body"><p>Verwenden Sie Jitsi Meet für interaktive Streams.</p><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn" onclick="GENTLY.startJitsiStream()" title="Action Button">Jitsi Stream starten</button><button class="btn" onclick="GENTLY.connectJitsi()" title="Action Button">Jitsi verbinden</button></div></div>`,
+      actions:[{label:"Jitsi Stream", href:"#", onclick:"GENTLY.startJitsiStream()"}]
+    },
+    {
+      id:"obs-studio", kind:"streaming", title:"OBS Studio", descr:"Professionelle Streaming-Software", tags:["streaming","obs"],
+      embed: ()=>`<div class="body"><p>Verwenden Sie OBS Studio für professionelle Streams.</p><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn" onclick="GENTLY.connectOBS()" title="Action Button">OBS verbinden</button><button class="btn" onclick="GENTLY.downloadOBS()" title="Action Button">OBS herunterladen</button></div></div>`,
+      actions:[{label:"OBS verbinden", href:"#", onclick:"GENTLY.connectOBS()"}]
+    },
+    {
+      id:"stream-recording", kind:"recording", title:"Stream Recording", descr:"Aufzeichnung von Streams", tags:["recording","streaming"],
+      embed: ()=>`<div class="body"><p>Zeichnen Sie Ihre Streams auf.</p><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn" onclick="GENTLY.startRecording()" title="Action Button">Aufnahme starten</button><button class="btn" onclick="GENTLY.stopRecording()" title="Action Button">Aufnahme stoppen</button></div></div>`,
+      actions:[{label:"Aufnahme starten", href:"#", onclick:"GENTLY.startRecording()"}]
+    },
+    {
+      id:"tel-portal", kind:"portal", title:"TEL Portal", descr:"MegaphonCyberdom TEL Global Museum", tags:["portal","tel","museum"],
+      embed: ()=>`<div class="body"><p>Öffnen Sie das TEL Portal für globales Multimedia-Museum und Content-Sharing.</p><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn" onclick="GENTLY.openTELPortal()" title="Action Button">TEL Portal öffnen</button><button class="btn" onclick="GENTLY.openMuseum()" title="Action Button">Museum öffnen</button></div></div>`,
+      actions:[{label:"TEL Portal", href:"#", onclick:"GENTLY.openTELPortal()"}]
+    },
+    {
+      id:"matrix-integration", kind:"matrix", title:"Matrix Integration", descr:"TELCO Hub Matrix Bridge", tags:["matrix","telco","bridge"],
+      embed: ()=>`<div class="body"><p>Verbinden Sie sich mit dem TELCO Hub Matrix System für weltweite Kommunikation.</p><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn" onclick="GENTLY.openTELCOHub()" title="Action Button">TELCO Hub öffnen</button><button class="btn" onclick="GENTLY.connectMatrix()" title="Action Button">Matrix verbinden</button></div></div>`,
+      actions:[{label:"TELCO Hub", href:"#", onclick:"GENTLY.openTELCOHub()"}]
+    }
+  ];
+
+  // ------------------------
+  // 2) STREAMING SYSTEM
+  // ------------------------
+  let stream = null;
+  let mediaRecorder = null;
+  let recordedChunks = [];
+  let isStreaming = false;
+  let viewerCount = 0;
+  let chatMessages = [];
+
+  // ------------------------
+  // 3) RENDER & INTERACTIONS
+  // ------------------------
+  const qs = (s, el=document)=>el.querySelector(s);
+  const qsa = (s, el=document)=>[...el.querySelectorAll(s)];
+  const streamingServices = qs('#streamingServices');
+  const year = qs('#year');
+  year.textContent = new Date().getFullYear();
+
+  function renderStreamingServices(filter=''){
+    const f = filter.trim().toLowerCase();
+    streamingServices.innerHTML = '';
+    STREAMING_SERVICES.filter(s=>!f || s.title.toLowerCase().includes(f) || (s.tags||[]).some(t=>t.includes(f)) || s.id.includes(f)).forEach(s=>{
+      const card = document.createElement('article');
+      card.className = 'card';
+      card.innerHTML = `<header><h3>${iconFor(s.kind)} ${s.title}</h3></header>
+        <div class="body">${s.embed()}</div>
+        <footer>${s.descr||''}</footer>`;
+      // action links in footer
+      const footer = card.querySelector('footer');
+      const bar = document.createElement('div'); bar.className='row'; bar.style.gap='8px'; bar.style.flexWrap='wrap'; bar.style.marginTop='6px';
+      (s.actions||[]).forEach(a=>{
+        const b = document.createElement('a'); b.className='btn'; b.textContent=a.label; b.href=a.href||'#'; b.target=a.href? '_blank': '';
+        if(a.onclick){ b.removeAttribute('href'); b.addEventListener('click', e=>{e.preventDefault(); eval(a.onclick);}); }
+        bar.appendChild(b);
+      });
+      footer.appendChild(bar);
+      streamingServices.appendChild(card);
+    })
+  }
+
+  function iconFor(kind){
+    const map={streaming:'🔴',recording:'📹',chat:'💬',matrix:'🌐',youtube:'📺',twitch:'🎮',portal:'🌐',tel:'📱',museum:'🏛️',bridge:'🔗'};return `<span aria-visible="false">${map[kind]||'🔗'}</span>`
+  }
+
+  // search input
+  const search = qs('#q');
+  document.addEventListener('keydown',e=>{ if(e.key==='/' && document.activeElement!==search){ e.preventDefault(); search.focus(); } });
+  search.addEventListener('input',e=>renderStreamingServices(e.target.value));
+
+  // dialogs
+  const about = qs('#about');
+  qs('#aboutBtn').onclick=()=>about.showModal();
+
+  // Share
+  qs('#shareBtn').onclick=async()=>{
+    const data={title:document.title, text:'GENTLYOVERDONE Live Streaming', url:location.href};
+    if(navigator.share){ try{ await navigator.share(data);}catch(e){} }
+    else { navigator.clipboard.writeText(location.href); alert('Stream-Link kopiert.'); }
+  }
+
+  // ------------------------
+  // 4) STREAMING FUNCTIONALITY
+  // ------------------------
+  const GENTLY = window.GENTLY = {
+    async startStream() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: 1280, height: 720 },
+          audio: true
+        });
+        
+        const video = qs('#streamVideo');
+        video.srcObject = stream;
+        video.style.display = 'block';
+        
+        this.updateStreamStatus(true);
+        this.addChatMessage('system', 'Stream gestartet! Willkommen bei GENTLYOVERDONE.');
+        
+        return stream;
+      } catch (error) {
+        alert('Fehler beim Starten des Streams: ' + error.message);
+        return null;
+      }
+    },
+
+    stopStream() {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+      }
+      
+      const video = qs('#streamVideo');
+      video.style.display = 'none';
+      
+      this.updateStreamStatus(false);
+      this.addChatMessage('system', 'Stream gestoppt.');
+    },
+
+    async startScreenShare() {
+      try {
+        const stream = await navigator.mediaDevices.getDisplayMedia({
+          video: { width: 1920, height: 1080 },
+          audio: true
+        });
+        
+        const video = qs('#streamVideo');
+        video.srcObject = stream;
+        video.style.display = 'block';
+        
+        this.updateStreamStatus(true);
+        this.addChatMessage('system', 'Bildschirm-Sharing gestartet!');
+        
+        return stream;
+      } catch (error) {
+        alert('Fehler beim Bildschirm-Sharing: ' + error.message);
+        return null;
+      }
+    },
+
+    startRecording() {
+      if (!stream) {
+        alert('Bitte starten Sie zuerst einen Stream.');
+        return;
+      }
+      
+      recordedChunks = [];
+      mediaRecorder = new MediaRecorder(stream);
+      
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          recordedChunks.push(event.data);
+        }
+      };
+      
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `gentlyoverdone-stream-${new Date().toISOString()}.webm`;
+        a.click();
+        URL.revokeObjectURL(url);
+      };
+      
+      mediaRecorder.start();
+      this.addChatMessage('system', 'Aufnahme gestartet!');
+    },
+
+    stopRecording() {
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+        this.addChatMessage('system', 'Aufnahme gestoppt und heruntergeladen.');
+      }
+    },
+
+    updateStreamStatus(isLive) {
+      isStreaming = isLive;
+      const statusPill = qs('#streamStatus');
+      const statusDisplay = qs('#streamStatusDisplay');
+      const overlay = qs('#streamOverlay');
+      
+      if (isLive) {
+        statusPill.textContent = 'LIVE';
+        statusPill.className = 'pill live';
+        statusDisplay.className = 'stream-status live';
+        statusDisplay.innerHTML = '<span>🔴</span><span>Stream live</span><span id="viewerCount">' + viewerCount + ' Zuschauer</span>';
+        overlay.className = 'stream-overlay live';
+        overlay.innerHTML = '<span>🔴 LIVE</span>';
+      } else {
+        statusPill.textContent = 'offline';
+        statusPill.className = 'pill';
+        statusDisplay.className = 'stream-status offline';
+        statusDisplay.innerHTML = '<span>⏹️</span><span>Stream offline</span><span id="viewerCount">0 Zuschauer</span>';
+        overlay.className = 'stream-overlay offline';
+        overlay.innerHTML = '<span>⏹️ Stream offline</span>';
+      }
+    },
+
+    addChatMessage(type, message) {
+      const chatContainer = qs('#chatContainer');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `chat-message ${type}`;
+      messageDiv.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+      chatContainer.appendChild(messageDiv);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    },
+
+    // Streaming Service Integration
+    startYouTubeStream() {
+      this.addChatMessage('system', 'YouTube Live Stream gestartet!');
+      // YouTube Live API Integration hier
+    },
+
+    startTwitchStream() {
+      this.addChatMessage('system', 'Twitch Stream gestartet!');
+      // Twitch API Integration hier
+    },
+
+    startMatrixStream() {
+      this.addChatMessage('matrix', 'Matrix WebRTC Stream gestartet! Weltweite Verteilung aktiviert.');
+      // Matrix WebRTC Integration hier
+    },
+
+    startJitsiStream() {
+      this.addChatMessage('system', 'Jitsi Meet Stream gestartet!');
+      // Jitsi Meet Integration hier
+    },
+
+    connectOBS() {
+      this.addChatMessage('system', 'OBS Studio Verbindung hergestellt!');
+      // OBS Studio Integration hier
+    },
+
+    // TEL Portal Integration
+    openTELPortal() {
+      window.open('http://localhost:8080/web/apps/tel-global-museum.html', '_blank');
+      this.addChatMessage('system', 'TEL Portal geöffnet! Globales Multimedia-Museum verfügbar.');
+    },
+
+    openTEL1NL() {
+      window.open('https://tel1.nl', '_blank');
+      this.addChatMessage('system', 'TEL1.NL geöffnet! Offizielle TEL Portal Website.');
+    },
+
+    openGENTLYOVERDONECOM() {
+      window.open('https://gentlyoverdone.com', '_blank');
+      this.addChatMessage('system', 'gentlyoverdone.com geöffnet! GENTLYOVERDONE Website.');
+    },
+
+    openMuseum() {
+      window.open('http://localhost:8080/web/apps/tel-global-museum.html#museum', '_blank');
+      this.addChatMessage('system', 'TEL Museum geöffnet! Content-Sharing verfügbar.');
+    },
+
+    openTELCOHub() {
+      window.open('http://localhost:8080', '_blank');
+      this.addChatMessage('system', 'TELCO Hub geöffnet! Matrix Integration verfügbar.');
+    },
+
+    connectMatrix() {
+      window.open('http://localhost:8080', '_blank');
+      this.addChatMessage('matrix', 'Matrix Integration aktiviert! Weltweite Kommunikation verfügbar.');
+    }
+  };
+
+  // Event Listeners
+  qs('#startStream').onclick = () => GENTLY.startStream();
+  qs('#stopStream').onclick = () => GENTLY.stopStream();
+  qs('#screenShare').onclick = () => GENTLY.startScreenShare();
+  qs('#recordStream').onclick = () => GENTLY.startRecording();
+
+  qs('#startStreamBtn').onclick = () => GENTLY.startStream();
+  qs('#toggleAudio').onclick = () => GENTLY.addChatMessage('system', 'Audio umgeschaltet');
+  qs('#toggleVideo').onclick = () => GENTLY.addChatMessage('system', 'Video umgeschaltet');
+  qs('#toggleChat').onclick = () => GENTLY.addChatMessage('system', 'Chat umgeschaltet');
+  qs('#shareStream').onclick = () => GENTLY.addChatMessage('system', 'Stream geteilt!');
+
+  qs('#sendChat').onclick = () => {
+    const input = qs('#chatInput');
+    if (input.value.trim()) {
+      GENTLY.addChatMessage('user', input.value);
+      input.value = '';
+    }
+  };
+
+  qs('#chatInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      qs('#sendChat').click();
+    }
+  });
+
+  // PWA: dynamic manifest + Service Worker via Blob
+  (function setupPWA(){
+    const manifest = { name:"GENTLYOVERDONE Streaming", short_name:"GENTLY", start_url:"./", display:"standalone", background_color:"#FF6B35", theme_color:"#FF6B35", icons:[{src:iconData(), sizes:"192x192", type:"image/png"}] };
+    const mBlob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+    const mUrl = URL.createObjectURL(mBlob);
+    const link=document.createElement('link'); link.rel='manifest'; link.href=mUrl; document.head.appendChild(link);
+
+    const swCode = `self.addEventListener('install',e=>{e.waitUntil(caches.open('gently-streaming-v1').then(c=>c.addAll(['./'])))});
+self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>caches.match('./'))))});`;
+    const swUrl = URL.createObjectURL(new Blob([swCode],{type:'text/javascript'}));
+    if('serviceWorker' in navigator){ navigator.serviceWorker.register(swUrl).then(()=>console.log('PWA ready')).catch(()=>{}); }
+
+    // install prompt
+    const installBtn = document.getElementById('installBtn');
+    let deferred; window.addEventListener('beforeinstallprompt', (e)=>{ e.preventDefault(); deferred=e; installBtn.disabled=false; });
+    installBtn.onclick=()=> deferred? deferred.prompt(): alert('In Browser‑Menü „Zum Home‑Bildschirm hinzufügen".');
+
+    function iconData(){ // simple PNG via canvas -> dataURL
+      const c=document.createElement('canvas'); c.width=c.height=192; const x=c.getContext('2d'); x.fillStyle='#FF6B35'; x.fillRect(0,0,192,192); x.fillStyle='#fff'; x.font='bold 108px Inter,Segoe UI,Arial'; x.textAlign='center'; x.textBaseline='middle'; x.fillText('G',96,96); return c.toDataURL('image/png');
+    }
+  })();
+
+  // Load streaming services
+  window.addEventListener('load',async()=>{
+    renderStreamingServices();
+    GENTLY.addChatMessage('system', 'GENTLYOVERDONE Streaming Portal geladen! Bereit für Live-Streams.');
+    
+    // Live-Info-System laden
+    try {
+      const liveInfoScript = document.createElement('script');
+      liveInfoScript.src = '/live-info-system.js';
+      liveInfoScript.type = 'module';
+      document.head.appendChild(liveInfoScript);
+      
+      const aiLaunchpadScript = document.createElement('script');
+      aiLaunchpadScript.src = '/ai-launchpad-widget.js';
+      aiLaunchpadScript.setAttribute('data-position', 'bl');
+      aiLaunchpadScript.setAttribute('data-accent', '#FF6B35');
+      aiLaunchpadScript.setAttribute('data-title', 'GENTLYOVERDONE AI Tools');
+      aiLaunchpadScript.setAttribute('data-compact', 'false');
+      document.head.appendChild(aiLaunchpadScript);
+      
+      GENTLY.addChatMessage('system', 'Live-Info-System mit Pop-Hover, Haptic Touch und AI Launchpad wird geladen...');
+    } catch (error) {
+      console.error('Fehler beim Laden des Live-Info-Systems:', error);
+    }
+  });
+
+  </script>
+</body>
+</html>

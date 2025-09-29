@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 Think & Question Beacon - Universal Connection Manager</title>
+<h1 style="position: absolute; left: -9999px;">🧠 Think & Question Beacon - Universal Connection Manager</h1>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        :root {
+            --think-primary: #1a1a2e;
+            --think-secondary: #16213e;
+            --think-accent: #0f3460;
+            --think-gold: #e94560;
+            --think-light: #f5f5f5;
+            --think-universe: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --think-cosmos: linear-gradient(45deg, #1e3c72 0%, #2a5298 100%);
+        }
+
+        .think-universe {
+            background: var(--think-universe);
+            min-height: 100vh;
+            color: var(--think-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
+            overflow-x: visible;
+        }
+
+        .think-universe::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+            animation: universeFloat 20s ease-in-out infinite;
+        }
+
+        @keyframes universeFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-10px) rotate(1deg); }
+            66% { transform: translateY(5px) rotate(-1deg); }
+        }
+
+        .think-header {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 3rem 2rem;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(20px);
+            border-bottom: 3px solid var(--think-gold);
+        }
+
+        .think-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin: 0;
+            background: linear-gradient(45deg, #FFD700, #FFA500, #FF6B6B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255,215,0,0.5);
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            0% { filter: brightness(1) drop-shadow(0 0 20px rgba(255,215,0,0.5)); }
+            100% { filter: brightness(1.2) drop-shadow(0 0 30px rgba(255,215,0,0.8)); }
+        }
+
+        .think-subtitle {
+            font-size: 1.4rem;
+            margin: 1rem 0 0 0;
+            opacity: 0.9;
+            font-style: italic;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .connection-manager {
+            position: relative;
+            z-index: 10;
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+
+        .manager-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .manager-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--think-gold);
+            margin-bottom: 1rem;
+        }
+
+        .manager-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+
+        .connection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .connection-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: visible;
+        }
+
+        .connection-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .connection-card:hover::before {
+            left: 100%;
+        }
+
+        .connection-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border-color: var(--think-gold);
+        }
+
+        .connection-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .connection-icon {
+            font-size: 2.5rem;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            border: 2px solid var(--think-gold);
+            animation: iconPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(233, 69, 96, 0.3); }
+            50% { transform: scale(1.1); box-shadow: 0 0 30px rgba(233, 69, 96, 0.6); }
+        }
+
+        .connection-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--think-gold);
+        }
+
+        .connection-description {
+            margin: 1rem 0;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .connection-status {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin: 1rem 0;
+        }
+
+        .status-active { background: rgba(16, 185, 129, 0.3); color: #10B981; border: 1px solid #10B981; }
+        .status-connecting { background: rgba(245, 158, 11, 0.3); color: #F59E0B; border: 1px solid #F59E0B; }
+        .status-connected { background: rgba(59, 130, 246, 0.3); color: #3B82F6; border: 1px solid #3B82F6; }
+        .status-anonymous { background: rgba(107, 114, 128, 0.3); color: #6B7280; border: 1px solid #6B7280; }
+
+        .connection-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .connection-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+            position: relative;
+            overflow: visible;
+        }
+
+        .connection-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .connection-btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: var(--think-gold);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #d63384;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(233, 69, 96, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #10B981, #059669);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(45deg, #059669, #047857);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #F59E0B, #D97706);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: linear-gradient(45deg, #D97706, #B45309);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+        }
+
+        .connection-form {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--think-gold);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .form-checkbox input {
+            width: 20px;
+            height: 20px;
+        }
+
+        .connection-log {
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            border-left: 4px solid var(--think-gold);
+        }
+
+        .log-timestamp {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-bottom: 0.5rem;
+        }
+
+        .log-message {
+            font-weight: 500;
+        }
+
+        .log-status {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            margin-left: 0.5rem;
+        }
+
+        .status-success { background: rgba(16, 185, 129, 0.3); color: #10B981; }
+        .status-error { background: rgba(239, 68, 68, 0.3); color: #EF4444; }
+        .status-info { background: rgba(59, 130, 246, 0.3); color: #3B82F6; }
+
+        .floating-beacons {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .floating-beacon {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--think-gold);
+            border-radius: 50%;
+            animation: floatBeacon 8s ease-in-out infinite;
+        }
+
+        @keyframes floatBeacon {
+            0%, 100% { opacity: 0.3; transform: translateY(0px); }
+            50% { opacity: 1; transform: translateY(-20px); }
+        }
+
+        .beacon-1 { top: 20%; left: 10%; animation-delay: 0s; }
+        .beacon-2 { top: 60%; left: 20%; animation-delay: 2s; }
+        .beacon-3 { top: 30%; left: 80%; animation-delay: 4s; }
+        .beacon-4 { top: 70%; left: 70%; animation-delay: 6s; }
+        .beacon-5 { top: 40%; left: 50%; animation-delay: 1s; }
+        .beacon-6 { top: 80%; left: 30%; animation-delay: 3s; }
+
+        .notification-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--think-gold);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 10000;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .notification-toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        @media (max-width: 768px) {
+            .think-title {
+                font-size: 2.5rem;
+            }
+            
+            .connection-grid {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+            
+            .connection-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="think-universe">
+        <!-- Floating Beacons -->
+        <div class="floating-beacons">
+            <div class="floating-beacon beacon-1"></div>
+            <div class="floating-beacon beacon-2"></div>
+            <div class="floating-beacon beacon-3"></div>
+            <div class="floating-beacon beacon-4"></div>
+            <div class="floating-beacon beacon-5"></div>
+            <div class="floating-beacon beacon-6"></div>
+        </div>
+
+        <!-- Header -->
+        <div class="think-header">
+            <h1 class="think-title">🧠 Think & Question Beacon</h1>
+            <p class="think-subtitle">Universal Connection Manager - Denk.link & Fragen.link Integration</p>
+        </div>
+
+        <!-- Connection Manager -->
+        <div class="connection-manager">
+            <div class="manager-header">
+                <h2 class="manager-title">🌐 Universal Connection Manager</h2>
+                <p class="manager-subtitle">Alle Verbindungen inklusive Denk.link, Fragen.link, Email, Telefon und mehr</p>
+            </div>
+
+            <!-- Connection Grid -->
+            <div class="connection-grid">
+                <!-- Denk.link Connection -->
+                <div class="connection-card">
+                    <div class="connection-header">
+                        <div class="connection-icon">🧠</div>
+                        <div>
+                            <h3 class="connection-title">Denk.link Platform</h3>
+                            <span class="connection-status status-active">Active</span>
+                        </div>
+                    </div>
+                    <div class="connection-description">
+                        Verbindung zur Denk.link Plattform für tiefes Denken und philosophische Diskussionen. 
+                        Integration in das weltweite Massensprechen-System.
+                    </div>
+                    <div class="connection-actions">
+                        <button class="connection-btn btn-primary" onclick="connectToDenk()" title="Action Button">🧠 Connect to Denk</button>
+                        <button class="connection-btn btn-secondary" onclick="openDenkLink()" title="Action Button">🔗 Open Denk.link</button>
+                    </div>
+                </div>
+
+                <!-- Fragen.link Connection -->
+                <div class="connection-card">
+                    <div class="connection-header">
+                        <div class="connection-icon">❓</div>
+                        <div>
+                            <h3 class="connection-title">Fragen.link Platform</h3>
+                            <span class="connection-status status-active">Active</span>
+                        </div>
+                    </div>
+                    <div class="connection-description">
+                        Verbindung zur Fragen.link Plattform für Fragen und Antworten. 
+                        Teilnahme an der weltweiten Action mit einem Mund sprechen.
+                    </div>
+                    <div class="connection-actions">
+                        <button class="connection-btn btn-primary" onclick="connectToFragen()" title="Action Button">❓ Connect to Fragen</button>
+                        <button class="connection-btn btn-secondary" onclick="openFragenLink()" title="Action Button">🔗 Open Fragen.link</button>
+                    </div>
+                </div>
+
+                <!-- Email Connection -->
+                <div class="connection-card">
+                    <div class="connection-header">
+                        <div class="connection-icon">📧</div>
+                        <div>
+                            <h3 class="connection-title">Email System</h3>
+                            <span class="connection-status status-connected">Connected</span>
+                        </div>
+                    </div>
+                    <div class="connection-description">
+                        Automatisches Email-System für Benachrichtigungen und Kommunikation. 
+                        Test-Email an gentlyoverdone@outlook.com verfügbar.
+                    </div>
+                    <div class="connection-actions">
+                        <button class="connection-btn btn-success" onclick="sendTestEmail()" title="Action Button">📧 Send Test Email</button>
+                        <button class="connection-btn btn-secondary" onclick="openEmailForm()" title="Action Button">✍️ Compose Email</button>
+                    </div>
+                </div>
+
+                <!-- Phone Connection -->
+                <div class="connection-card">
+                    <div class="connection-header">
+                        <div class="connection-icon">📞</div>
+                        <div>
+                            <h3 class="connection-title">Phone System</h3>
+                            <span class="connection-status status-connecting">Connecting</span>
+                        </div>
+                    </div>
+                    <div class="connection-description">
+                        Telefon-System mit Anonymitätsoptionen. 
+                        Test-Anruf an +31613803782 verfügbar.
+                    </div>
+                    <div class="connection-actions">
+                        <button class="connection-btn btn-warning" onclick="makeTestCall()" title="Action Button">📞 Test Call</button>
+                        <button class="connection-btn btn-secondary" onclick="openPhoneForm()" title="Action Button">📱 Call Manager</button>
+                    </div>
+                </div>
+
+                <!-- Anonymous Connection -->
+                <div class="connection-card">
+                    <div class="connection-header">
+                        <div class="connection-icon">🎭</div>
+                        <div>
+                            <h3 class="connection-title">Anonymous Mode</h3>
+                            <span class="connection-status status-anonymous">Available</span>
+                        </div>
+                    </div>
+                    <div class="connection-description">
+                        Anonyme Verbindungsoptionen für alle Kommunikationsarten. 
+                        Schutz der Privatsphäre bei allen Verbindungen.
+                    </div>
+                    <div class="connection-actions">
+                        <button class="connection-btn btn-secondary" onclick="enableAnonymous()" title="Action Button">🎭 Enable Anonymous</button>
+                        <button class="connection-btn btn-primary" onclick="anonymousConnect()" title="Action Button">🔒 Anonymous Connect</button>
+                    </div>
+                </div>
+
+                <!-- Mass Speaking Action -->
+                <div class="connection-card">
+                    <div class="connection-header">
+                        <div class="connection-icon">🌍</div>
+                        <div>
+                            <h3 class="connection-title">Mass Speaking Action</h3>
+                            <span class="connection-status status-active">Active</span>
+                        </div>
+                    </div>
+                    <div class="connection-description">
+                        Weltweite Action mit einem Mund sprechen. 
+                        Integration aller Plattformen für globale Kommunikation.
+                    </div>
+                    <div class="connection-actions">
+                        <button class="connection-btn btn-success" onclick="joinMassSpeaking()" title="Action Button">🌍 Join Mass Speaking</button>
+                        <button class="connection-btn btn-secondary" onclick="viewMassSpeaking()" title="Action Button">📊 View Status</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Connection Forms -->
+            <div class="connection-form" id="email-form" style="display: block;">
+                <h3 style="color: var(--think-gold); margin-bottom: 1rem;">📧 Email Composer</h3>
+                <div class="form-group">
+                    <label class="form-label">To:</label>
+                    <input type="email" class="form-input" id="email-to" placeholder="recipient@example.com" value="gentlyoverdone@outlook.com" aria-label="Input Field">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Subject:</label>
+                    <input type="text" class="form-input" id="email-subject" placeholder="Email subject" aria-label="Input Field">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Message:</label>
+                    <textarea class="form-input form-textarea" id="email-message" placeholder="Your message here..."></textarea>
+                </div>
+                <div class="form-checkbox">
+                    <input type="checkbox" id="email-anonymous" aria-label="Input Field">
+                    <label for="email-anonymous">Send anonymously</label>
+                </div>
+                <div class="connection-actions">
+                    <button class="connection-btn btn-success" onclick="sendEmail()" title="Action Button">📧 Send Email</button>
+                    <button class="connection-btn btn-secondary" onclick="closeEmailForm()" title="Action Button">❌ Cancel</button>
+                </div>
+            </div>
+
+            <div class="connection-form" id="phone-form" style="display: block;">
+                <h3 style="color: var(--think-gold); margin-bottom: 1rem;">📞 Phone Manager</h3>
+                <div class="form-group">
+                    <label class="form-label">Phone Number:</label>
+                    <input type="tel" class="form-input" id="phone-number" placeholder="+1234567890" value="+31613803782" aria-label="Input Field">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Call Type:</label>
+                    <select class="form-input" id="call-type">
+                        <option value="test">Test Call</option>
+                        <option value="normal">Normal Call</option>
+                        <option value="conference">Conference Call</option>
+                    </select>
+                </div>
+                <div class="form-checkbox">
+                    <input type="checkbox" id="phone-anonymous" aria-label="Input Field">
+                    <label for="phone-anonymous">Call anonymously</label>
+                </div>
+                <div class="connection-actions">
+                    <button class="connection-btn btn-warning" onclick="makeCall()" title="Action Button">📞 Make Call</button>
+                    <button class="connection-btn btn-secondary" onclick="closePhoneForm()" title="Action Button">❌ Cancel</button>
+                </div>
+            </div>
+
+            <!-- Connection Log -->
+            <div class="connection-log">
+                <h3 style="color: var(--think-gold); margin-bottom: 1rem;">📋 Connection Log</h3>
+                <div id="connection-log-entries">
+                    <!-- Log entries will be dynamically added -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Toast -->
+        <div class="notification-toast" id="notification-toast"></div>
+    </div>
+
+    <script>
+        class ThinkQuestionBeacon {
+            constructor() {
+                this.connections = new Map();
+                this.connectionLog = [];
+                this.anonymousMode = false;
+                this.massSpeakingActive = false;
+                
+                this.init();
+            }
+
+            async init() {
+                console.log('🧠 Think & Question Beacon initializing...');
+                
+                await this.loadConnections();
+                await this.loadConnectionLog();
+                this.initializeConnections();
+                this.startConnectionMonitoring();
+                
+                console.log('✅ Think & Question Beacon initialized');
+            }
+
+            async loadConnections() {
+                try {
+                    const saved = localStorage.getItem('think-question-connections');
+                    if (saved) {
+                        this.connections = new Map(JSON.parse(saved));
+                    } else {
+                        this.initializeDefaultConnections();
+                    }
+                } catch (error) {
+                    console.error('Error loading connections:', error);
+                    this.initializeDefaultConnections();
+                }
+            }
+
+            initializeDefaultConnections() {
+                const defaultConnections = [
+                    {
+                        id: 'denk-link',
+                        name: 'Denk.link',
+                        url: 'https://denk.link',
+                        type: 'platform',
+                        status: 'active',
+                        description: 'Philosophical thinking platform'
+                    },
+                    {
+                        id: 'fragen-link',
+                        name: 'Fragen.link',
+                        url: 'https://fragen.link',
+                        type: 'platform',
+                        status: 'active',
+                        description: 'Questions and answers platform'
+                    },
+                    {
+                        id: 'email-system',
+                        name: 'Email System',
+                        url: 'mailto:',
+                        type: 'communication',
+                        status: 'connected',
+                        description: 'Email communication system'
+                    },
+                    {
+                        id: 'phone-system',
+                        name: 'Phone System',
+                        url: 'tel:',
+                        type: 'communication',
+                        status: 'connecting',
+                        description: 'Telephone communication system'
+                    }
+                ];
+
+                defaultConnections.forEach(conn => {
+                    this.connections.set(conn.id, conn);
+                });
+
+                this.saveConnections();
+            }
+
+            async loadConnectionLog() {
+                try {
+                    const saved = localStorage.getItem('think-question-log');
+                    if (saved) {
+                        this.connectionLog = JSON.parse(saved);
+                    }
+                } catch (error) {
+                    console.error('Error loading connection log:', error);
+                }
+            }
+
+            initializeConnections() {
+                // Initialize connection statuses
+                this.connections.forEach((conn, id) => {
+                    this.updateConnectionStatus(id, conn.status);
+                });
+            }
+
+            startConnectionMonitoring() {
+                // Monitor connections every 30 seconds
+                setInterval(() => {
+                    this.monitorConnections();
+                }, 30000);
+            }
+
+            async monitorConnections() {
+                for (const [id, conn] of this.connections) {
+                    try {
+                        const status = await this.checkConnectionStatus(conn);
+                        if (status !== conn.status) {
+                            this.updateConnectionStatus(id, status);
+                            this.addLogEntry(`Connection status changed for ${conn.name}: ${status}`, 'info');
+                        }
+                    } catch (error) {
+                        console.error(`Error monitoring ${conn.name}:`, error);
+                    }
+                }
+            }
+
+            async checkConnectionStatus(connection) {
+                // Simulate connection check
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        const statuses = ['active', 'connected', 'connecting', 'disconnected'];
+                        const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+                        resolve(randomStatus);
+                    }, Math.random() * 1000 + 500);
+                });
+            }
+
+            updateConnectionStatus(id, status) {
+                const conn = this.connections.get(id);
+                if (conn) {
+                    conn.status = status;
+                    conn.lastUpdate = Date.now();
+                    this.connections.set(id, conn);
+                    this.saveConnections();
+                }
+            }
+
+            addLogEntry(message, type = 'info') {
+                const entry = {
+                    id: `log-${Date.now()}`,
+                    timestamp: new Date().toISOString(),
+                    message: message,
+                    type: type
+                };
+
+                this.connectionLog.push(entry);
+                
+                // Keep only last 100 entries
+                if (this.connectionLog.length > 100) {
+                    this.connectionLog = this.connectionLog.slice(-100);
+                }
+
+                this.saveConnectionLog();
+                this.updateLogDisplay();
+            }
+
+            updateLogDisplay() {
+                const container = document.getElementById('connection-log-entries');
+                container.innerHTML = '';
+
+                this.connectionLog.slice(-10).reverse().forEach(entry => {
+                    const logEntry = document.createElement('div');
+                    logEntry.className = 'log-entry';
+                    logEntry.innerHTML = `
+                        <div class="log-timestamp">${new Date(entry.timestamp).toLocaleString()}</div>
+                        <div class="log-message">
+                            ${entry.message}
+                            <span class="log-status status-${entry.type}">${entry.type.toUpperCase()}</span>
+                        </div>
+                    `;
+                    container.appendChild(logEntry);
+                });
+            }
+
+            saveConnections() {
+                const data = Array.from(this.connections.entries());
+                localStorage.setItem('think-question-connections', JSON.stringify(data));
+            }
+
+            saveConnectionLog() {
+                localStorage.setItem('think-question-log', JSON.stringify(this.connectionLog));
+            }
+
+            // Connection Methods
+            async connectToDenk() {
+                this.addLogEntry('Connecting to Denk.link platform...', 'info');
+                this.showNotification('Connecting to Denk.link...', 'info');
+                
+                try {
+                    // Simulate connection
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    
+                    this.updateConnectionStatus('denk-link', 'connected');
+                    this.addLogEntry('Successfully connected to Denk.link', 'success');
+                    this.showNotification('Connected to Denk.link!', 'success');
+                    
+                    // Open Denk.link in new tab
+                    window.open('https://denk.link', '_blank');
+                } catch (error) {
+                    this.addLogEntry(`Failed to connect to Denk.link: ${error.message}`, 'error');
+                    this.showNotification('Failed to connect to Denk.link', 'error');
+                }
+            }
+
+            async connectToFragen() {
+                this.addLogEntry('Connecting to Fragen.link platform...', 'info');
+                this.showNotification('Connecting to Fragen.link...', 'info');
+                
+                try {
+                    // Simulate connection
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    
+                    this.updateConnectionStatus('fragen-link', 'connected');
+                    this.addLogEntry('Successfully connected to Fragen.link', 'success');
+                    this.showNotification('Connected to Fragen.link!', 'success');
+                    
+                    // Open Fragen.link in new tab
+                    window.open('https://fragen.link', '_blank');
+                } catch (error) {
+                    this.addLogEntry(`Failed to connect to Fragen.link: ${error.message}`, 'error');
+                    this.showNotification('Failed to connect to Fragen.link', 'error');
+                }
+            }
+
+            async sendTestEmail() {
+                this.addLogEntry('Sending test email to gentlyoverdone@outlook.com...', 'info');
+                this.showNotification('Sending test email...', 'info');
+                
+                try {
+                    // Simulate email sending
+                    await new Promise(resolve => setTimeout(resolve, 3000));
+                    
+                    this.addLogEntry('Test email sent successfully', 'success');
+                    this.showNotification('Test email sent!', 'success');
+                    
+                    // Open email client
+                    const subject = 'Test Email from Think & Question Beacon';
+                    const body = 'This is a test email from the Think & Question Beacon system.';
+                    const mailtoLink = `mailto:gentlyoverdone@outlook.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                    window.open(mailtoLink);
+                } catch (error) {
+                    this.addLogEntry(`Failed to send test email: ${error.message}`, 'error');
+                    this.showNotification('Failed to send test email', 'error');
+                }
+            }
+
+            async makeTestCall() {
+                this.addLogEntry('Making test call to +31613803782...', 'info');
+                this.showNotification('Making test call...', 'info');
+                
+                try {
+                    // Simulate call
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    
+                    this.addLogEntry('Test call initiated successfully', 'success');
+                    this.showNotification('Test call initiated!', 'success');
+                    
+                    // Open phone client
+                    window.open('tel:+31613803782');
+                } catch (error) {
+                    this.addLogEntry(`Failed to make test call: ${error.message}`, 'error');
+                    this.showNotification('Failed to make test call', 'error');
+                }
+            }
+
+            async joinMassSpeaking() {
+                this.addLogEntry('Joining worldwide mass speaking action...', 'info');
+                this.showNotification('Joining mass speaking action...', 'info');
+                
+                try {
+                    // Simulate joining
+                    await new Promise(resolve => setTimeout(resolve, 3000));
+                    
+                    this.massSpeakingActive = true;
+                    this.addLogEntry('Successfully joined mass speaking action', 'success');
+                    this.showNotification('Joined mass speaking action!', 'success');
+                    
+                    // Connect to all platforms
+                    await this.connectToDenk();
+                    await this.connectToFragen();
+                } catch (error) {
+                    this.addLogEntry(`Failed to join mass speaking: ${error.message}`, 'error');
+                    this.showNotification('Failed to join mass speaking', 'error');
+                }
+            }
+
+            enableAnonymous() {
+                this.anonymousMode = !this.anonymousMode;
+                const status = this.anonymousMode ? 'enabled' : 'disabled';
+                this.addLogEntry(`Anonymous mode ${status}`, 'info');
+                this.showNotification(`Anonymous mode ${status}`, 'info');
+            }
+
+            openEmailForm() {
+                document.getElementById('email-form').style.display = 'block';
+            }
+
+            closeEmailForm() {
+                document.getElementById('email-form').style.display = 'none';
+            }
+
+            openPhoneForm() {
+                document.getElementById('phone-form').style.display = 'block';
+            }
+
+            closePhoneForm() {
+                document.getElementById('phone-form').style.display = 'none';
+            }
+
+            async sendEmail() {
+                const to = document.getElementById('email-to').value;
+                const subject = document.getElementById('email-subject').value;
+                const message = document.getElementById('email-message').value;
+                const anonymous = document.getElementById('email-anonymous').checked;
+
+                if (!to || !subject || !message) {
+                    this.showNotification('Please fill in all fields', 'error');
+                    return;
+                }
+
+                this.addLogEntry(`Sending email to ${to}${anonymous ? ' (anonymous)' : ''}...`, 'info');
+                this.showNotification('Sending email...', 'info');
+
+                try {
+                    // Simulate email sending
+                    await new Promise(resolve => setTimeout(resolve, 3000));
+                    
+                    this.addLogEntry(`Email sent to ${to}`, 'success');
+                    this.showNotification('Email sent!', 'success');
+                    
+                    // Open email client
+                    const mailtoLink = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+                    window.open(mailtoLink);
+                    
+                    this.closeEmailForm();
+                } catch (error) {
+                    this.addLogEntry(`Failed to send email: ${error.message}`, 'error');
+                    this.showNotification('Failed to send email', 'error');
+                }
+            }
+
+            async makeCall() {
+                const number = document.getElementById('phone-number').value;
+                const type = document.getElementById('call-type').value;
+                const anonymous = document.getElementById('phone-anonymous').checked;
+
+                if (!number) {
+                    this.showNotification('Please enter a phone number', 'error');
+                    return;
+                }
+
+                this.addLogEntry(`Making ${type} call to ${number}${anonymous ? ' (anonymous)' : ''}...`, 'info');
+                this.showNotification('Making call...', 'info');
+
+                try {
+                    // Simulate call
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    
+                    this.addLogEntry(`Call initiated to ${number}`, 'success');
+                    this.showNotification('Call initiated!', 'success');
+                    
+                    // Open phone client
+                    window.open(`tel:${number}`);
+                    
+                    this.closePhoneForm();
+                } catch (error) {
+                    this.addLogEntry(`Failed to make call: ${error.message}`, 'error');
+                    this.showNotification('Failed to make call', 'error');
+                }
+            }
+
+            openDenkLink() {
+                window.open('https://denk.link', '_blank');
+            }
+
+            openFragenLink() {
+                window.open('https://fragen.link', '_blank');
+            }
+
+            anonymousConnect() {
+                this.enableAnonymous();
+                this.showNotification('Anonymous connection enabled for all communications', 'info');
+            }
+
+            viewMassSpeaking() {
+                this.showNotification(`Mass speaking status: ${this.massSpeakingActive ? 'Active' : 'Inactive'}`, 'info');
+            }
+
+            showNotification(message, type = 'info') {
+                const toast = document.getElementById('notification-toast');
+                toast.textContent = message;
+                toast.className = `notification-toast show ${type}`;
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // Global functions for button clicks
+        function connectToDenk() {
+            window.thinkQuestionBeacon.connectToDenk();
+        }
+
+        function connectToFragen() {
+            window.thinkQuestionBeacon.connectToFragen();
+        }
+
+        function sendTestEmail() {
+            window.thinkQuestionBeacon.sendTestEmail();
+        }
+
+        function makeTestCall() {
+            window.thinkQuestionBeacon.makeTestCall();
+        }
+
+        function joinMassSpeaking() {
+            window.thinkQuestionBeacon.joinMassSpeaking();
+        }
+
+        function enableAnonymous() {
+            window.thinkQuestionBeacon.enableAnonymous();
+        }
+
+        function openEmailForm() {
+            window.thinkQuestionBeacon.openEmailForm();
+        }
+
+        function closeEmailForm() {
+            window.thinkQuestionBeacon.closeEmailForm();
+        }
+
+        function openPhoneForm() {
+            window.thinkQuestionBeacon.openPhoneForm();
+        }
+
+        function closePhoneForm() {
+            window.thinkQuestionBeacon.closePhoneForm();
+        }
+
+        function sendEmail() {
+            window.thinkQuestionBeacon.sendEmail();
+        }
+
+        function makeCall() {
+            window.thinkQuestionBeacon.makeCall();
+        }
+
+        function openDenkLink() {
+            window.thinkQuestionBeacon.openDenkLink();
+        }
+
+        function openFragenLink() {
+            window.thinkQuestionBeacon.openFragenLink();
+        }
+
+        function anonymousConnect() {
+            window.thinkQuestionBeacon.anonymousConnect();
+        }
+
+        function viewMassSpeaking() {
+            window.thinkQuestionBeacon.viewMassSpeaking();
+        }
+
+        // Initialize Think & Question Beacon
+        window.thinkQuestionBeacon = new ThinkQuestionBeacon();
+
+        console.log('🧠 Think & Question Beacon loaded successfully');
+    </script>
+</body>
+</html>

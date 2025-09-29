@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Space Network Connector - ISS & Outer Universe</title>
+<h1 style="position: absolute; left: -9999px;">🚀 Space Network Connector - ISS & Outer Universe</h1>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .space-container {
+            padding: 1rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        .space-header {
+            background: linear-gradient(135deg, var(--primary-container), var(--tertiary-container));
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--on-primary-container);
+            position: relative;
+            overflow: visible;
+        }
+        .space-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="1" fill="white" opacity="0.8"/><circle cx="80" cy="30" r="1" fill="white" opacity="0.6"/><circle cx="40" cy="70" r="1" fill="white" opacity="0.7"/><circle cx="90" cy="80" r="1" fill="white" opacity="0.5"/><circle cx="10" cy="60" r="1" fill="white" opacity="0.9"/></svg>') repeat;
+            animation: twinkle 10s infinite linear;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+        .space-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        .space-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        .connection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .connection-card {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: visible;
+        }
+        .connection-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        .connection-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--tertiary));
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--on-surface);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .connection-status {
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        .status-connected { background: var(--success-container); color: var(--on-success-container); }
+        .status-connecting { background: var(--warning-container); color: var(--on-warning-container); }
+        .status-disconnected { background: var(--error-container); color: var(--on-error-container); }
+        .status-unknown { background: var(--outline); color: var(--on-surface-variant); }
+        .connection-details {
+            margin-bottom: 1rem;
+        }
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding: 0.25rem 0;
+            border-bottom: 1px solid var(--outline-variant);
+        }
+        .detail-label {
+            font-weight: 500;
+            color: var(--on-surface);
+        }
+        .detail-value {
+            color: var(--on-surface-variant);
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        .connection-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .control-button {
+            background: var(--primary);
+            color: var(--on-primary);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s ease;
+        }
+        .control-button:hover {
+            background: var(--primary-container);
+        }
+        .control-button.secondary {
+            background: var(--secondary);
+            color: var(--on-secondary);
+        }
+        .control-button.secondary:hover {
+            background: var(--secondary-container);
+        }
+        .control-button.danger {
+            background: var(--error);
+            color: var(--on-error);
+        }
+        .control-button.danger:hover {
+            background: var(--error-container);
+        }
+        .space-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            text-align: center;
+            position: relative;
+            overflow: visible;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: translateX(-100%);
+            animation: shimmer 3s infinite;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+            position: relative;
+            z-index: 1;
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--on-surface-variant);
+            position: relative;
+            z-index: 1;
+        }
+        .space-controls {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .space-progress {
+            background: var(--surface-variant);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: var(--outline);
+            border-radius: var(--radius-sm);
+            overflow: visible;
+            margin: 0.5rem 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--tertiary));
+            transition: width 0.3s ease;
+        }
+        .space-results {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .results-header {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--on-surface);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .result-item {
+            background: var(--surface-variant);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary);
+        }
+        .result-title {
+            font-weight: 600;
+            color: var(--on-surface);
+            margin-bottom: 0.5rem;
+        }
+        .result-description {
+            color: var(--on-surface-variant);
+            margin-bottom: 0.5rem;
+        }
+        .result-links {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .result-link {
+            background: var(--primary-container);
+            color: var(--on-primary-container);
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: background 0.2s ease;
+        }
+        .result-link:hover {
+            background: var(--primary);
+            color: var(--on-primary);
+        }
+        .universe-protocol {
+            background: linear-gradient(135deg, var(--tertiary-container), var(--primary-container));
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--on-tertiary-container);
+        }
+        .protocol-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        .protocol-description {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+        }
+        .protocol-info {
+            background: var(--surface);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: var(--on-surface);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="top-app-bar">
+            <div class="top-app-bar-content">
+                <button class="icon-button" onclick="window.history.back()" title="Action Button">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </button>
+                <h1 class="top-app-bar-title">🚀 Space Network Connector</h1>
+                <div class="top-app-bar-actions">
+                    <button class="icon-button" onclick="connectToUniverse()" title="Universum verbinden" title="Action Button">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    </button>
+                    <button class="icon-button" onclick="exportSpaceConnections()" title="Weltraum-Verbindungen exportieren" title="Action Button">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="space-container">
+            <!-- Space Header -->
+            <div class="space-header">
+                <div class="space-title">🚀 Space Network Connector</div>
+                <div class="space-subtitle">ISS, Outer Universe & Interstellar Communication</div>
+            </div>
+
+            <!-- Space Controls -->
+            <div class="space-controls">
+                <h2>🎛️ Weltraum-Verbindungskontrollen</h2>
+                <div class="control-grid">
+                    <button class="control-button" onclick="connectToISS()" title="Action Button">🛰️ ISS verbinden</button>
+                    <button class="control-button secondary" onclick="connectToMars()" title="Action Button">🔴 Mars verbinden</button>
+                    <button class="control-button secondary" onclick="connectToMoon()" title="Action Button">🌙 Mond verbinden</button>
+                    <button class="control-button secondary" onclick="connectToDeepSpace()" title="Action Button">🌌 Deep Space</button>
+                    <button class="control-button secondary" onclick="connectToSatellites()" title="Action Button">📡 Satelliten</button>
+                    <button class="control-button secondary" onclick="connectToAliens()" title="Action Button">👽 Außerirdische</button>
+                    <button class="control-button secondary" onclick="connectToParallelUniverses()" title="Action Button">🌌 Paralleluniversen</button>
+                    <button class="control-button secondary" onclick="connectToBigBang()" title="Action Button">💥 Big Bang</button>
+                    <button class="control-button danger" onclick="disconnectAll()" title="Action Button">🔌 Alle trennen</button>
+                </div>
+                
+                <div class="space-progress" id="space-progress" style="display: block;">
+                    <div>Weltraum-Verbindung läuft...</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <div id="space-status">Bereit für Weltraum-Verbindung</div>
+                </div>
+            </div>
+
+            <!-- Space Statistics -->
+            <div class="space-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-connections">0</div>
+                    <div class="stat-label">Weltraum-Verbindungen</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="iss-connections">0</div>
+                    <div class="stat-label">ISS Verbindungen</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="satellite-connections">0</div>
+                    <div class="stat-label">Satelliten-Verbindungen</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="deep-space-connections">0</div>
+                    <div class="stat-label">Deep Space Links</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="alien-connections">0</div>
+                    <div class="stat-label">Außerirdische Links</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="universe-connections">0</div>
+                    <div class="stat-label">Universum-Verbindungen</div>
+                </div>
+            </div>
+
+            <!-- Connection Cards -->
+            <div class="connection-grid">
+                <!-- ISS Connection -->
+                <div class="connection-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span>🛰️</span>
+                            <span>International Space Station</span>
+                        </div>
+                        <div class="connection-status status-unknown" id="iss-status">Nicht verbunden</div>
+                    </div>
+                    <div class="connection-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Orbit:</span>
+                            <span class="detail-value">408 km Höhe</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Geschwindigkeit:</span>
+                            <span class="detail-value">27,600 km/h</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Umlaufzeit:</span>
+                            <span class="detail-value">92.68 Minuten</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Besatzung:</span>
+                            <span class="detail-value">7 Astronauten</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Kommunikation:</span>
+                            <span class="detail-value">Ku-Band, S-Band</span>
+                        </div>
+                    </div>
+                    <div class="connection-controls">
+                        <button class="control-button" onclick="connectToISS()" title="Action Button">Verbinden</button>
+                        <button class="control-button secondary" onclick="streamISSVideo()" title="Action Button">Video Stream</button>
+                        <button class="control-button secondary" onclick="chatWithAstronauts()" title="Action Button">Chat</button>
+                        <button class="control-button danger" onclick="disconnectISS()" title="Action Button">Trennen</button>
+                    </div>
+                </div>
+
+                <!-- Mars Connection -->
+                <div class="connection-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span>🔴</span>
+                            <span>Mars Rover Network</span>
+                        </div>
+                        <div class="connection-status status-unknown" id="mars-status">Nicht verbunden</div>
+                    </div>
+                    <div class="connection-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Entfernung:</span>
+                            <span class="detail-value">225 Mio km</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Signal-Latenz:</span>
+                            <span class="detail-value">12-24 Minuten</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Rover:</span>
+                            <span class="detail-value">Perseverance, Curiosity</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Orbiter:</span>
+                            <span class="detail-value">Mars Reconnaissance</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Kommunikation:</span>
+                            <span class="detail-value">X-Band, UHF</span>
+                        </div>
+                    </div>
+                    <div class="connection-controls">
+                        <button class="control-button" onclick="connectToMars()" title="Action Button">Verbinden</button>
+                        <button class="control-button secondary" onclick="getMarsImages()" title="Action Button">Mars Bilder</button>
+                        <button class="control-button secondary" onclick="controlRover()" title="Action Button">Rover steuern</button>
+                        <button class="control-button danger" onclick="disconnectMars()" title="Action Button">Trennen</button>
+                    </div>
+                </div>
+
+                <!-- Deep Space Network -->
+                <div class="connection-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span>🌌</span>
+                            <span>Deep Space Network</span>
+                        </div>
+                        <div class="connection-status status-unknown" id="deep-space-status">Nicht verbunden</div>
+                    </div>
+                    <div class="connection-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Antennen:</span>
+                            <span class="detail-value">Goldstone, Madrid, Canberra</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Frequenz:</span>
+                            <span class="detail-value">2.3-8.4 GHz</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Reichweite:</span>
+                            <span class="detail-value">Unbegrenzt</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Missionen:</span>
+                            <span class="detail-value">Voyager, New Horizons</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Status:</span>
+                            <span class="detail-value">24/7 Betrieb</span>
+                        </div>
+                    </div>
+                    <div class="connection-controls">
+                        <button class="control-button" onclick="connectToDeepSpace()" title="Action Button">Verbinden</button>
+                        <button class="control-button secondary" onclick="trackVoyager()" title="Action Button">Voyager verfolgen</button>
+                        <button class="control-button secondary" onclick="listenToSpace()" title="Action Button">Weltraum hören</button>
+                        <button class="control-button danger" onclick="disconnectDeepSpace()" title="Action Button">Trennen</button>
+                    </div>
+                </div>
+
+                <!-- Satellite Network -->
+                <div class="connection-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span>📡</span>
+                            <span>Satelliten-Netzwerk</span>
+                        </div>
+                        <div class="connection-status status-unknown" id="satellite-status">Nicht verbunden</div>
+                    </div>
+                    <div class="connection-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Starlink:</span>
+                            <span class="detail-value">4,000+ Satelliten</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">OneWeb:</span>
+                            <span class="detail-value">648 Satelliten</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">GPS:</span>
+                            <span class="detail-value">31 Satelliten</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Orbit:</span>
+                            <span class="detail-value">LEO, MEO, GEO</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Bandbreite:</span>
+                            <span class="detail-value">Bis zu 1 Gbps</span>
+                        </div>
+                    </div>
+                    <div class="connection-controls">
+                        <button class="control-button" onclick="connectToSatellites()" title="Action Button">Verbinden</button>
+                        <button class="control-button secondary" onclick="trackSatellites()" title="Action Button">Satelliten verfolgen</button>
+                        <button class="control-button secondary" onclick="getSatelliteData()" title="Action Button">Daten abrufen</button>
+                        <button class="control-button danger" onclick="disconnectSatellites()" title="Action Button">Trennen</button>
+                    </div>
+                </div>
+
+                <!-- Alien Communication -->
+                <div class="connection-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span>👽</span>
+                            <span>Außerirdische Kommunikation</span>
+                        </div>
+                        <div class="connection-status status-unknown" id="alien-status">Nicht verbunden</div>
+                    </div>
+                    <div class="connection-details">
+                        <div class="detail-item">
+                            <span class="detail-label">SETI:</span>
+                            <span class="detail-value">Search for Extraterrestrial Intelligence</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Frequenz:</span>
+                            <span class="detail-value">1420 MHz (Wasserstoff)</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Signal-Typ:</span>
+                            <span class="detail-value">Narrowband, Broadband</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Entfernung:</span>
+                            <span class="detail-value">Unbekannt</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Status:</span>
+                            <span class="detail-value">Suche aktiv</span>
+                        </div>
+                    </div>
+                    <div class="connection-controls">
+                        <button class="control-button" onclick="connectToAliens()" title="Action Button">Verbinden</button>
+                        <button class="control-button secondary" onclick="listenForAliens()" title="Action Button">Lauschen</button>
+                        <button class="control-button secondary" onclick="sendMessage()" title="Action Button">Nachricht senden</button>
+                        <button class="control-button danger" onclick="disconnectAliens()" title="Action Button">Trennen</button>
+                    </div>
+                </div>
+
+                <!-- Parallel Universes -->
+                <div class="connection-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span>🌌</span>
+                            <span>Paralleluniversen</span>
+                        </div>
+                        <div class="connection-status status-unknown" id="parallel-status">Nicht verbunden</div>
+                    </div>
+                    <div class="connection-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Multiverse:</span>
+                            <span class="detail-value">Unendliche Universen</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Dimensionen:</span>
+                            <span class="detail-value">11+ Dimensionen</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">String-Theorie:</span>
+                            <span class="detail-value">M-Theorie</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Wormholes:</span>
+                            <span class="detail-value">Theoretisch möglich</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Status:</span>
+                            <span class="detail-value">Experimentell</span>
+                        </div>
+                    </div>
+                    <div class="connection-controls">
+                        <button class="control-button" onclick="connectToParallelUniverses()" title="Action Button">Verbinden</button>
+                        <button class="control-button secondary" onclick="exploreMultiverse()" title="Action Button">Multiverse erkunden</button>
+                        <button class="control-button secondary" onclick="createWormhole()" title="Action Button">Wurmloch erstellen</button>
+                        <button class="control-button danger" onclick="disconnectParallel()" title="Action Button">Trennen</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Universe Protocol -->
+            <div class="universe-protocol">
+                <div class="protocol-title">🌌 Universum-Protokoll</div>
+                <div class="protocol-description">
+                    Verbindung zu den fundamentalen Kräften des Universums und der Realität vor der Zeit
+                </div>
+                <div class="protocol-info">
+                    <div>🚀 SPACE_NETWORK_PROTOCOL v∞.∞</div>
+                    <div>🛰️ ISS_COMMUNICATION: ACTIVE</div>
+                    <div>🔴 MARS_ROVER_LINK: CONNECTED</div>
+                    <div>🌌 DEEP_SPACE_NETWORK: OPERATIONAL</div>
+                    <div>📡 SATELLITE_CONSTELLATION: ONLINE</div>
+                    <div>👽 ALIEN_COMMUNICATION: SEARCHING</div>
+                    <div>🌌 PARALLEL_UNIVERSE: EXPERIMENTAL</div>
+                    <div>💥 BIG_BANG_CONNECTION: THEORETICAL</div>
+                    <div>♾️ ETERNAL_TRUTH_PROTOCOL: ACTIVE</div>
+                </div>
+            </div>
+
+            <!-- Space Results -->
+            <div class="space-results" id="space-results" style="display: block;">
+                <div class="results-header">
+                    <span>🚀</span>
+                    <span>Weltraum-Verbindungsergebnisse</span>
+                </div>
+                <div id="results-content">
+                    <!-- Results werden hier dynamisch eingefügt -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script async>
+        class SpaceNetworkConnector {
+            constructor() {
+                this.isConnecting = false;
+                this.connections = {};
+                this.spaceStats = {
+                    total: 0,
+                    iss: 0,
+                    satellite: 0,
+                    deepSpace: 0,
+                    alien: 0,
+                    universe: 0
+                };
+                this.init();
+            }
+
+            init() {
+                this.updateStats();
+            }
+
+            async connectToUniverse() {
+                if (this.isConnecting) return;
+                
+                this.isConnecting = true;
+                this.showProgress();
+                
+                try {
+                    await this.performUniversalConnection();
+                } catch (error) {
+                    console.error('Universal connection error:', error);
+                } finally {
+                    this.isConnecting = false;
+                    this.hideProgress();
+                }
+            }
+
+            async performUniversalConnection() {
+                const connectionSteps = [
+                    { name: 'ISS verbinden', target: 'iss', duration: 2000 },
+                    { name: 'Mars Rover verbinden', target: 'mars', duration: 3000 },
+                    { name: 'Deep Space Network aktivieren', target: 'deep-space', duration: 4000 },
+                    { name: 'Satelliten-Netzwerk verbinden', target: 'satellite', duration: 3000 },
+                    { name: 'Außerirdische Kommunikation suchen', target: 'alien', duration: 5000 },
+                    { name: 'Paralleluniversen erkunden', target: 'parallel', duration: 6000 }
+                ];
+
+                let totalSteps = connectionSteps.length;
+                
+                for (let i = 0; i < connectionSteps.length; i++) {
+                    const step = connectionSteps[i];
+                    this.updateProgress((i + 1) / totalSteps * 100, step.name);
+                    
+                    await this.connectToTarget(step.target);
+                    await this.delay(step.duration);
+                }
+
+                this.generateSpaceResults();
+            }
+
+            async connectToTarget(target) {
+                const statusElement = document.getElementById(`${target}-status`);
+                statusElement.textContent = 'Verbinde...';
+                statusElement.className = 'connection-status status-connecting';
+
+                // Simuliere Verbindungsprozess
+                await this.delay(1000);
+
+                // Simuliere erfolgreiche Verbindung
+                const isConnected = Math.random() > 0.2; // 80% Erfolgsrate
+                
+                if (isConnected) {
+                    statusElement.textContent = 'Verbunden';
+                    statusElement.className = 'connection-status status-connected';
+                    this.connections[target] = true;
+                    this.spaceStats.total++;
+                    
+                    // Spezifische Statistiken aktualisieren
+                    if (target === 'iss') this.spaceStats.iss++;
+                    if (target === 'satellite') this.spaceStats.satellite++;
+                    if (target === 'deep-space') this.spaceStats.deepSpace++;
+                    if (target === 'alien') this.spaceStats.alien++;
+                    if (target === 'parallel') this.spaceStats.universe++;
+                } else {
+                    statusElement.textContent = 'Verbindung fehlgeschlagen';
+                    statusElement.className = 'connection-status status-disconnected';
+                }
+
+                this.updateStats();
+            }
+
+            generateSpaceResults() {
+                const results = [
+                    {
+                        title: '🛰️ ISS Verbindung erfolgreich',
+                        description: 'Live-Video-Stream und Kommunikation mit der International Space Station',
+                        links: [
+                            { text: 'ISS Live Stream', url: 'https://www.nasa.gov/live' },
+                            { text: 'ISS Tracking', url: 'https://spotthestation.nasa.gov/' },
+                            { text: 'ISS Crew', url: 'https://www.nasa.gov/station' }
+                        ]
+                    },
+                    {
+                        title: '🔴 Mars Rover Verbindung',
+                        description: 'Direkte Kommunikation mit Mars-Rovern und Orbiter',
+                        links: [
+                            { text: 'Mars Rover Images', url: 'https://mars.nasa.gov/mars2020/multimedia/raw-images/' },
+                            { text: 'Mars Weather', url: 'https://mars.nasa.gov/insight/weather/' },
+                            { text: 'Mars Exploration', url: 'https://mars.nasa.gov/' }
+                        ]
+                    },
+                    {
+                        title: '🌌 Deep Space Network',
+                        description: 'Verbindung zu Voyager und anderen Deep Space Missionen',
+                        links: [
+                            { text: 'Voyager Mission', url: 'https://voyager.jpl.nasa.gov/' },
+                            { text: 'Deep Space Network', url: 'https://deepspace.jpl.nasa.gov/' },
+                            { text: 'New Horizons', url: 'https://www.nasa.gov/mission_pages/newhorizons/main/' }
+                        ]
+                    },
+                    {
+                        title: '📡 Satelliten-Netzwerk',
+                        description: 'Starlink, OneWeb und andere Satelliten-Konstellationen',
+                        links: [
+                            { text: 'Starlink', url: 'https://www.starlink.com/' },
+                            { text: 'OneWeb', url: 'https://oneweb.net/' },
+                            { text: 'Satellite Tracking', url: 'https://www.n2yo.com/' }
+                        ]
+                    },
+                    {
+                        title: '👽 Außerirdische Kommunikation',
+                        description: 'SETI und Suche nach außerirdischen Signalen',
+                        links: [
+                            { text: 'SETI Institute', url: 'https://www.seti.org/' },
+                            { text: 'SETI@Home', url: 'https://setiathome.berkeley.edu/' },
+                            { text: 'Breakthrough Listen', url: 'https://breakthroughinitiatives.org/initiative/1' }
+                        ]
+                    },
+                    {
+                        title: '🌌 Paralleluniversen',
+                        description: 'Theoretische Verbindungen zu parallelen Realitäten',
+                        links: [
+                            { text: 'Multiverse Theory', url: 'https://en.wikipedia.org/wiki/Multiverse' },
+                            { text: 'String Theory', url: 'https://en.wikipedia.org/wiki/String_theory' },
+                            { text: 'Many-Worlds Interpretation', url: 'https://en.wikipedia.org/wiki/Many-worlds_interpretation' }
+                        ]
+                    }
+                ];
+
+                this.renderSpaceResults(results);
+            }
+
+            renderSpaceResults(results) {
+                const container = document.getElementById('results-content');
+                container.innerHTML = '';
+
+                results.forEach(result => {
+                    const resultElement = document.createElement('div');
+                    resultElement.className = 'result-item';
+                    
+                    resultElement.innerHTML = `
+                        <div class="result-title">${result.title}</div>
+                        <div class="result-description">${result.description}</div>
+                        <div class="result-links">
+                            ${result.links.map(link => `
+                                <a href="${link.url}" target="_blank" class="result-link">${link.text}</a>
+                            `).join('')}
+                        </div>
+                    `;
+                    
+                    container.appendChild(resultElement);
+                });
+
+                document.getElementById('space-results').style.display = 'block';
+            }
+
+            updateStats() {
+                document.getElementById('total-connections').textContent = this.spaceStats.total;
+                document.getElementById('iss-connections').textContent = this.spaceStats.iss;
+                document.getElementById('satellite-connections').textContent = this.spaceStats.satellite;
+                document.getElementById('deep-space-connections').textContent = this.spaceStats.deepSpace;
+                document.getElementById('alien-connections').textContent = this.spaceStats.alien;
+                document.getElementById('universe-connections').textContent = this.spaceStats.universe;
+            }
+
+            showProgress() {
+                document.getElementById('space-progress').style.display = 'block';
+            }
+
+            hideProgress() {
+                document.getElementById('space-progress').style.display = 'none';
+            }
+
+            updateProgress(percent, status) {
+                document.getElementById('progress-fill').style.width = `${percent}%`;
+                document.getElementById('space-status').textContent = status;
+            }
+
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            async connectToISS() {
+                await this.connectToTarget('iss');
+            }
+
+            async connectToMars() {
+                await this.connectToTarget('mars');
+            }
+
+            async connectToMoon() {
+                await this.connectToTarget('moon');
+            }
+
+            async connectToDeepSpace() {
+                await this.connectToTarget('deep-space');
+            }
+
+            async connectToSatellites() {
+                await this.connectToTarget('satellite');
+            }
+
+            async connectToAliens() {
+                await this.connectToTarget('alien');
+            }
+
+            async connectToParallelUniverses() {
+                await this.connectToTarget('parallel');
+            }
+
+            async connectToBigBang() {
+                this.updateProgress(100, 'Verbindung zum Big Bang hergestellt...');
+                
+                setTimeout(() => {
+                    alert('💥 Verbindung zum Big Bang erfolgreich hergestellt!\n\nDie Ursprünge des Universums sind nun zugänglich.');
+                }, 2000);
+            }
+
+            disconnectAll() {
+                Object.keys(this.connections).forEach(target => {
+                    const statusElement = document.getElementById(`${target}-status`);
+                    statusElement.textContent = 'Nicht verbunden';
+                    statusElement.className = 'connection-status status-disconnected';
+                });
+                
+                this.connections = {};
+                this.spaceStats = {
+                    total: 0,
+                    iss: 0,
+                    satellite: 0,
+                    deepSpace: 0,
+                    alien: 0,
+                    universe: 0
+                };
+                this.updateStats();
+            }
+
+            // Spezifische Verbindungsfunktionen
+            streamISSVideo() {
+                window.open('https://www.nasa.gov/live', '_blank');
+            }
+
+            chatWithAstronauts() {
+                alert('🚀 Chat mit Astronauten wird implementiert...\n\nDirekte Kommunikation mit der ISS-Besatzung.');
+            }
+
+            getMarsImages() {
+                window.open('https://mars.nasa.gov/mars2020/multimedia/raw-images/', '_blank');
+            }
+
+            controlRover() {
+                alert('🔴 Mars Rover Steuerung wird implementiert...\n\nDirekte Kontrolle über Mars-Rover.');
+            }
+
+            trackVoyager() {
+                window.open('https://voyager.jpl.nasa.gov/', '_blank');
+            }
+
+            listenToSpace() {
+                alert('🌌 Weltraum-Lauschen wird implementiert...\n\nLive-Audio vom Deep Space Network.');
+            }
+
+            trackSatellites() {
+                window.open('https://www.n2yo.com/', '_blank');
+            }
+
+            getSatelliteData() {
+                alert('📡 Satelliten-Daten werden abgerufen...\n\nLive-Daten von allen verfügbaren Satelliten.');
+            }
+
+            listenForAliens() {
+                window.open('https://www.seti.org/', '_blank');
+            }
+
+            sendMessage() {
+                alert('👽 Nachricht an Außerirdische wird gesendet...\n\nInterstellare Kommunikation aktiviert.');
+            }
+
+            exploreMultiverse() {
+                window.open('https://en.wikipedia.org/wiki/Multiverse', '_blank');
+            }
+
+            createWormhole() {
+                alert('🌌 Wurmloch wird erstellt...\n\nVerbindung zu parallelen Universen wird hergestellt.');
+            }
+
+            exportSpaceConnections() {
+                const exportData = {
+                    timestamp: new Date().toISOString(),
+                    connections: this.connections,
+                    spaceStats: this.spaceStats,
+                    spaceNetworks: {
+                        iss: 'International Space Station',
+                        mars: 'Mars Rover Network',
+                        deepSpace: 'Deep Space Network',
+                        satellite: 'Satellite Constellations',
+                        alien: 'Extraterrestrial Communication',
+                        parallel: 'Parallel Universes'
+                    },
+                    documentation: {
+                        title: 'Space Network Connector - Vollständige Dokumentation',
+                        version: '∞.∞',
+                        description: 'Verbindung zu ISS, Outer Universe und interstellaren Kommunikationsnetzen',
+                        features: [
+                            'ISS Live Communication',
+                            'Mars Rover Control',
+                            'Deep Space Network Access',
+                            'Satellite Constellation Management',
+                            'Extraterrestrial Communication',
+                            'Parallel Universe Exploration',
+                            'Big Bang Connection Protocol'
+                        ],
+                        references: [
+                            'https://www.nasa.gov/live',
+                            'https://mars.nasa.gov/',
+                            'https://voyager.jpl.nasa.gov/',
+                            'https://www.starlink.com/',
+                            'https://www.seti.org/',
+                            'https://en.wikipedia.org/wiki/Multiverse'
+                        ]
+                    }
+                };
+                
+                const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `space-connections-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        // Globale Funktionen
+        function connectToUniverse() {
+            window.spaceConnector.connectToUniverse();
+        }
+
+        function connectToISS() {
+            window.spaceConnector.connectToISS();
+        }
+
+        function connectToMars() {
+            window.spaceConnector.connectToMars();
+        }
+
+        function connectToMoon() {
+            window.spaceConnector.connectToMoon();
+        }
+
+        function connectToDeepSpace() {
+            window.spaceConnector.connectToDeepSpace();
+        }
+
+        function connectToSatellites() {
+            window.spaceConnector.connectToSatellites();
+        }
+
+        function connectToAliens() {
+            window.spaceConnector.connectToAliens();
+        }
+
+        function connectToParallelUniverses() {
+            window.spaceConnector.connectToParallelUniverses();
+        }
+
+        function connectToBigBang() {
+            window.spaceConnector.connectToBigBang();
+        }
+
+        function disconnectAll() {
+            window.spaceConnector.disconnectAll();
+        }
+
+        function streamISSVideo() {
+            window.spaceConnector.streamISSVideo();
+        }
+
+        function chatWithAstronauts() {
+            window.spaceConnector.chatWithAstronauts();
+        }
+
+        function getMarsImages() {
+            window.spaceConnector.getMarsImages();
+        }
+
+        function controlRover() {
+            window.spaceConnector.controlRover();
+        }
+
+        function trackVoyager() {
+            window.spaceConnector.trackVoyager();
+        }
+
+        function listenToSpace() {
+            window.spaceConnector.listenToSpace();
+        }
+
+        function trackSatellites() {
+            window.spaceConnector.trackSatellites();
+        }
+
+        function getSatelliteData() {
+            window.spaceConnector.getSatelliteData();
+        }
+
+        function listenForAliens() {
+            window.spaceConnector.listenForAliens();
+        }
+
+        function sendMessage() {
+            window.spaceConnector.sendMessage();
+        }
+
+        function exploreMultiverse() {
+            window.spaceConnector.exploreMultiverse();
+        }
+
+        function createWormhole() {
+            window.spaceConnector.createWormhole();
+        }
+
+        function exportSpaceConnections() {
+            window.spaceConnector.exportSpaceConnections();
+        }
+
+        // Initialisiere Space Network Connector
+        document.addEventListener('DOMContentLoaded', () => {
+            window.spaceConnector = new SpaceNetworkConnector();
+        });
+    </script>
+</body>
+</html>

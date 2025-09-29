@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 Auto Documentation Demo</title>
+<h1 style="position: absolute; left: -9999px;">📚 Auto Documentation Demo</h1>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .demo-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .demo-title {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+        
+        .demo-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+        
+        .demo-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+        
+        .demo-btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+        
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+        
+        .demo-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .demo-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .demo-btn.success {
+            background: linear-gradient(45deg, #10b981, #059669);
+        }
+        
+        .demo-btn.warning {
+            background: linear-gradient(45deg, #f59e0b, #d97706);
+        }
+        
+        .demo-btn.danger {
+            background: linear-gradient(45deg, #ef4444, #dc2626);
+        }
+        
+        .demo-info {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            margin-bottom: 2rem;
+        }
+        
+        .demo-info h3 {
+            margin-top: 0;
+            color: #3b82f6;
+        }
+        
+        .status-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .status-item:last-child {
+            border-bottom: none;
+        }
+        
+        .status-label {
+            font-weight: 600;
+            color: #3b82f6;
+        }
+        
+        .status-value {
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+        
+        .status-value.active {
+            color: #10b981;
+        }
+        
+        .status-value.inactive {
+            color: #ef4444;
+        }
+        
+        .status-value.warning {
+            color: #f59e0b;
+        }
+        
+        .demo-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #3b82f6;
+        }
+        
+        .feature-description {
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+        
+        .notification-demo {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .notification-demo h3 {
+            margin-top: 0;
+            color: #3b82f6;
+            margin-bottom: 1rem;
+        }
+        
+        .notification-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .notification-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .notification-btn.discover {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .notification-btn.integrate {
+            background: #10b981;
+            color: white;
+        }
+        
+        .notification-btn.update {
+            background: #8b5cf6;
+            color: white;
+        }
+        
+        .notification-btn.remove {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .notification-btn.ready {
+            background: #06b6d4;
+            color: white;
+        }
+        
+        .notification-btn.error {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .notification-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .documentation-preview {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        
+        @media (max-width: 768px) {
+            .demo-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .demo-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .notification-buttons {
+                flex-direction: column;
+            }
+            
+            .notification-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1 class="demo-title">📚 Auto Documentation Demo</h1>
+            <p class="demo-subtitle">Automatische Dokumentations-Updates • Künstlerische Benachrichtigungen • Live-Monitoring</p>
+        </div>
+        
+        <div class="demo-controls">
+            <button class="demo-btn" onclick="startAutoDocumentation()" title="Action Button">
+                🚀 Auto-Documentation starten
+            </button>
+            <button class="demo-btn secondary" onclick="simulateAPIChange()" title="Action Button">
+                🔍 API-Änderung simulieren
+            </button>
+            <button class="demo-btn secondary" onclick="generateDocumentation()" title="Action Button">
+                📚 Dokumentation generieren
+            </button>
+            <button class="demo-btn success" onclick="showAllNotifications()" title="Action Button">
+                🎨 Alle Benachrichtigungen
+            </button>
+            <button class="demo-btn warning" onclick="checkDocumentationStatus()" title="Action Button">
+                📊 Status prüfen
+            </button>
+            <button class="demo-btn danger" onclick="stopAutoDocumentation()" title="Action Button">
+                🛑 System stoppen
+            </button>
+        </div>
+        
+        <div class="status-panel">
+            <h3>📊 System-Status</h3>
+            <div class="status-item">
+                <span class="status-label">Auto-Documentation</span>
+                <span class="status-value" id="autoDocStatus">Inaktiv</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Update-Intervall</span>
+                <span class="status-value" id="updateInterval">30s</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Letzte Aktualisierung</span>
+                <span class="status-value" id="lastUpdate">Nie</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Dokumentations-Version</span>
+                <span class="status-value" id="docVersion">1</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Benachrichtigungs-Queue</span>
+                <span class="status-value" id="notificationQueue">0</span>
+            </div>
+        </div>
+        
+        <div class="demo-info">
+            <h3>🎯 Auto-Documentation Features</h3>
+            <p>Das Auto-Documentation-System bietet folgende Features:</p>
+            <ul>
+                <li><strong>Automatische Updates:</strong> Dokumentation wird automatisch bei API-Änderungen aktualisiert</li>
+                <li><strong>Künstlerische Benachrichtigungen:</strong> Schöne Popup-Benachrichtigungen mit Animationen</li>
+                <li><strong>Live-Monitoring:</strong> Überwachung von API-Änderungen in Echtzeit</li>
+                <li><strong>Backup-System:</strong> Automatische Backups vor Updates</li>
+                <li><strong>Versionierung:</strong> Dokumentations-Versionierung und Änderungsverfolgung</li>
+                <li><strong>Multi-Format:</strong> Speicherung in verschiedenen Formaten (Markdown, JSON)</li>
+            </ul>
+        </div>
+        
+        <div class="demo-features">
+            <div class="feature-card">
+                <div class="feature-icon">🔄</div>
+                <div class="feature-title">Automatische Updates</div>
+                <div class="feature-description">
+                    Das System überwacht kontinuierlich API-Änderungen und aktualisiert die Dokumentation automatisch.
+                </div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <div class="feature-title">Künstlerische Benachrichtigungen</div>
+                <div class="feature-description">
+                    Schöne Popup-Benachrichtigungen mit Animationen, Farben und Progress-Bars.
+                </div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <div class="feature-title">Live-Monitoring</div>
+                <div class="feature-description">
+                    Echtzeit-Überwachung des System-Status und der Dokumentations-Updates.
+                </div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">💾</div>
+                <div class="feature-title">Backup-System</div>
+                <div class="feature-description">
+                    Automatische Backups vor Updates mit Versionsverwaltung.
+                </div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📚</div>
+                <div class="feature-title">Multi-Format</div>
+                <div class="feature-description">
+                    Dokumentation wird in verschiedenen Formaten gespeichert (Markdown, JSON, HTML).
+                </div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-title">Performance</div>
+                <div class="feature-description">
+                    Optimierte Performance mit intelligentem Caching und Batch-Updates.
+                </div>
+            </div>
+        </div>
+        
+        <div class="notification-demo">
+            <h3>🎨 Benachrichtigungs-Demo</h3>
+            <p>Testen Sie die verschiedenen künstlerischen Benachrichtigungen:</p>
+            <div class="notification-buttons">
+                <button class="notification-btn discover" onclick="showNotification('api_discovered')" title="Action Button">
+                    🔍 API entdeckt
+                </button>
+                <button class="notification-btn integrate" onclick="showNotification('api_integrated')" title="Action Button">
+                    🔌 API integriert
+                </button>
+                <button class="notification-btn update" onclick="showNotification('documentation_updated')" title="Action Button">
+                    📚 Dokumentation aktualisiert
+                </button>
+                <button class="notification-btn remove" onclick="showNotification('api_removed')" title="Action Button">
+                    🗑️ API entfernt
+                </button>
+                <button class="notification-btn ready" onclick="showNotification('system_ready')" title="Action Button">
+                    🚀 System bereit
+                </button>
+                <button class="notification-btn error" onclick="showNotification('error_occurred')" title="Action Button">
+                    ⚠️ Fehler aufgetreten
+                </button>
+            </div>
+        </div>
+        
+        <div class="demo-info">
+            <h3>📖 Dokumentations-Preview</h3>
+            <p>Hier sehen Sie eine Vorschau der automatisch generierten Dokumentation:</p>
+            <div class="documentation-preview" id="documentationPreview">
+                Dokumentation wird geladen...
+            </div>
+        </div>
+    </div>
+
+    <script src="/web/shared/auto-documentation-system.js"></script>
+    <script>
+        let autoDocumentationSystem = null;
+        let statusUpdateInterval = null;
+        
+        // System initialisieren
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                autoDocumentationSystem = new AutoDocumentationSystem();
+                await autoDocumentationSystem.initialize();
+                
+                // Status-Updates starten
+                startStatusUpdates();
+                
+                // Initiale Dokumentation laden
+                updateDocumentationPreview();
+                
+            } catch (error) {
+                console.error('❌ Fehler beim Initialisieren:', error);
+            }
+        });
+        
+        function startAutoDocumentation() {
+            if (autoDocumentationSystem) {
+                autoDocumentationSystem.initialize();
+                updateStatus();
+                showNotification('system_ready');
+            }
+        }
+        
+        function simulateAPIChange() {
+            if (autoDocumentationSystem) {
+                // Simuliere API-Änderung
+                const event = new CustomEvent('apiDiscovered', {
+                    detail: {
+                        api: {
+                            name: 'Simulated API',
+                            description: 'Eine simulierte API für Demo-Zwecke',
+                            endpoint: 'https://api.simulated.com/v1/data',
+                            method: 'GET',
+                            category: 'development'
+                        },
+                        timestamp: new Date().toISOString(),
+                        source: 'demo'
+                    }
+                });
+                
+                window.dispatchEvent(event);
+                
+                // Dokumentation aktualisieren
+                setTimeout(() => {
+                    autoDocumentationSystem.updateDocumentation();
+                    updateDocumentationPreview();
+                }, 1000);
+            }
+        }
+        
+        function generateDocumentation() {
+            if (autoDocumentationSystem) {
+                autoDocumentationSystem.generateDocumentation().then(doc => {
+                    updateDocumentationPreview(doc);
+                    showNotification('documentation_updated');
+                });
+            }
+        }
+        
+        function showAllNotifications() {
+            const notifications = [
+                'api_discovered',
+                'api_integrated', 
+                'documentation_updated',
+                'api_removed',
+                'system_ready',
+                'error_occurred'
+            ];
+            
+            notifications.forEach((type, index) => {
+                setTimeout(() => {
+                    showNotification(type);
+                }, index * 1000);
+            });
+        }
+        
+        function checkDocumentationStatus() {
+            if (autoDocumentationSystem) {
+                const status = autoDocumentationSystem.getStatus();
+                console.log('📊 Dokumentations-Status:', status);
+                
+                // Status in UI aktualisieren
+                updateStatus();
+                
+                showNotification('system_ready', { 
+                    message: `Status geprüft: ${status.documentationVersion} Versionen, ${status.notificationQueueLength} Benachrichtigungen in Queue` 
+                });
+            }
+        }
+        
+        function stopAutoDocumentation() {
+            if (autoDocumentationSystem) {
+                autoDocumentationSystem.stop();
+                updateStatus();
+                showNotification('api_removed', { 
+                    message: 'Auto-Documentation-System gestoppt' 
+                });
+            }
+        }
+        
+        function showNotification(type, data = {}) {
+            if (autoDocumentationSystem) {
+                autoDocumentationSystem.showNotification(type, data);
+            }
+        }
+        
+        function startStatusUpdates() {
+            statusUpdateInterval = setInterval(() => {
+                updateStatus();
+            }, 1000);
+        }
+        
+        function updateStatus() {
+            if (autoDocumentationSystem) {
+                const status = autoDocumentationSystem.getStatus();
+                
+                document.getElementById('autoDocStatus').textContent = status.initialized ? 'Aktiv' : 'Inaktiv';
+                document.getElementById('autoDocStatus').className = `status-value ${status.initialized ? 'active' : 'inactive'}`;
+                
+                document.getElementById('updateInterval').textContent = `${status.updateInterval / 1000}s`;
+                
+                document.getElementById('lastUpdate').textContent = status.lastUpdate ? 
+                    new Date(status.lastUpdate).toLocaleString('de-DE') : 'Nie';
+                
+                document.getElementById('docVersion').textContent = status.documentationVersion;
+                
+                document.getElementById('notificationQueue').textContent = status.notificationQueueLength;
+                document.getElementById('notificationQueue').className = `status-value ${status.notificationQueueLength > 0 ? 'warning' : 'active'}`;
+            }
+        }
+        
+        function updateDocumentationPreview(doc = null) {
+            const preview = document.getElementById('documentationPreview');
+            
+            if (doc) {
+                preview.textContent = doc;
+            } else if (autoDocumentationSystem) {
+                autoDocumentationSystem.generateDocumentation().then(documentation => {
+                    preview.textContent = documentation;
+                });
+            }
+        }
+        
+        // Event-Listener für Auto-Documentation Events
+        window.addEventListener('apiDiscovered', (event) => {
+            console.log('🔍 API entdeckt:', event.detail);
+            updateDocumentationPreview();
+        });
+        
+        window.addEventListener('apiIntegrated', (event) => {
+            console.log('🔌 API integriert:', event.detail);
+            updateDocumentationPreview();
+        });
+        
+        window.addEventListener('apiRemoved', (event) => {
+            console.log('🗑️ API entfernt:', event.detail);
+            updateDocumentationPreview();
+        });
+        
+        window.addEventListener('documentationUpdate', (event) => {
+            console.log('📚 Dokumentation aktualisiert:', event.detail);
+            updateDocumentationPreview();
+        });
+        
+        // Cleanup beim Verlassen der Seite
+        window.addEventListener('beforeunload', () => {
+            if (statusUpdateInterval) {
+                clearInterval(statusUpdateInterval);
+            }
+            
+            if (autoDocumentationSystem) {
+                autoDocumentationSystem.stop();
+            }
+        });
+    </script>
+</body>
+</html>

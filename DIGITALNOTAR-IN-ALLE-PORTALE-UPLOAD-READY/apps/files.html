@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TELCO Hub - File Manager</title>
+<h1 style="position: absolute; left: -9999px;">TELCO Hub - File Manager</h1>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .file-manager {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 1rem;
+            height: calc(100vh - 120px);
+        }
+        .sidebar {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        .main-content {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+        }
+        .toolbar {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .toolbar-button {
+            background: var(--primary);
+            color: var(--on-primary);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .toolbar-button:hover {
+            opacity: 0.9;
+        }
+        .toolbar-button.secondary {
+            background: var(--surface-variant);
+            color: var(--on-surface);
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            background: var(--surface-variant);
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+        }
+        .breadcrumb-item {
+            cursor: pointer;
+            color: var(--primary);
+        }
+        .breadcrumb-item:hover {
+            text-decoration: underline;
+        }
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+        .file-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        .file-item:hover {
+            background: var(--surface-variant);
+            transform: translateY(-2px);
+        }
+        .file-item.selected {
+            background: var(--primary);
+            color: var(--on-primary);
+        }
+        .file-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .file-name {
+            font-size: 0.875rem;
+            word-break: break-all;
+            max-width: 100%;
+        }
+        .file-info {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: 0.25rem;
+        }
+        .upload-area {
+            border: 2px dashed var(--outline);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            transition: all 0.2s ease;
+        }
+        .upload-area.dragover {
+            border-color: var(--primary);
+            background: var(--primary-container);
+        }
+        .upload-input {
+            display: block;
+        }
+        .sidebar-item {
+            padding: 0.5rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .sidebar-item:hover {
+            background: var(--surface-variant);
+        }
+        .sidebar-item.active {
+            background: var(--primary);
+            color: var(--on-primary);
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header class="top-app-bar">
+            <div class="top-app-bar-content"><button class="icon-button" onclick="window.history.back()" title="Zurück" title="Action Button">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </button>
+                
+                <h1 class="app-title">📁 TELCO File Manager</h1>
+                <div class="top-app-bar-actions"><button class="icon-button" onclick="window.history.forward()" title="Vorwärts" title="Action Button">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M4 11v2h12.17l-5.59 5.59L12 20l8-8-8-8-1.41 1.41L16.17 11H4z"/></svg>
+                    </button>
+                    
+                    <button class="toolbar-button secondary" onclick="window.location.href='../index.html'" title="Action Button">
+                        ← Zurück
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="file-manager">
+                <!-- Sidebar -->
+                <div class="sidebar">
+                    <h3>Speicherorte</h3>
+                    <div class="sidebar-item active" data-path="/" onclick="navigateToPath('/')">
+                        🏠 Startseite
+                    </div>
+                    <div class="sidebar-item" data-path="/documents" onclick="navigateToPath('/documents')">
+                        📄 Dokumente
+                    </div>
+                    <div class="sidebar-item" data-path="/downloads" onclick="navigateToPath('/downloads')">
+                        ⬇️ Downloads
+                    </div>
+                    <div class="sidebar-item" data-path="/pictures" onclick="navigateToPath('/pictures')">
+                        🖼️ Bilder
+                    </div>
+                    <div class="sidebar-item" data-path="/videos" onclick="navigateToPath('/videos')">
+                        🎥 Videos
+                    </div>
+                    <div class="sidebar-item" data-path="/music" onclick="navigateToPath('/music')">
+                        🎵 Musik
+                    </div>
+                    <div class="sidebar-item" data-path="/shared" onclick="navigateToPath('/shared')">
+                        🤝 Geteilt
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="main-content">
+                    <!-- Toolbar -->
+                    <div class="toolbar">
+            <button class="toolbar-button" id="create-folder-button" onclick="createFolder()" title="Action Button">
+                📁 Ordner erstellen
+            </button>
+        
+                        <button class="toolbar-button" onclick="createNewFolder()" title="Action Button">
+                            📁 Neuer Ordner
+                        </button>
+                        <button class="toolbar-button" id="upload-button" onclick="uploadFile()" title="Action Button">
+                            ⬆️ Datei hochladen
+                        </button>
+                        <button class="toolbar-button secondary" onclick="refreshFiles()" title="Action Button">
+                            🔄 Aktualisieren
+                        </button>
+                        <button class="toolbar-button secondary" onclick="selectAll()" title="Action Button">
+                            ☑️ Alle auswählen
+                        </button>
+                        <button class="toolbar-button secondary" onclick="deleteSelected()" title="Action Button">
+                            🗑️ Löschen
+                        </button>
+                        <button class="toolbar-button secondary" onclick="shareSelected()" title="Action Button">
+                            🤝 Teilen
+                        </button>
+                    </div>
+
+                    <!-- Breadcrumb -->
+                    <div class="breadcrumb" id="breadcrumb">
+                        <span class="breadcrumb-item" onclick="navigateToPath('/')">🏠</span>
+                    </div>
+
+                    <!-- Upload Area -->
+                    <div class="upload-area" id="upload-area" onclick="uploadFile()">
+                        <div>
+                            <div style="font-size: 2rem; margin-bottom: 1rem;">📁</div>
+                            <h3>Dateien hier ablegen oder klicken zum Hochladen</h3>
+                            <p>Unterstützte Formate: Bilder, Videos, Dokumente, Audio</p>
+                        </div>
+                    </div>
+                    <input type="file" id="file-input" class="upload-input" multiple aria-label="Input Field">
+
+                    <!-- File Grid -->
+                    <div class="file-grid drop-zone" id="file-grid">
+                        <!-- Dateien werden hier dynamisch geladen -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../shared/common-functions.js"></script>
+    <script>
+        class FileManager {
+            constructor() {
+                this.currentPath = '/';
+                this.selectedFiles = new Set();
+                this.files = new Map();
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.loadFiles();
+                this.updateBreadcrumb();
+            }
+
+            setupEventListeners() {
+                // Drag & Drop
+                const uploadArea = document.getElementById('upload-area');
+                uploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.add('dragover');
+                });
+
+                uploadArea.addEventListener('dragleave', () => {
+                    uploadArea.classList.remove('dragover');
+                });
+
+                uploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.remove('dragover');
+                    this.handleFiles(e.dataTransfer.files);
+                });
+
+                // File Input
+                document.getElementById('file-input').addEventListener('change', (e) => {
+                    this.handleFiles(e.target.files);
+                });
+
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey) {
+                        switch (e.key) {
+                            case 'a':
+                                e.preventDefault();
+                                this.selectAll();
+                                break;
+                            case 'n':
+                                e.preventDefault();
+                                this.createNewFolder();
+                                break;
+                            case 'r':
+                                e.preventDefault();
+                                this.refreshFiles();
+                                break;
+                        }
+                    }
+                    if (e.key === 'Delete') {
+                        this.deleteSelected();
+                    }
+                });
+            }
+
+            async loadFiles() {
+                try {
+                    // Lade echte Dateien
+                    await this.loadRealFiles();
+                } catch (error) {
+                    console.error('Fehler beim Laden der Dateien:', error);
+                    this.showNotification('Fehler beim Laden der Dateien', 'error');
+                }
+            }
+
+            async loadRealFiles() {
+                try {
+                    // Echte Datei-API Integration
+                    const response = await fetch('/api/files', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        const realFiles = await response.json();
+                        this.files.clear();
+                        
+                        realFiles.forEach(file => {
+                            this.files.set(file.name, {
+                                ...file,
+                                id: file.id || Math.random().toString(36).substr(2, 9),
+                                path: file.path || this.currentPath + file.name,
+                                size: this.formatFileSize(file.size),
+                                modified: new Date(file.modified).toLocaleDateString(),
+                                type: this.detectFileType(file.name, file.mimeType)
+                            });
+                        });
+                        
+                        this.renderFiles();
+                        this.showNotification(`${realFiles.length} Dateien geladen`, 'success');
+                    } else {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                } catch (error) {
+                    console.error('Fehler beim Laden echter Dateien:', error);
+                    this.showNotification('Fehler beim Laden der Dateien', 'error');
+                    
+                    // Fallback: Lokale Dateien über File System Access API
+                    await this.loadLocalFiles();
+                }
+            }
+
+            async loadLocalFiles() {
+                try {
+                    // File System Access API für echte lokale Dateien
+                    if ('showDirectoryPicker' in window) {
+                        const dirHandle = await window.showDirectoryPicker();
+                        await this.scanDirectory(dirHandle);
+                        this.renderFiles();
+                    } else {
+                        // Fallback für Browser ohne File System Access API
+                        this.showNotification('Datei-Zugriff nicht unterstützt. Bitte verwenden Sie den Upload-Button.', 'warning');
+                    }
+                } catch (error) {
+                    console.error('Fehler beim Laden lokaler Dateien:', error);
+                    this.showNotification('Lokale Dateien konnten nicht geladen werden', 'error');
+                }
+            }
+
+            async scanDirectory(dirHandle, path = '') {
+                for await (const [name, handle] of dirHandle.entries()) {
+                    const filePath = path + '/' + name;
+                    
+                    if (handle.kind === 'file') {
+                        const file = await handle.getFile();
+                        this.files.set(name, {
+                            id: Math.random().toString(36).substr(2, 9),
+                            name: name,
+                            path: filePath,
+                            size: this.formatFileSize(file.size),
+                            modified: new Date(file.lastModified).toLocaleDateString(),
+                            type: this.detectFileType(name, file.type),
+                            handle: handle,
+                            file: file
+                        });
+                    } else if (handle.kind === 'directory') {
+                        await this.scanDirectory(handle, filePath);
+                    }
+                }
+            }
+
+            detectFileType(filename, mimeType) {
+                const extension = filename.split('.').pop().toLowerCase();
+                const mimeMap = {
+                    'pdf': 'pdf',
+                    'doc': 'document', 'docx': 'document',
+                    'ppt': 'presentation', 'pptx': 'presentation',
+                    'jpg': 'image', 'jpeg': 'image', 'png': 'image', 'gif': 'image', 'webp': 'image',
+                    'mp4': 'video', 'avi': 'video', 'mov': 'video', 'webm': 'video',
+                    'mp3': 'audio', 'wav': 'audio', 'flac': 'audio', 'ogg': 'audio',
+                    'zip': 'archive', 'rar': 'archive', '7z': 'archive',
+                    'js': 'code', 'html': 'code', 'css': 'code', 'json': 'code', 'py': 'code', 'java': 'code'
+                };
+                
+                return mimeMap[extension] || 'file';
+            }
+
+            formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            renderFiles() {
+                const grid = document.getElementById('file-grid');
+                grid.innerHTML = '';
+
+                if (this.files.size === 0) {
+                    grid.innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; opacity: 0.7;">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">📁</div>
+                            <h3>Ordner ist leer</h3>
+                            <p>Ziehen Sie Dateien hierher oder klicken Sie auf "Datei hochladen"</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                this.files.forEach((file, name) => {
+                    const item = document.createElement('div');
+                    item.className = 'file-item';
+                    item.dataset.fileId = file.id;
+                    
+                    const icon = this.getFileIcon(file.type);
+                    const isSelected = this.selectedFiles.has(file.id);
+                    
+                    if (isSelected) {
+                        item.classList.add('selected');
+                    }
+
+                    item.innerHTML = `
+                        <div class="file-icon">${icon}</div>
+                        <div class="file-name" title="${file.name}">${file.name}</div>
+                        <div class="file-info">${file.size}</div>
+                        <div class="file-info">${file.modified}</div>
+                    `;
+
+                    item.addEventListener('click', (e) => {
+                        if (e.ctrlKey || e.metaKey) {
+                            this.toggleSelection(file.id);
+                        } else {
+                            this.selectFile(file.id);
+                        }
+                    });
+
+                    item.addEventListener('dblclick', () => {
+                        this.openFile(file);
+                    });
+
+                    grid.appendChild(item);
+                });
+            }
+
+            getFileIcon(type) {
+                const icons = {
+                    folder: '📁',
+                    pdf: '📄',
+                    powerpoint: '📊',
+                    image: '🖼️',
+                    video: '🎥',
+                    audio: '🎵',
+                    archive: '🗜️',
+                    code: '💻',
+                    text: '📝',
+                    spreadsheet: '📈',
+                    default: '📄'
+                };
+                return icons[type] || icons.default;
+            }
+
+            navigateToPath(path) {
+                this.currentPath = path;
+                this.selectedFiles.clear();
+                this.updateBreadcrumb();
+                this.updateSidebar();
+                this.loadFiles();
+            }
+
+            updateBreadcrumb() {
+                const breadcrumb = document.getElementById('breadcrumb');
+                const parts = this.currentPath.split('/').filter(p => p);
+                
+                breadcrumb.innerHTML = '<span class="breadcrumb-item" onclick="navigateToPath(\'/\')">🏠</span>';
+                
+                let currentPath = '';
+                parts.forEach(part => {
+                    currentPath += '/' + part;
+                    const item = document.createElement('span');
+                    item.className = 'breadcrumb-item';
+                    item.textContent = part;
+                    item.onclick = () => this.navigateToPath(currentPath);
+                    breadcrumb.appendChild(document.createTextNode(' / '));
+                    breadcrumb.appendChild(item);
+                });
+            }
+
+            updateSidebar() {
+                document.querySelectorAll('.sidebar-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.path === this.currentPath) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+
+            toggleSelection(fileId) {
+                if (this.selectedFiles.has(fileId)) {
+                    this.selectedFiles.delete(fileId);
+                } else {
+                    this.selectedFiles.add(fileId);
+                }
+                this.updateSelection();
+            }
+
+            selectFile(fileId) {
+                this.selectedFiles.clear();
+                this.selectedFiles.add(fileId);
+                this.updateSelection();
+            }
+
+            updateSelection() {
+                document.querySelectorAll('.file-item').forEach(item => {
+                    const fileId = item.dataset.fileId;
+                    if (this.selectedFiles.has(fileId)) {
+                        item.classList.add('selected');
+                    } else {
+                        item.classList.remove('selected');
+                    }
+                });
+            }
+
+            selectAll() {
+                this.files.forEach((file, name) => {
+                    this.selectedFiles.add(file.id);
+                });
+                this.updateSelection();
+            }
+
+            async deleteSelected() {
+                if (this.selectedFiles.size === 0) {
+                    this.showNotification('Keine Dateien ausgewählt', 'warning');
+                    return;
+                }
+
+                if (confirm(`${this.selectedFiles.size} Datei(en) wirklich löschen?`)) {
+                    try {
+                        // Simuliere Löschvorgang
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        
+                        this.selectedFiles.forEach(fileId => {
+                            const file = Array.from(this.files.values()).find(f => f.id === fileId);
+                            if (file) {
+                                this.files.delete(file.name);
+                            }
+                        });
+                        
+                        this.selectedFiles.clear();
+                        this.renderFiles();
+                        this.showNotification(`${this.selectedFiles.size} Datei(en) gelöscht`, 'success');
+                    } catch (error) {
+                        this.showNotification('Fehler beim Löschen', 'error');
+                    }
+                }
+            }
+
+            async shareSelected() {
+                if (this.selectedFiles.size === 0) {
+                    this.showNotification('Keine Dateien ausgewählt', 'warning');
+                    return;
+                }
+
+                const selectedFileNames = Array.from(this.selectedFiles).map(fileId => {
+                    const file = Array.from(this.files.values()).find(f => f.id === fileId);
+                    return file ? file.name : '';
+                }).filter(name => name);
+
+                const shareUrl = `https://telco-hub.com/share/${Math.random().toString(36).substr(2, 9)}`;
+                
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: 'Geteilte Dateien',
+                            text: `Dateien: ${selectedFileNames.join(', ')}`,
+                            url: shareUrl
+                        });
+                    } catch (error) {
+                        this.copyToClipboard(shareUrl);
+                    }
+                } else {
+                    this.copyToClipboard(shareUrl);
+                }
+                
+                this.showNotification('Freigabe-Link kopiert', 'success');
+            }
+
+            copyToClipboard(text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    this.showNotification('In Zwischenablage kopiert', 'success');
+                });
+            }
+
+            openFile(file) {
+                if (file.type === 'folder') {
+                    this.navigateToPath(this.currentPath + '/' + file.name);
+                } else {
+                    // Simuliere Datei öffnen
+                    this.showNotification(`Öffne ${file.name}...`, 'info');
+                }
+            }
+
+            async createNewFolder() {
+                const name = prompt('Ordnername eingeben:');
+                if (name && name.trim()) {
+                    const newFolder = {
+                        id: Math.random().toString(36).substr(2, 9),
+                        name: name.trim(),
+                        type: 'folder',
+                        size: '-',
+                        modified: new Date().toISOString().split('T')[0],
+                        path: this.currentPath + '/' + name.trim()
+                    };
+                    
+                    this.files.set(newFolder.name, newFolder);
+                    this.renderFiles();
+                    this.showNotification(`Ordner "${name}" erstellt`, 'success');
+                }
+            }
+
+            uploadFile() {
+                document.getElementById('file-input').click();
+            }
+
+            async handleFiles(fileList) {
+                for (let file of fileList) {
+                    const newFile = {
+                        id: Math.random().toString(36).substr(2, 9),
+                        name: file.name,
+                        type: this.getFileType(file.type),
+                        size: this.formatFileSize(file.size),
+                        modified: new Date().toISOString().split('T')[0],
+                        path: this.currentPath + '/' + file.name,
+                        file: file
+                    };
+                    
+                    this.files.set(newFile.name, newFile);
+                }
+                
+                this.renderFiles();
+                this.showNotification(`${fileList.length} Datei(en) hochgeladen`, 'success');
+            }
+
+            getFileType(mimeType) {
+                if (mimeType.startsWith('image/')) return 'image';
+                if (mimeType.startsWith('video/')) return 'video';
+                if (mimeType.startsWith('audio/')) return 'audio';
+                if (mimeType.includes('pdf')) return 'pdf';
+                if (mimeType.includes('powerpoint')) return 'powerpoint';
+                if (mimeType.includes('spreadsheet')) return 'spreadsheet';
+                if (mimeType.includes('zip') || mimeType.includes('rar')) return 'archive';
+                if (mimeType.includes('text/') || mimeType.includes('javascript')) return 'code';
+                return 'default';
+            }
+
+            formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            refreshFiles() {
+                this.loadFiles();
+                this.showNotification('Dateien aktualisiert', 'info');
+            }
+
+            showNotification(message, type = 'info') {
+                // Einfache Benachrichtigung
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: var(--primary);
+                    color: var(--on-primary);
+                    padding: 1rem;
+                    border-radius: var(--radius-lg);
+                    z-index: 1000;
+                    box-shadow: var(--shadow-md);
+                `;
+                notification.textContent = message;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+        }
+
+        // Globale Funktionen
+        function navigateToPath(path) {
+            if (window.fileManager) {
+                window.fileManager.navigateToPath(path);
+            }
+        }
+
+        function createNewFolder() {
+            if (window.fileManager) {
+                window.fileManager.createNewFolder();
+            }
+        }
+
+        function uploadFile() {
+            if (window.fileManager) {
+                window.fileManager.uploadFile();
+            }
+        }
+
+        function refreshFiles() {
+            if (window.fileManager) {
+                window.fileManager.refreshFiles();
+            }
+        }
+
+        function selectAll() {
+            if (window.fileManager) {
+                window.fileManager.selectAll();
+            }
+        }
+
+        function deleteSelected() {
+            if (window.fileManager) {
+                window.fileManager.deleteSelected();
+            }
+        }
+
+        function shareSelected() {
+            if (window.fileManager) {
+                window.fileManager.shareSelected();
+            }
+        }
+
+        // App initialisieren
+        document.addEventListener('DOMContentLoaded', () => {
+            window.fileManager = new FileManager();
+        });
+    
+            function createFolder() {
+                console.log('📁 Erstelle neuen Ordner...');
+                const folderName = prompt('Ordnername eingeben:');
+                if (folderName && folderName.trim()) {
+                    // Simuliere Ordner-Erstellung
+                    const newFolder = {
+                        name: folderName,
+                        type: 'folder',
+                        created: new Date().toISOString()
+                    };
+                    console.log('✅ Ordner erstellt:', newFolder);
+                    // Hier würde die echte Ordner-Erstellung implementiert werden
+                }
+            }
+        
+</script>
+
+        <script>
+            // Browser Navigation Enhancement
+            document.addEventListener('DOMContentLoaded', function() {
+                // Navigation-Status anzeigen
+                updateNavigationStatus();
+                
+                // Popstate Event für Browser-Navigation
+                window.addEventListener('popstate', function(event) {
+                    console.log('Browser Navigation:', event.state);
+                    updateNavigationStatus();
+                });
+                
+                // Navigation-Status aktualisieren
+                function updateNavigationStatus() {
+                    const canGoBack = window.history.length > 1;
+                    const canGoForward = window.history.length > 1; // Vereinfacht
+                    
+                    // Back-Button aktivieren/deaktivieren
+                    const backButtons = document.querySelectorAll('button[onclick*="history.back"]');
+                    backButtons.forEach(btn => {
+                        btn.disabled = !canGoBack;
+                        btn.style.opacity = canGoBack ? '1' : '0.5';
+                    });
+                    
+                    // Forward-Button aktivieren/deaktivieren
+                    const forwardButtons = document.querySelectorAll('button[onclick*="history.forward"]');
+                    forwardButtons.forEach(btn => {
+                        btn.disabled = !canGoForward;
+                        btn.style.opacity = canGoForward ? '1' : '0.5';
+                    });
+                }
+                
+                // Globale Navigation-Funktionen
+                window.goBack = function() {
+                    if (window.history.length > 1) {
+                        window.history.back();
+                    }
+                };
+                
+                window.goForward = function() {
+                    window.history.forward();
+                };
+                
+                window.goHome = function() {
+                    window.location.href = '/';
+                };
+            });
+        </script>
+
+    </body>
+</html>

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TELCO Hub - TURN Server Status</title>
+<h1 style="position: absolute; left: -9999px;">TELCO Hub - TURN Server Status</h1>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .turn-container {
+            padding: 1rem;
+        }
+        .turn-status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .turn-status-card {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            text-align: center;
+        }
+        .turn-status-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .turn-status-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+        .turn-status-label {
+            font-size: 0.9rem;
+            color: var(--on-surface-variant);
+        }
+        .turn-config {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+        .config-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--outline);
+        }
+        .config-item:last-child {
+            border-bottom: none;
+        }
+        .config-label {
+            font-weight: 600;
+            color: var(--on-surface);
+        }
+        .config-value {
+            font-family: monospace;
+            color: var(--on-surface-variant);
+            background: var(--surface-variant);
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+        }
+        .turn-logs {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            font-family: monospace;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            padding: 0.25rem;
+            border-radius: var(--radius-sm);
+        }
+        .log-info { background: var(--info-container); color: var(--on-info-container); }
+        .log-success { background: var(--success-container); color: var(--on-success-container); }
+        .log-warning { background: var(--warning-container); color: var(--on-warning-container); }
+        .log-error { background: var(--error-container); color: var(--on-error-container); }
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        .status-online { background: var(--success); }
+        .status-offline { background: var(--error); }
+        .status-maintenance { background: var(--warning); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="top-app-bar">
+            <div class="top-app-bar-content">
+                <button class="icon-button" onclick="window.history.back()" title="Action Button">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </button>
+                <h1 class="top-app-bar-title">🔐 TURN Server Status</h1>
+                <div class="top-app-bar-actions"><button class="icon-button" onclick="window.history.forward()" title="Vorwärts" title="Action Button">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M4 11v2h12.17l-5.59 5.59L12 20l8-8-8-8-1.41 1.41L16.17 11H4z"/></svg>
+                    </button>
+                    
+                    <button class="icon-button" onclick="refreshTURNStatus()" title="Action Button">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="turn-container">
+            <!-- TURN Server Status -->
+            <div class="turn-status-grid">
+                <div class="turn-status-card">
+                    <div class="turn-status-icon">🔄</div>
+                    <div class="turn-status-value" id="server-status">
+                        <span class="status-indicator status-online"></span>Online
+                    </div>
+                    <div class="turn-status-label">Server Status</div>
+                </div>
+                <div class="turn-status-card">
+                    <div class="turn-status-icon">👥</div>
+                    <div class="turn-status-value" id="active-sessions">12</div>
+                    <div class="turn-status-label">Aktive Sessions</div>
+                </div>
+                <div class="turn-status-card">
+                    <div class="turn-status-icon">📊</div>
+                    <div class="turn-status-value" id="bandwidth-usage">2.3 GB</div>
+                    <div class="turn-status-label">Bandbreite (24h)</div>
+                </div>
+                <div class="turn-status-card">
+                    <div class="turn-status-icon">⚡</div>
+                    <div class="turn-status-value" id="cpu-usage">15%</div>
+                    <div class="turn-status-label">CPU Auslastung</div>
+                </div>
+            </div>
+
+            <!-- TURN Server Configuration -->
+            <div class="turn-config">
+                <h3>⚙️ TURN Server Konfiguration</h3>
+                <div class="config-item">
+                    <div class="config-label">Server Adresse</div>
+                    <div class="config-value">turn.telco-hub.local:3478</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-label">Realm</div>
+                    <div class="config-value">telco.local</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-label">Username</div>
+                    <div class="config-value">peeruser</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-label">Password</div>
+                    <div class="config-value">••••••••</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-label">TLS Port</div>
+                    <div class="config-value">5349</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-label">UDP Port</div>
+                    <div class="config-value">3478</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-label">Max Sessions</div>
+                    <div class="config-value">1000</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-label">Session Timeout</div>
+                    <div class="config-value">3600s</div>
+                </div>
+            </div>
+
+            <!-- TURN Server Logs -->
+            <div class="turn-logs">
+                <h3>📋 Server Logs</h3>
+                <div id="turn-logs-content">
+                    <!-- Logs werden hier dynamisch geladen -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        class TURNStatus {
+            constructor() {
+                this.logs = [];
+                this.init();
+            }
+
+            init() {
+                this.loadSampleLogs();
+                this.renderLogs();
+                this.startStatusUpdates();
+            }
+
+            loadSampleLogs() {
+                this.logs = [
+                    { timestamp: new Date(), level: 'info', message: 'TURN server started on port 3478' },
+                    { timestamp: new Date(Date.now() - 60000), level: 'success', message: 'New relay allocation: 192.168.1.100:49152' },
+                    { timestamp: new Date(Date.now() - 120000), level: 'info', message: 'Client connected from 203.0.113.45' },
+                    { timestamp: new Date(Date.now() - 180000), level: 'success', message: 'Relay allocation successful for peer connection' },
+                    { timestamp: new Date(Date.now() - 240000), level: 'warning', message: 'High bandwidth usage detected: 15MB/s' },
+                    { timestamp: new Date(Date.now() - 300000), level: 'info', message: 'Session timeout for inactive client' },
+                    { timestamp: new Date(Date.now() - 360000), level: 'success', message: 'TLS connection established on port 5349' },
+                    { timestamp: new Date(Date.now() - 420000), level: 'info', message: 'Memory usage: 45% (128MB/256MB)' },
+                    { timestamp: new Date(Date.now() - 480000), level: 'success', message: 'STUN binding request processed' },
+                    { timestamp: new Date(Date.now() - 540000), level: 'info', message: 'TURN server health check passed' }
+                ];
+            }
+
+            renderLogs() {
+                const logsContent = document.getElementById('turn-logs-content');
+                logsContent.innerHTML = '';
+
+                this.logs.slice(-20).forEach(log => {
+                    const logEntry = document.createElement('div');
+                    logEntry.className = `log-entry log-${log.level}`;
+                    
+                    const timestamp = log.timestamp.toLocaleTimeString();
+                    logEntry.textContent = `[${timestamp}] ${log.message}`;
+                    
+                    logsContent.appendChild(logEntry);
+                });
+
+                // Auto-scroll to bottom
+                logsContent.scrollTop = logsContent.scrollHeight;
+            }
+
+            startStatusUpdates() {
+                setInterval(() => {
+                    this.updateStatus();
+                    this.addRandomLog();
+                }, 5000);
+            }
+
+            updateStatus() {
+                // Simuliere Status-Updates
+                const activeSessions = Math.floor(Math.random() * 20) + 5;
+                const bandwidthUsage = (Math.random() * 5 + 1).toFixed(1);
+                const cpuUsage = Math.floor(Math.random() * 30) + 10;
+
+                document.getElementById('active-sessions').textContent = activeSessions;
+                document.getElementById('bandwidth-usage').textContent = bandwidthUsage + ' GB';
+                document.getElementById('cpu-usage').textContent = cpuUsage + '%';
+
+                // Update server status indicator
+                const statusIndicator = document.querySelector('#server-status .status-indicator');
+                if (Math.random() > 0.9) {
+                    statusIndicator.className = 'status-indicator status-maintenance';
+                    document.getElementById('server-status').innerHTML = '<span class="status-indicator status-maintenance"></span>Wartung';
+                } else {
+                    statusIndicator.className = 'status-indicator status-online';
+                    document.getElementById('server-status').innerHTML = '<span class="status-indicator status-online"></span>Online';
+                }
+            }
+
+            addRandomLog() {
+                const logMessages = [
+                    { level: 'info', message: 'Periodic health check completed' },
+                    { level: 'success', message: 'New relay allocation created' },
+                    { level: 'info', message: 'Memory cleanup performed' },
+                    { level: 'success', message: 'Client session established' },
+                    { level: 'warning', message: 'Bandwidth threshold approaching' },
+                    { level: 'info', message: 'TLS certificate validation passed' }
+                ];
+
+                if (Math.random() > 0.7) {
+                    const randomLog = logMessages[Math.floor(Math.random() * logMessages.length)];
+                    this.logs.push({
+                        timestamp: new Date(),
+                        level: randomLog.level,
+                        message: randomLog.message
+                    });
+
+                    this.renderLogs();
+                }
+            }
+
+            testTURNConnection() {
+                // Simuliere TURN-Verbindungstest
+                const testLog = {
+                    timestamp: new Date(),
+                    level: 'success',
+                    message: 'TURN connection test successful'
+                };
+
+                this.logs.push(testLog);
+                this.renderLogs();
+            }
+
+            restartTURNServer() {
+                // Simuliere Server-Neustart
+                const restartLogs = [
+                    { timestamp: new Date(), level: 'info', message: 'TURN server restart initiated' },
+                    { timestamp: new Date(Date.now() + 1000), level: 'warning', message: 'All active sessions terminated' },
+                    { timestamp: new Date(Date.now() + 2000), level: 'success', message: 'TURN server restarted successfully' }
+                ];
+
+                restartLogs.forEach(log => {
+                    this.logs.push(log);
+                });
+
+                this.renderLogs();
+            }
+        }
+
+        // Globale Funktionen
+        function refreshTURNStatus() {
+            location.reload();
+        }
+
+        function testTURNConnection() {
+            window.turnStatus.testTURNConnection();
+        }
+
+        function restartTURNServer() {
+            if (confirm('TURN Server wirklich neustarten? Alle aktiven Sessions werden beendet.')) {
+                window.turnStatus.restartTURNServer();
+            }
+        }
+
+        // Initialisiere TURN Status
+        document.addEventListener('DOMContentLoaded', () => {
+            window.turnStatus = new TURNStatus();
+        });
+    </script>
+</body>
+</html>
+
+
+

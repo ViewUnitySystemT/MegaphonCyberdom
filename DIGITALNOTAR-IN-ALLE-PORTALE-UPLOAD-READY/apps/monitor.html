@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TELCO Hub - Monitoring</title>
+<h1 style="position: absolute; left: -9999px;">TELCO Hub - Monitoring</h1>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .monitoring-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .metric-card {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        .metric-label {
+            color: var(--on-surface);
+            opacity: 0.7;
+        }
+        .connection-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .connection-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--outline);
+        }
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        .status-connected { background: #4CAF50; }
+        .status-disconnected { background: #F44336; }
+        .status-pending { background: #FF9800; }
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .control-button {
+            background: var(--primary);
+            color: var(--on-primary);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        .control-button:hover {
+            opacity: 0.9;
+        }
+        .control-button.secondary {
+            background: var(--surface-variant);
+            color: var(--on-surface);
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header class="top-app-bar">
+            <div class="top-app-bar-content"><button class="icon-button" onclick="window.history.back()" title="Zurück" title="Action Button">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </button>
+                
+                <h1 class="app-title">📊 TELCO Monitoring</h1>
+                <div class="top-app-bar-actions"><button class="icon-button" onclick="window.history.forward()" title="Vorwärts" title="Action Button">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M4 11v2h12.17l-5.59 5.59L12 20l8-8-8-8-1.41 1.41L16.17 11H4z"/></svg>
+                    </button>
+                    
+                    <button class="control-button secondary" onclick="window.location.href='../index.html'" title="Action Button">
+                        ← Zurück
+                    </button>
+                    <button class="control-button" onclick="refreshData()" title="Action Button">
+                        🔄 Aktualisieren
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Metrics Grid -->
+            <div class="monitoring-grid">
+                <div class="metric-card">
+                    <div class="metric-value" id="connection-count">0</div>
+                    <div class="metric-label">Aktive Verbindungen</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="room-count">0</div>
+                    <div class="metric-label">Aktive Räume</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="total-messages">0</div>
+                    <div class="metric-label">Nachrichten/Min</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="uptime">00:00:00</div>
+                    <div class="metric-label">Server Uptime</div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls">
+                <button class="control-button" onclick="startMonitoring()" title="Action Button">▶️ Monitoring starten</button>
+                <button class="control-button secondary" onclick="stopMonitoring()" title="Action Button">⏹️ Monitoring stoppen</button>
+                <button class="control-button secondary" onclick="exportData()" title="Action Button">📥 Daten exportieren</button>
+                <button class="control-button secondary" onclick="clearData()" title="Action Button">🗑️ Daten löschen</button>
+            </div>
+
+            <!-- Connection List -->
+            <div class="metric-card">
+                <h3>Aktive Verbindungen</h3>
+                <div class="connection-list" id="connection-list">
+                    <div class="connection-item">
+                        <span>Keine aktiven Verbindungen</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Server Log -->
+            <div class="metric-card">
+                <h3>Server Log</h3>
+                <div id="server-log" style="
+                    background: var(--background);
+                    border: 1px solid var(--outline);
+                    border-radius: var(--radius-sm);
+                    padding: 1rem;
+                    font-family: 'Courier New', monospace;
+                    font-size: 0.875rem;
+                    max-height: 200px;
+                    overflow-y: auto;
+                    white-space: pre-wrap;
+                ">Server startet...</div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        class MonitoringApp {
+            constructor() {
+                this.ws = null;
+                this.monitoringInterval = null;
+                this.isMonitoring = false;
+                this.connections = new Map();
+                this.serverLog = [];
+                this.init();
+            }
+
+            init() {
+                this.connectToServer();
+                this.setupEventListeners();
+                this.startAutoRefresh();
+            }
+
+            connectToServer() {
+                try {
+                    this.ws = new WebSocket('ws://localhost:8080');
+                    
+                    this.ws.onopen = () => {
+                        this.log('✅ Verbunden mit Signaling-Server');
+                        this.ws.send(JSON.stringify({ type: 'ping' }));
+                    };
+
+                    this.ws.onmessage = (event) => {
+                        const message = JSON.parse(event.data);
+                        this.handleMessage(message);
+                    };
+
+                    this.ws.onclose = () => {
+                        this.log('❌ Verbindung zum Server getrennt');
+                        setTimeout(() => this.connectToServer(), 3000);
+                    };
+
+                    this.ws.onerror = (error) => {
+                        this.log('❌ WebSocket Fehler: ' + error.message);
+                    };
+                } catch (error) {
+                    this.log('❌ Verbindungsfehler: ' + error.message);
+                }
+            }
+
+            handleMessage(message) {
+                switch (message.type) {
+                    case 'pong':
+                        this.log('🏓 Pong empfangen');
+                        break;
+                    case 'connection':
+                        this.updateConnection(message.payload);
+                        break;
+                    case 'disconnection':
+                        this.removeConnection(message.payload.id);
+                        break;
+                    case 'room_update':
+                        this.updateRoomInfo(message.payload);
+                        break;
+                    default:
+                        this.log('📨 Nachricht: ' + JSON.stringify(message));
+                }
+            }
+
+            updateConnection(conn) {
+                this.connections.set(conn.id, {
+                    id: conn.id,
+                    ip: conn.ip || 'Unbekannt',
+                    userAgent: conn.userAgent || 'Unbekannt',
+                    room: conn.room || 'Kein Raum',
+                    connectedAt: new Date(conn.connectedAt || Date.now()),
+                    status: 'connected'
+                });
+                this.renderConnections();
+                this.updateMetrics();
+            }
+
+            removeConnection(connectionId) {
+                this.connections.delete(connectionId);
+                this.renderConnections();
+                this.updateMetrics();
+            }
+
+            renderConnections() {
+                const list = document.getElementById('connection-list');
+                if (this.connections.size === 0) {
+                    list.innerHTML = '<div class="connection-item"><span>Keine aktiven Verbindungen</span></div>';
+                    return;
+                }
+
+                list.innerHTML = '';
+                this.connections.forEach((conn, id) => {
+                    const item = document.createElement('div');
+                    item.className = 'connection-item';
+                    item.innerHTML = `
+                        <div>
+                            <span class="status-indicator status-connected"></span>
+                            <strong>${conn.id.substring(0, 8)}...</strong>
+                            <span style="opacity: 0.7;">in ${conn.room}</span>
+                        </div>
+                        <div style="font-size: 0.875rem; opacity: 0.7;">
+                            ${this.formatDuration(Date.now() - conn.connectedAt.getTime())}
+                        </div>
+                    `;
+                    list.appendChild(item);
+                });
+            }
+
+            updateMetrics() {
+                document.getElementById('total-connections').textContent = this.connections.size;
+                document.getElementById('total-rooms').textContent = this.getUniqueRooms().length;
+                
+                // Simuliere Nachrichten/Min
+                const messagesPerMin = Math.floor(Math.random() * 50) + 10;
+                document.getElementById('total-messages').textContent = messagesPerMin;
+            }
+
+            getUniqueRooms() {
+                const rooms = new Set();
+                this.connections.forEach(conn => {
+                    if (conn.room && conn.room !== 'Kein Raum') {
+                        rooms.add(conn.room);
+                    }
+                });
+                return Array.from(rooms);
+            }
+
+            formatDuration(ms) {
+                const seconds = Math.floor(ms / 1000);
+                const minutes = Math.floor(seconds / 60);
+                const hours = Math.floor(minutes / 60);
+                
+                if (hours > 0) return `${hours}h ${minutes % 60}m`;
+                if (minutes > 0) return `${minutes}m ${seconds % 60}s`;
+                return `${seconds}s`;
+            }
+
+            log(message) {
+                const timestamp = new Date().toLocaleTimeString();
+                const logEntry = `[${timestamp}] ${message}`;
+                this.serverLog.push(logEntry);
+                
+                // Behalte nur die letzten 50 Einträge
+                if (this.serverLog.length > 50) {
+                    this.serverLog.shift();
+                }
+                
+                const logElement = document.getElementById('server-log');
+                logElement.textContent = this.serverLog.join('\n');
+                logElement.scrollTop = logElement.scrollHeight;
+            }
+
+            setupEventListeners() {
+                // Automatische Aktualisierung alle 5 Sekunden
+                this.monitoringInterval = setInterval(() => {
+                    if (this.isMonitoring) {
+                        this.fetchServerData();
+                    }
+                }, 5000);
+            }
+
+            async fetchServerData() {
+                try {
+                    const response = await fetch('http://localhost:8080/health');
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.updateMetricsFromServer(data);
+                    }
+                } catch (error) {
+                    this.log('❌ Fehler beim Abrufen der Server-Daten: ' + error.message);
+                }
+            }
+
+            updateMetricsFromServer(data) {
+                if (data.metrics) {
+                    document.getElementById('total-connections').textContent = data.metrics.connections || 0;
+                    document.getElementById('total-rooms').textContent = data.metrics.rooms || 0;
+                    document.getElementById('total-messages').textContent = data.metrics.messages || 0;
+                    
+                    if (data.uptime) {
+                        const uptime = this.formatDuration(data.uptime * 1000);
+                        document.getElementById('uptime').textContent = uptime;
+                    }
+                }
+            }
+
+            startAutoRefresh() {
+                this.isMonitoring = true;
+                this.fetchServerData();
+                this.log('🔄 Automatische Aktualisierung gestartet');
+            }
+        }
+
+        // Globale Funktionen
+        function refreshData() {
+            if (window.monitoringApp) {
+                window.monitoringApp.fetchServerData();
+                window.monitoringApp.log('🔄 Manuelle Aktualisierung');
+            }
+        }
+
+        function startMonitoring() {
+            if (window.monitoringApp) {
+                window.monitoringApp.isMonitoring = true;
+                window.monitoringApp.log('▶️ Monitoring gestartet');
+            }
+        }
+
+        function stopMonitoring() {
+            if (window.monitoringApp) {
+                window.monitoringApp.isMonitoring = false;
+                window.monitoringApp.log('⏹️ Monitoring gestoppt');
+            }
+        }
+
+        function exportData() {
+            if (window.monitoringApp) {
+                const data = {
+                    timestamp: new Date().toISOString(),
+                    connections: Array.from(window.monitoringApp.connections.values()),
+                    metrics: {
+                        totalConnections: window.monitoringApp.connections.size,
+                        totalRooms: window.monitoringApp.getUniqueRooms().length,
+                        uptime: Date.now() - (window.monitoringApp.startTime || Date.now())
+                    },
+                    log: window.monitoringApp.serverLog
+                };
+                
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `telco-monitoring-${new Date().toISOString().slice(0, 19)}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                window.monitoringApp.log('📥 Daten exportiert');
+            }
+        }
+
+        function clearData() {
+            if (confirm('Alle Monitoring-Daten löschen?')) {
+                if (window.monitoringApp) {
+                    window.monitoringApp.connections.clear();
+                    window.monitoringApp.serverLog = [];
+                    window.monitoringApp.renderConnections();
+                    window.monitoringApp.updateMetrics();
+                    window.monitoringApp.log('🗑️ Daten gelöscht');
+                }
+            }
+        }
+
+        // App initialisieren
+        document.addEventListener('DOMContentLoaded', () => {
+            window.monitoringApp = new MonitoringApp();
+        });
+    </script>
+
+            <script>
+                // WebSocket-Verbindung für Real-time Monitoring
+                let ws = null;
+                
+                function connectWebSocket() {
+                    try {
+                        ws = new WebSocket('ws://localhost:8080');
+                        
+                        ws.onopen = () => {
+                            console.log('🔌 WebSocket verbunden');
+                            updateConnectionStatus('connected');
+                        };
+                        
+                        ws.onmessage = (event) => {
+                            try {
+                                const data = JSON.parse(event.data);
+                                updateMonitoringData(data);
+                            } catch (error) {
+                                console.error('WebSocket Daten-Parsing Fehler:', error);
+                            }
+                        };
+                        
+                        ws.onclose = () => {
+                            console.log('🔌 WebSocket getrennt');
+                            updateConnectionStatus('disconnected');
+                            // Reconnect nach 5 Sekunden
+                            setTimeout(connectWebSocket, 5000);
+                        };
+                        
+                        ws.onerror = (error) => {
+                            console.error('WebSocket Fehler:', error);
+                            updateConnectionStatus('error');
+                        };
+                        
+                    } catch (error) {
+                        console.error('WebSocket Verbindungsfehler:', error);
+                        updateConnectionStatus('error');
+                    }
+                }
+                
+                function updateConnectionStatus(status) {
+                    const statusElement = document.getElementById('connection-status');
+                    if (statusElement) {
+                        statusElement.textContent = status;
+                        statusElement.className = `status-${status}`;
+                    }
+                }
+                
+                function updateMonitoringData(data) {
+                    // Update Monitoring-Daten basierend auf WebSocket-Nachrichten
+                    if (data.type === 'stats') {
+                        document.getElementById('connection-count').textContent = data.connections || 0;
+                        document.getElementById('room-count').textContent = data.rooms || 0;
+                    }
+                }
+                
+                // Verbinde WebSocket beim Laden der Seite
+                document.addEventListener('DOMContentLoaded', connectWebSocket);
+            </script>
+        
+
+        <script>
+            // Browser Navigation Enhancement
+            document.addEventListener('DOMContentLoaded', function() {
+                // Navigation-Status anzeigen
+                updateNavigationStatus();
+                
+                // Popstate Event für Browser-Navigation
+                window.addEventListener('popstate', function(event) {
+                    console.log('Browser Navigation:', event.state);
+                    updateNavigationStatus();
+                });
+                
+                // Navigation-Status aktualisieren
+                function updateNavigationStatus() {
+                    const canGoBack = window.history.length > 1;
+                    const canGoForward = window.history.length > 1; // Vereinfacht
+                    
+                    // Back-Button aktivieren/deaktivieren
+                    const backButtons = document.querySelectorAll('button[onclick*="history.back"]');
+                    backButtons.forEach(btn => {
+                        btn.disabled = !canGoBack;
+                        btn.style.opacity = canGoBack ? '1' : '0.5';
+                    });
+                    
+                    // Forward-Button aktivieren/deaktivieren
+                    const forwardButtons = document.querySelectorAll('button[onclick*="history.forward"]');
+                    forwardButtons.forEach(btn => {
+                        btn.disabled = !canGoForward;
+                        btn.style.opacity = canGoForward ? '1' : '0.5';
+                    });
+                }
+                
+                // Globale Navigation-Funktionen
+                window.goBack = function() {
+                    if (window.history.length > 1) {
+                        window.history.back();
+                    }
+                };
+                
+                window.goForward = function() {
+                    window.history.forward();
+                };
+                
+                window.goHome = function() {
+                    window.location.href = '/';
+                };
+            });
+        </script>
+
+    </body>
+</html>

@@ -1,0 +1,537 @@
+<!-- 🌍 MEGAPHONCYBERDOM GLOBAL REDUNDANCY MONITOR -->
+<!-- Features: Global failover, space-grade redundancy, worldwide transmission monitoring -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>🌍 Global Redundancy Monitor - Space Grade</title>
+<h1 style="position: absolute; left: -9999px;">🌍 Global Redundancy Monitor - Space Grade</h1>
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    .global-status {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: linear-gradient(45deg, #00ff00, #0080ff);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: bold;
+      z-index: 10000;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.7; }
+      100% { opacity: 1; }
+    }
+    
+    .redundancy-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin: 20px 0;
+    }
+    
+    .redundancy-node {
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      border: 2px solid #00ff00;
+      border-radius: 12px;
+      padding: 20px;
+      color: #00ff00;
+      font-family: monospace;
+    }
+    
+    .node-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0;
+    }
+    
+    .status-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #00ff00;
+      animation: blink 1s infinite;
+    }
+    
+    .status-indicator.warning {
+      background: #ffaa00;
+    }
+    
+    .status-indicator.error {
+      background: #ff0000;
+    }
+    
+    .status-indicator.inactive {
+      background: #333;
+      animation: none;
+    }
+    
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0.3; }
+    }
+    
+    .transmission-stats {
+      background: #000;
+      color: #00ff00;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+      font-family: monospace;
+    }
+    
+    .space-weather {
+      background: linear-gradient(45deg, #ff6b35, #f7931e);
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+    
+    .failover-controls {
+      background: #000;
+      color: #00ff00;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 20px 0;
+      border: 2px solid #00ff00;
+    }
+    
+    .world-map {
+      background: #000;
+      color: #00ff00;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 20px 0;
+      border: 2px solid #00ff00;
+      text-align: center;
+    }
+    
+    .map-node {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #00ff00;
+      margin: 5px;
+      position: relative;
+      cursor: pointer;
+    }
+    
+    .map-node.warning {
+      background: #ffaa00;
+    }
+    
+    .map-node.error {
+      background: #ff0000;
+    }
+    
+    .map-node.inactive {
+      background: #333;
+    }
+  </style>
+</head>
+<body>
+  <!-- 🌍 Global Status Indicator -->
+  <div class="global-status" id="globalStatus">
+    🌍 GLOBAL REDUNDANCY: ACTIVE
+  </div>
+
+  <header class="top-app-bar">
+    <div class="top-app-bar-content">
+      <button class="icon-button" onclick="window.history.back()" title="Back" title="Action Button">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+      </button>
+      <h1 class="top-app-bar-title">🌍 Global Redundancy Monitor</h1>
+      <div class="top-app-bar-actions">
+        <button class="icon-button" onclick="toggleGlobalMode()" title="Global Mode" title="Action Button">
+          🌍
+        </button>
+        <button class="icon-button" onclick="toggleSpaceMode()" title="Space Mode" title="Action Button">
+          🛰️
+        </button>
+        <button class="icon-button" onclick="refreshNodes()" title="Refresh" title="Action Button">
+          🔄
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="card">
+      <h2>🌍 Global Redundancy & Failover System</h2>
+      
+      <!-- Space Weather Status -->
+      <div class="space-weather" id="spaceWeather">
+        <h3>🛰️ Space Weather Conditions</h3>
+        <div id="spaceWeatherData">
+          SOLAR WIND: NORMAL<br>
+          RADIATION: LOW<br>
+          MAGNETIC FIELD: STABLE<br>
+          COSMIC RAYS: NORMAL
+        </div>
+      </div>
+      
+      <!-- World Map -->
+      <div class="world-map">
+        <h3>🌍 Global Transmission Nodes</h3>
+        <div id="worldMap">
+          <!-- Nodes will be dynamically generated -->
+        </div>
+        <p>Click nodes for detailed information</p>
+      </div>
+      
+      <!-- Redundancy Grid -->
+      <div class="redundancy-grid" id="redundancyGrid">
+        <!-- Nodes will be dynamically generated -->
+      </div>
+      
+      <!-- Failover Controls -->
+      <div class="failover-controls">
+        <h3>🔄 Failover Controls</h3>
+        <div class="controls">
+          <button onclick="initiateFailover()" style="background: #ffaa00; color: #000; border: none; padding: 10px 20px; border-radius: 8px;" title="Action Button">
+            🔄 Initiate Failover
+          </button>
+          <button onclick="testRedundancy()" style="background: #0080ff; color: #fff; border: none; padding: 10px 20px; border-radius: 8px;" title="Action Button">
+            🧪 Test Redundancy
+          </button>
+          <button onclick="emergencyShutdown()" style="background: #ff0000; color: #fff; border: none; padding: 10px 20px; border-radius: 8px;" title="Action Button">
+            🚨 Emergency Shutdown
+          </button>
+        </div>
+      </div>
+      
+      <!-- Transmission Statistics -->
+      <div class="transmission-stats" id="transmissionStats">
+        <h3>📊 Global Transmission Statistics</h3>
+        <div id="statsData">
+          ACTIVE NODES: 0<br>
+          TOTAL TRANSMISSIONS: 0<br>
+          SUCCESS RATE: 0%<br>
+          FAILOVER EVENTS: 0<br>
+          SPACE TRANSMISSIONS: 0
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // 🌍 GLOBAL REDUNDANCY MONITOR
+    
+    class GlobalRedundancyMonitor {
+      constructor() {
+        this.nodes = new Map();
+        this.spaceWeather = {
+          solarWind: 'NORMAL',
+          radiation: 'LOW',
+          magneticField: 'STABLE',
+          cosmicRays: 'NORMAL'
+        };
+        this.globalStats = {
+          activeNodes: 0,
+          totalTransmissions: 0,
+          successRate: 100,
+          failoverEvents: 0,
+          spaceTransmissions: 0
+        };
+        this.worldMapNodes = [
+          { id: 'north-america', name: 'North America', lat: 45, lng: -100, status: 'active' },
+          { id: 'europe', name: 'Europe', lat: 50, lng: 10, status: 'active' },
+          { id: 'asia', name: 'Asia', lat: 35, lng: 100, status: 'active' },
+          { id: 'africa', name: 'Africa', lat: 0, lng: 20, status: 'warning' },
+          { id: 'australia', name: 'Australia', lat: -25, lng: 135, status: 'active' },
+          { id: 'south-america', name: 'South America', lat: -15, lng: -60, status: 'active' },
+          { id: 'antarctica', name: 'Antarctica', lat: -80, lng: 0, status: 'inactive' },
+          { id: 'space-station', name: 'Space Station', lat: 0, lng: 0, status: 'active' },
+          { id: 'moon-base', name: 'Moon Base', lat: 0, lng: 0, status: 'active' },
+          { id: 'mars-station', name: 'Mars Station', lat: 0, lng: 0, status: 'active' }
+        ];
+        
+        this.init();
+      }
+      
+      init() {
+        this.generateRedundancyNodes();
+        this.renderWorldMap();
+        this.startMonitoring();
+        this.updateGlobalStatus();
+      }
+      
+      generateRedundancyNodes() {
+        const nodeTypes = [
+          { type: 'ground-station', name: 'Ground Station', capacity: 1000 },
+          { type: 'satellite', name: 'Satellite', capacity: 500 },
+          { type: 'space-station', name: 'Space Station', capacity: 2000 },
+          { type: 'moon-base', name: 'Moon Base', capacity: 100 },
+          { type: 'mars-station', name: 'Mars Station', capacity: 50 }
+        ];
+        
+        nodeTypes.forEach((nodeType, index) => {
+          const node = {
+            id: `${nodeType.type}-${index + 1}`,
+            name: `${nodeType.name} ${index + 1}`,
+            type: nodeType.type,
+            capacity: nodeType.capacity,
+            status: Math.random() > 0.1 ? 'active' : 'warning',
+            location: this.getRandomLocation(),
+            connections: Math.floor(Math.random() * nodeType.capacity),
+            uptime: Math.floor(Math.random() * 100),
+            lastSeen: Date.now() - Math.random() * 3600000,
+            transmissionStats: {
+              sent: Math.floor(Math.random() * 10000),
+              received: Math.floor(Math.random() * 10000),
+              errors: Math.floor(Math.random() * 100),
+              retransmissions: Math.floor(Math.random() * 50)
+            }
+          };
+          
+          this.nodes.set(node.id, node);
+        });
+        
+        this.renderRedundancyGrid();
+      }
+      
+      getRandomLocation() {
+        const locations = [
+          'New York, USA', 'London, UK', 'Tokyo, Japan', 'Sydney, Australia',
+          'São Paulo, Brazil', 'Cape Town, South Africa', 'Moscow, Russia',
+          'Space Station Alpha', 'Moon Base Beta', 'Mars Station Gamma'
+        ];
+        return locations[Math.floor(Math.random() * locations.length)];
+      }
+      
+      renderWorldMap() {
+        const worldMap = document.getElementById('worldMap');
+        worldMap.innerHTML = '';
+        
+        this.worldMapNodes.forEach(node => {
+          const nodeElement = document.createElement('div');
+          nodeElement.className = `map-node ${node.status}`;
+          nodeElement.title = `${node.name} - ${node.status.toUpperCase()}`;
+          nodeElement.onclick = () => this.showNodeDetails(node);
+          worldMap.appendChild(nodeElement);
+        });
+      }
+      
+      renderRedundancyGrid() {
+        const grid = document.getElementById('redundancyGrid');
+        grid.innerHTML = '';
+        
+        this.nodes.forEach(node => {
+          const nodeElement = document.createElement('div');
+          nodeElement.className = 'redundancy-node';
+          nodeElement.innerHTML = `
+            <h3>${node.name}</h3>
+            <div class="node-status">
+              <div class="status-indicator ${node.status}"></div>
+              <span>${node.status.toUpperCase()}</span>
+            </div>
+            <div class="transmission-stats">
+              <strong>Location:</strong> ${node.location}<br>
+              <strong>Capacity:</strong> ${node.capacity}<br>
+              <strong>Connections:</strong> ${node.connections}<br>
+              <strong>Uptime:</strong> ${node.uptime}%<br>
+              <strong>Sent:</strong> ${node.transmissionStats.sent}<br>
+              <strong>Received:</strong> ${node.transmissionStats.received}<br>
+              <strong>Errors:</strong> ${node.transmissionStats.errors}<br>
+              <strong>Retransmissions:</strong> ${node.transmissionStats.retransmissions}
+            </div>
+          `;
+          grid.appendChild(nodeElement);
+        });
+      }
+      
+      startMonitoring() {
+        // Update space weather
+        setInterval(() => {
+          this.updateSpaceWeather();
+        }, 5000);
+        
+        // Update node statuses
+        setInterval(() => {
+          this.updateNodeStatuses();
+        }, 10000);
+        
+        // Update global statistics
+        setInterval(() => {
+          this.updateGlobalStatistics();
+        }, 2000);
+      }
+      
+      updateSpaceWeather() {
+        const conditions = ['NORMAL', 'HIGH', 'LOW', 'DISTURBED', 'STABLE'];
+        
+        this.spaceWeather = {
+          solarWind: conditions[Math.floor(Math.random() * conditions.length)],
+          radiation: conditions[Math.floor(Math.random() * conditions.length)],
+          magneticField: conditions[Math.floor(Math.random() * conditions.length)],
+          cosmicRays: conditions[Math.floor(Math.random() * conditions.length)]
+        };
+        
+        const spaceWeatherData = document.getElementById('spaceWeatherData');
+        spaceWeatherData.innerHTML = `
+          SOLAR WIND: ${this.spaceWeather.solarWind}<br>
+          RADIATION: ${this.spaceWeather.radiation}<br>
+          MAGNETIC FIELD: ${this.spaceWeather.magneticField}<br>
+          COSMIC RAYS: ${this.spaceWeather.cosmicRays}
+        `;
+      }
+      
+      updateNodeStatuses() {
+        this.nodes.forEach(node => {
+          // Simulate status changes
+          if (Math.random() > 0.95) {
+            node.status = node.status === 'active' ? 'warning' : 'active';
+          }
+          
+          // Update transmission stats
+          node.transmissionStats.sent += Math.floor(Math.random() * 10);
+          node.transmissionStats.received += Math.floor(Math.random() * 10);
+          node.transmissionStats.errors += Math.floor(Math.random() * 2);
+          node.transmissionStats.retransmissions += Math.floor(Math.random() * 1);
+          
+          node.lastSeen = Date.now();
+        });
+        
+        this.renderRedundancyGrid();
+      }
+      
+      updateGlobalStatistics() {
+        let activeNodes = 0;
+        let totalTransmissions = 0;
+        let totalErrors = 0;
+        
+        this.nodes.forEach(node => {
+          if (node.status === 'active') activeNodes++;
+          totalTransmissions += node.transmissionStats.sent + node.transmissionStats.received;
+          totalErrors += node.transmissionStats.errors;
+        });
+        
+        this.globalStats.activeNodes = activeNodes;
+        this.globalStats.totalTransmissions = totalTransmissions;
+        this.globalStats.successRate = totalTransmissions > 0 ? 
+          Math.round(((totalTransmissions - totalErrors) / totalTransmissions) * 100) : 100;
+        this.globalStats.spaceTransmissions = Math.floor(Math.random() * 1000);
+        
+        this.updateStatsDisplay();
+      }
+      
+      updateStatsDisplay() {
+        const statsData = document.getElementById('statsData');
+        statsData.innerHTML = `
+          ACTIVE NODES: ${this.globalStats.activeNodes}<br>
+          TOTAL TRANSMISSIONS: ${this.globalStats.totalTransmissions}<br>
+          SUCCESS RATE: ${this.globalStats.successRate}%<br>
+          FAILOVER EVENTS: ${this.globalStats.failoverEvents}<br>
+          SPACE TRANSMISSIONS: ${this.globalStats.spaceTransmissions}
+        `;
+      }
+      
+      updateGlobalStatus() {
+        const globalStatus = document.getElementById('globalStatus');
+        const status = this.globalStats.successRate > 95 ? 'ACTIVE' : 'DEGRADED';
+        globalStatus.innerHTML = `🌍 GLOBAL REDUNDANCY: ${status}`;
+        globalStatus.style.background = status === 'ACTIVE' ? 
+          'linear-gradient(45deg, #00ff00, #0080ff)' : 
+          'linear-gradient(45deg, #ffaa00, #ff0000)';
+      }
+      
+      showNodeDetails(node) {
+        alert(`Node Details:\n\nName: ${node.name}\nStatus: ${node.status.toUpperCase()}\nLocation: ${node.location}\nCapacity: ${node.capacity}\nConnections: ${node.connections}\nUptime: ${node.uptime}%`);
+      }
+      
+      initiateFailover() {
+        console.log('🔄 Initiating global failover...');
+        this.globalStats.failoverEvents++;
+        
+        // Simulate failover process
+        this.nodes.forEach(node => {
+          if (node.status === 'warning') {
+            node.status = 'active';
+          }
+        });
+        
+        this.renderRedundancyGrid();
+        this.updateGlobalStatus();
+        
+        alert('🔄 Global failover initiated successfully!');
+      }
+      
+      testRedundancy() {
+        console.log('🧪 Testing global redundancy...');
+        
+        // Simulate redundancy test
+        let testResults = [];
+        this.nodes.forEach(node => {
+          const testResult = Math.random() > 0.1 ? 'PASS' : 'FAIL';
+          testResults.push(`${node.name}: ${testResult}`);
+        });
+        
+        alert(`Redundancy Test Results:\n\n${testResults.join('\n')}`);
+      }
+      
+      emergencyShutdown() {
+        if (confirm('🚨 Are you sure you want to initiate emergency shutdown?')) {
+          console.log('🚨 Emergency shutdown initiated...');
+          
+          this.nodes.forEach(node => {
+            node.status = 'inactive';
+          });
+          
+          this.renderRedundancyGrid();
+          this.updateGlobalStatus();
+          
+          alert('🚨 Emergency shutdown completed!');
+        }
+      }
+    }
+    
+    // Global functions for UI controls
+    function toggleGlobalMode() {
+      console.log('🌍 Global mode toggled');
+    }
+    
+    function toggleSpaceMode() {
+      console.log('🛰️ Space mode toggled');
+    }
+    
+    function refreshNodes() {
+      console.log('🔄 Refreshing nodes...');
+      globalMonitor.updateNodeStatuses();
+    }
+    
+    // Initialize global redundancy monitor
+    const globalMonitor = new GlobalRedundancyMonitor();
+    
+    // Add navigation buttons
+    const navigationButtons = `
+      <div class="navigation-buttons">
+        <button class="nav-btn" onclick="window.history.back()" title="Back" title="Action Button">
+          <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <button class="nav-btn" onclick="window.location.href='../index.html'" title="Home" title="Action Button">
+          <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        </button>
+        <button class="nav-btn" onclick="toggleGlobalMode()" title="Global Mode" title="Action Button">
+          🌍
+        </button>
+        <button class="nav-btn" onclick="toggleSpaceMode()" title="Space Mode" title="Action Button">
+          🛰️
+        </button>
+        <button class="nav-btn" onclick="refreshNodes()" title="Refresh" title="Action Button">
+          🔄
+        </button>
+      </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', navigationButtons);
+  </script>
+</body>
+</html>

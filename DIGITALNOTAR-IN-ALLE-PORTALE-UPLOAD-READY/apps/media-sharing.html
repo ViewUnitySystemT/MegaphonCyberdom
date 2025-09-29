@@ -1,0 +1,932 @@
+<!-- TODO: Replacement character detected () - verify source encoding -->
+<!DOCTYPE html>
+<html lang="de" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Media Sharing - TELCO Hub</title>
+<h1 style="position: absolute; left: -9999px;">Media Sharing - TELCO Hub</h1>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .media-sharing {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .media-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            overflow: visible;
+            transition: all 0.3s ease;
+        }
+        .media-card:hover {
+            border-color: #333333;
+            box-shadow: 0 4px 12px rgba(0,123,255,0.15);
+        }
+        .media-preview {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #f8f9fa;
+        }
+        .media-info {
+            padding: 1rem;
+        }
+        .media-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #333333;
+        }
+        .media-meta {
+            font-size: 0.875rem;
+            color: #333333;
+            margin-bottom: 0.5rem;
+        }
+        .media-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .action-button {
+            flex: 1;
+            padding: 0.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+        .action-button.primary {
+            background: #007bff;
+            color: white;
+        }
+        .action-button.primary:hover {
+            background: #0056b3;
+        }
+        .action-button.secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .action-button.secondary:hover {
+            background: #545b62;
+        }
+        .upload-section {
+            background: #f8f9fa;
+            border: 2px dashed #007bff;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            margin: 2rem 0;
+        }
+        .upload-section.dragover {
+            background: #e3f2fd;
+            border-color: #333333;
+        }
+        .upload-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin: 1rem;
+        }
+        .upload-button:hover {
+            background: #0056b3;
+        }
+        .upload-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .filter-section {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .filter-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .filter-controls input, .filter-controls select {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+        .filter-controls input[type="search"] {
+            flex: 1;
+            min-width: 200px;
+        }
+        .media-player {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            display: block;
+            align-items: center;
+            justify-content: center;
+        }
+        .media-player-content {
+            max-width: 90vw;
+            max-height: 90vh;
+            background: #000;
+            border-radius: 8px;
+            overflow: visible;
+        }
+        .media-player video, .media-player audio {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .media-player-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            padding: 1rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .player-button {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .player-button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .close-player {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .close-player:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .progress-bar {
+            flex: 1;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            position: relative;
+            cursor: pointer;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #007bff;
+            border-radius: 2px;
+            width: 0%;
+        }
+        .time-display {
+            color: white;
+            font-size: 0.875rem;
+            min-width: 80px;
+        }
+        .playlist-section {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+        .playlist-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .playlist-item:hover {
+            background: #f8f9fa;
+        }
+        .playlist-item.active {
+            background: #e3f2fd;
+        }
+        .playlist-thumbnail {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            background: #f8f9fa;
+        }
+        .playlist-info {
+            flex: 1;
+        }
+        .playlist-title {
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+        .playlist-meta {
+            font-size: 0.875rem;
+            color: #333333;
+        }
+        .playlist-duration {
+            font-size: 0.875rem;
+            color: #333333;
+        }
+        .sharing-section {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+        .share-link {
+            display: flex;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        .share-link input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+        .share-link button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .share-link button:hover {
+            background: #0056b3;
+        }
+        .stats-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333333;
+        }
+        .stat-label {
+            color: #333333;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="media-sharing">
+        <header class="top-app-bar">
+            <div class="top-app-bar-content">
+                <button class="icon-button" onclick="window.history.back()" title="Action Button">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                    </svg>
+                </button>
+                <h1 class="app-title">🎵 Media Sharing</h1>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Upload Section -->
+            <div class="upload-section" id="upload-section">
+                <h3>📁 Medien hochladen</h3>
+                <p>Ziehe Dateien hierher oder klicke zum Auswählen</p>
+                <input type="file" id="file-input" multiple accept="audio/*,video/*,image/*" class="optimized-style" aria-label="Input Field">
+                <button class="upload-button" onclick="document.getElementById('file-input').click()" title="Action Button">
+                    📁 Dateien auswählen
+                </button>
+                <div id="upload-progress" class="optimized-style"></div>
+            </div>
+
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <h3>🔍 Medien durchsuchen</h3>
+                <div class="filter-controls">
+                    <input type="search" id="search-input" placeholder="Nach Titel, Künstler oder Genre suchen..." aria-label="Input Field">
+                    <select id="type-filter">
+                        <option value="">Alle Typen</option>
+                        <option value="audio">Audio</option>
+                        <option value="video">Video</option>
+                        <option value="image">Bilder</option>
+                    </select>
+                    <select id="genre-filter">
+                        <option value="">Alle Genres</option>
+                        <option value="rock">Rock</option>
+                        <option value="pop">Pop</option>
+                        <option value="classical">Klassik</option>
+                        <option value="jazz">Jazz</option>
+                        <option value="electronic">Electronic</option>
+                        <option value="other">Andere</option>
+                    </select>
+                    <select id="sort-filter">
+                        <option value="newest">Neueste zuerst</option>
+                        <option value="oldest">Älteste zuerst</option>
+                        <option value="title">Nach Titel</option>
+                        <option value="duration">Nach Länge</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Media Grid -->
+            <div class="media-grid" id="media-grid">
+                <!-- Media items will be dynamically added here -->
+            </div>
+
+            <!-- Playlist Section -->
+            <div class="playlist-section">
+                <h3>🎵 Aktuelle Wiedergabeliste</h3>
+                <div id="playlist-container">
+                    <p class="optimized-style">Keine Medien in der Wiedergabeliste</p>
+                </div>
+            </div>
+
+            <!-- Sharing Section -->
+            <div class="sharing-section">
+                <h3>🔗 Medien teilen</h3>
+                <div class="share-link">
+                    <input type="text" id="share-url" placeholder="Freigabe-URL wird hier angezeigt..." readonly aria-label="Input Field">
+                    <button aria-label="📋 Kopieren" onclick="copyShareUrl()" title="Action Button">📋 Kopieren</button>
+                </div>
+                <div class="share-link">
+                    <input type="text" id="qr-code-url" placeholder="QR-Code URL..." readonly aria-label="Input Field">
+                    <button aria-label="📱 QR-Code" onclick="generateQRCode()" title="Action Button">📱 QR-Code</button>
+                </div>
+            </div>
+
+            <!-- Stats Section -->
+            <div class="stats-section">
+                <h3>📊 Statistiken</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="total-media">0</div>
+                        <div class="stat-label">Gesamt Medien</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="total-duration">0:00</div>
+                        <div class="stat-label">Gesamtlaufzeit</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="total-size">0 MB</div>
+                        <div class="stat-label">Gesamtgröße</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="play-count">0</div>
+                        <div class="stat-label">Wiedergaben</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Media Player -->
+        <div class="media-player" id="media-player">
+            <div class="media-player-content">
+                <video id="player-video" controls class="optimized-style"></video>
+                <audio id="player-audio" controls class="optimized-style"></audio>
+                <img alt="Image" loading="lazy" id="player-image" class="optimized-style">
+                
+                <button aria-label="✕" class="close-player" onclick="closePlayer()" title="Action Button">✕</button>
+                
+                <div class="media-player-controls">
+                    <button aria-label="▶️" class="player-button" id="play-pause-btn" onclick="togglePlayPause()" title="Action Button">▶️</button>
+                    <button aria-label="⏮️" class="player-button" onclick="previousTrack()" title="Action Button">⏮️</button>
+                    <button aria-label="⏭️" class="player-button" onclick="nextTrack()" title="Action Button">⏭️</button>
+                    <div class="progress-bar" onclick="seekTo(event)">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="time-display" id="time-display">0:00 / 0:00</div>
+                    <button aria-label="🔊" class="player-button" onclick="toggleMute()" title="Action Button">🔊</button>
+                    <input type="range" id="volume-slider" min="0" max="100" value="100" onchange="setVolume(this.value)" aria-label="Input Field">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script async>
+        // Global variables
+        let mediaLibrary = [];
+        let currentPlaylist = [];
+        let currentTrackIndex = -1;
+        let isPlaying = false;
+        let currentPlayer = null;
+        let playStats = {};
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMediaLibrary();
+            setupEventListeners();
+            updateStats();
+        });
+
+        // Event listeners
+        function setupEventListeners() {
+            const fileInput = document.getElementById('file-input');
+            const uploadSection = document.getElementById('upload-section');
+            const searchInput = document.getElementById('search-input');
+            const typeFilter = document.getElementById('type-filter');
+            const genreFilter = document.getElementById('genre-filter');
+            const sortFilter = document.getElementById('sort-filter');
+
+            fileInput.addEventListener('change', handleFileUpload);
+            
+            uploadSection.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadSection.classList.add('dragover');
+            });
+            
+            uploadSection.addEventListener('dragleave', () => {
+                uploadSection.classList.remove('dragover');
+            });
+            
+            uploadSection.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadSection.classList.remove('dragover');
+                handleFileUpload({ target: { files: e.dataTransfer.files } });
+            });
+
+            searchInput.addEventListener('input', filterMedia);
+            typeFilter.addEventListener('change', filterMedia);
+            genreFilter.addEventListener('change', filterMedia);
+            sortFilter.addEventListener('change', sortMedia);
+        }
+
+        // File upload
+        function handleFileUpload(event) {
+            const files = Array.from(event.target.files);
+            const progressContainer = document.getElementById('upload-progress');
+            
+            files.forEach((file, index) => {
+                const progressDiv = document.createElement('div');
+                progressDiv.innerHTML = `
+                    <div class="optimized-style">
+                        <div class="optimized-style">
+                            <div id="progress-${index}" class="optimized-style"></div>
+                        </div>
+                        <span>${file.name}</span>
+                    </div>
+                `;
+                progressContainer.appendChild(progressDiv);
+
+                // Simulate upload progress
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += Math.random() * 20;
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(progressInterval);
+                        
+                        // Add to media library
+                        addMediaToLibrary(file);
+                    }
+                    
+                    const progressBar = document.getElementById(`progress-${index}`);
+                    if (progressBar) {
+                        progressBar.style.width = progress + '%';
+                    }
+                }, 200);
+            });
+        }
+
+        function addMediaToLibrary(file) {
+            const mediaItem = {
+                id: Date.now() + Math.random(),
+                name: file.name,
+                type: file.type.split('/')[0],
+                size: file.size,
+                duration: 0, // Will be calculated for audio/video
+                genre: 'other',
+                artist: 'Unbekannt',
+                album: 'Unbekannt',
+                year: new Date().getFullYear(),
+                file: file,
+                url: URL.createObjectURL(file),
+                uploadDate: new Date(),
+                playCount: 0
+            };
+
+            mediaLibrary.push(mediaItem);
+            saveMediaLibrary();
+            renderMediaGrid();
+            updateStats();
+        }
+
+        // Media rendering
+        function renderMediaGrid() {
+            const grid = document.getElementById('media-grid');
+            const filteredMedia = getFilteredMedia();
+            
+            grid.innerHTML = '';
+            
+            filteredMedia.forEach(media => {
+                const card = createMediaCard(media);
+                grid.appendChild(card);
+            });
+        }
+
+        function createMediaCard(media) {
+            const card = document.createElement('div');
+            card.className = 'media-card';
+            
+            const thumbnail = getMediaThumbnail(media);
+            const duration = formatDuration(media.duration);
+            const size = formatFileSize(media.size);
+            
+            card.innerHTML = `
+                <img alt="Image" loading="lazy" class="media-preview"  src="${thumbnail}" alt="TELCO Hub Image" alt="${media.name}">
+                <div class="media-info">
+                    <div class="media-title">${media.name}</div>
+                    <div class="media-meta">
+                        ${media.artist} • ${media.album} • ${media.year}
+                    </div>
+                    <div class="media-meta">
+                        ${duration} • ${size} • ${media.type.toUpperCase()}
+                    </div>
+                    <div class="media-actions">
+                        <button class="action-button primary" onclick="playMedia(${media.id})" title="Action Button">
+                            ▶️ Abspielen
+                        </button>
+                        <button class="action-button secondary" onclick="addToPlaylist(${media.id})" title="Action Button">
+                            ➕ Zur Playlist
+                        </button>
+                        <button class="action-button secondary" onclick="generateMediaQR(${media.id})" title="Action Button">
+                            📱 QR-Code
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function getMediaThumbnail(media) {
+            if (media.type === 'image') {
+                return media.url;
+            } else if (media.type === 'video') {
+                return media.url; // In real app, extract thumbnail from video
+            } else if (media.type === 'audio') {
+                return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDMwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjhGOUZBIi8+CjxwYXRoIGQ9Ik0xNTAgNTBMMTUwIDE1ME0xMjAgODBMMTUwIDgwTTE1MCA4MEwxODAgODBNMTIwIDEyMEwxNTAgMTIwTTE1MCAxMjBMMTgwIDEyMCIgc3Ryb2tlPSIjMDA3QkZGIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4K';
+            }
+            return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDMwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjhGOUZBIi8+Cjx0ZXh0IHg9IjE1MCIgeT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiBmaWxsPSIjNjY2IiBmb250LWZhbWlseT0ic3lzdGVtLXVpIiBmb250LXNpemU9IjE0cHgiPk1lZGlhPC90ZXh0Pgo8L3N2Zz4K';
+        }
+
+        // Playback functionality
+        function playMedia(mediaId) {
+            const media = mediaLibrary.find(m => m.id === mediaId);
+            if (!media) return;
+
+            currentPlayer = document.getElementById('media-player');
+            const videoPlayer = document.getElementById('player-video');
+            const audioPlayer = document.getElementById('player-audio');
+            const imagePlayer = document.getElementById('player-image');
+
+            // Hide all players
+            videoPlayer.style.display = 'none';
+            audioPlayer.style.display = 'none';
+            imagePlayer.style.display = 'none';
+
+            // Show appropriate player
+            if (media.type === 'video') {
+                videoPlayer.src = media.url;
+                videoPlayer.style.display = 'block';
+                currentPlayer = videoPlayer;
+            } else if (media.type === 'audio') {
+                audioPlayer.src = media.url;
+                audioPlayer.style.display = 'block';
+                currentPlayer = audioPlayer;
+            } else if (media.type === 'image') {
+                imagePlayer.src = media.url;
+                imagePlayer.style.display = 'block';
+                currentPlayer = null;
+            }
+
+            // Show player
+            document.getElementById('media-player').style.display = 'flex';
+
+            // Update play count
+            media.playCount++;
+            playStats[mediaId] = (playStats[mediaId] || 0) + 1;
+            saveMediaLibrary();
+            updateStats();
+        }
+
+        function closePlayer() {
+            document.getElementById('media-player').style.display = 'none';
+            if (currentPlayer) {
+                currentPlayer.pause();
+                currentPlayer.currentTime = 0;
+            }
+        }
+
+        function togglePlayPause() {
+            if (currentPlayer) {
+                if (currentPlayer.paused) {
+                    currentPlayer.play();
+                    document.getElementById('play-pause-btn').textContent = '⏸️';
+                } else {
+                    currentPlayer.pause();
+                    document.getElementById('play-pause-btn').textContent = '▶️';
+                }
+            }
+        }
+
+        // Playlist functionality
+        function addToPlaylist(mediaId) {
+            const media = mediaLibrary.find(m => m.id === mediaId);
+            if (media && !currentPlaylist.find(m => m.id === mediaId)) {
+                currentPlaylist.push(media);
+                renderPlaylist();
+            }
+        }
+
+        function renderPlaylist() {
+            const container = document.getElementById('playlist-container');
+            
+            if (currentPlaylist.length === 0) {
+                container.innerHTML = '<p class="optimized-style">Keine Medien in der Wiedergabeliste</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            currentPlaylist.forEach((media, index) => {
+                const item = document.createElement('div');
+                item.className = 'playlist-item';
+                if (index === currentTrackIndex) {
+                    item.classList.add('active');
+                }
+                
+                item.innerHTML = `
+                    <img alt="Image" loading="lazy" class="playlist-thumbnail"  src="${getMediaThumbnail(media)}" alt="TELCO Hub Image" alt="${media.name}">
+                    <div class="playlist-info">
+                        <div class="playlist-title">${media.name}</div>
+                        <div class="playlist-meta">${media.artist} • ${media.album}</div>
+                    </div>
+                    <div class="playlist-duration">${formatDuration(media.duration)}</div>
+                `;
+                
+                item.onclick = () => {
+                    currentTrackIndex = index;
+                    playMedia(media.id);
+                    renderPlaylist();
+                };
+                
+                container.appendChild(item);
+            });
+        }
+
+        // Filtering and sorting
+        function getFilteredMedia() {
+            let filtered = [...mediaLibrary];
+            
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const typeFilter = document.getElementById('type-filter').value;
+            const genreFilter = document.getElementById('genre-filter').value;
+            
+            if (searchTerm) {
+                filtered = filtered.filter(media => 
+                    media.name.toLowerCase().includes(searchTerm) ||
+                    media.artist.toLowerCase().includes(searchTerm) ||
+                    media.album.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            if (typeFilter) {
+                filtered = filtered.filter(media => media.type === typeFilter);
+            }
+            
+            if (genreFilter) {
+                filtered = filtered.filter(media => media.genre === genreFilter);
+            }
+            
+            return filtered;
+        }
+
+        function filterMedia() {
+            renderMediaGrid();
+        }
+
+        function sortMedia() {
+            const sortBy = document.getElementById('sort-filter').value;
+            let sorted = [...getFilteredMedia()];
+            
+            switch(sortBy) {
+                case 'newest':
+                    sorted.sort((a, b) => b.uploadDate - a.uploadDate);
+                    break;
+                case 'oldest':
+                    sorted.sort((a, b) => a.uploadDate - b.uploadDate);
+                    break;
+                case 'title':
+                    sorted.sort((a, b) => a.name.localeCompare(b.name));
+                    break;
+                case 'duration':
+                    sorted.sort((a, b) => b.duration - a.duration);
+                    break;
+            }
+            
+            // Re-render with sorted data
+            const grid = document.getElementById('media-grid');
+            grid.innerHTML = '';
+            sorted.forEach(media => {
+                const card = createMediaCard(media);
+                grid.appendChild(card);
+            });
+        }
+
+        // Sharing functionality
+        function copyShareUrl() {
+            const shareUrl = `${window.location.origin}${window.location.pathname}?shared=true`;
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                alert('Freigabe-URL in Zwischenablage kopiert!');
+            });
+        }
+
+        function generateQRCode() {
+            const shareUrl = `${window.location.origin}${window.location.pathname}?shared=true`;
+            // In real app, generate QR code
+            alert(`QR-Code für: ${shareUrl}`);
+        }
+
+        // Stats
+        function updateStats() {
+            const totalMedia = mediaLibrary.length;
+            const totalDuration = mediaLibrary.reduce((sum, media) => sum + media.duration, 0);
+            const totalSize = mediaLibrary.reduce((sum, media) => sum + media.size, 0);
+            const totalPlays = Object.values(playStats).reduce((sum, count) => sum + count, 0);
+            
+            document.getElementById('total-media').textContent = totalMedia;
+            document.getElementById('total-duration').textContent = formatDuration(totalDuration);
+            document.getElementById('total-size').textContent = formatFileSize(totalSize);
+            document.getElementById('play-count').textContent = totalPlays;
+        }
+
+        // Utility functions
+        function formatDuration(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = Math.floor(seconds % 60);
+            
+            if (hours > 0) {
+                return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+            return `${minutes}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function formatFileSize(bytes) {
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            if (bytes === 0) return '0 Bytes';
+            const i = Math.floor(Math.log(bytes) / Math.log(1024));
+            return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        // QR-Code functionality
+        async function generateMediaQR(mediaId) {
+            const media = mediaLibrary.find(m => m.id === mediaId);
+            if (!media) return;
+
+            const shareUrl = `${window.location.origin}/share/${encodeURIComponent(media.name)}`;
+            
+            // Use TELCO Enhancements if available
+            if (window.TELCOEnhancements) {
+                try {
+                    // Create QR modal
+                    const modal = document.createElement('div');
+                    modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center;';
+                    
+                    const content = document.createElement('div');
+                    content.className = 'telco-card';
+                    content.style.cssText = 'max-width: 400px; text-align: center;';
+                    
+                    content.innerHTML = `
+                        <h3>📱 QR-Code für "${media.name}"</h3>
+                        <div id="qr-container" class="telco-qr"></div>
+                        <p>Teile diesen QR-Code um auf die Medien zuzugreifen</p>
+                        <button aria-label="Schließen" class="telco-btn" onclick="this.closest('[style*=\"position:fixed\"]').remove()" title="Action Button">Schließen</button>
+                    `;
+                    
+                    modal.appendChild(content);
+                    document.body.appendChild(modal);
+                    
+                    await window.TELCOEnhancements.generateQRCode('#qr-container', shareUrl);
+                    return;
+                } catch (error) {
+                    console.warn('TELCO Enhancements QR failed, using fallback:', error);
+                }
+            }
+            
+            // Fallback QR generation
+            try {
+                await ensureQRCodeLib();
+                const modal = document.createElement('div');
+                modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center;';
+                
+                const content = document.createElement('div');
+                content.style.cssText = 'background: white; padding: 2rem; border-radius: 12px; text-align: center; max-width: 400px;';
+                
+                content.innerHTML = `
+                    <h3>📱 QR-Code für "${media.name}"</h3>
+                    <div id="qr-fallback"></div>
+                    <p>Teile diesen QR-Code um auf die Medien zuzugreifen</p>
+                    <button aria-label="Schließen" onclick="this.closest('[style*=\"position:fixed\"]').remove()" class="optimized-style" title="Action Button">Schließen</button>
+                `;
+                
+                modal.appendChild(content);
+                document.body.appendChild(modal);
+                
+                new window.QRCode(document.getElementById('qr-fallback'), { 
+                    text: shareUrl, 
+                    width: 200, 
+                    height: 200 
+                });
+                
+            } catch (error) {
+                alert('QR-Code konnte nicht generiert werden: ' + error.message);
+            }
+        }
+
+        // QR-Code library fallback
+        async function ensureQRCodeLib() {
+            if (window.QRCode) return true;
+            await new Promise((resolve, reject) => {
+                const s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js';
+                s.onload = () => resolve(true);
+                s.onerror = () => reject(new Error('QR library failed to load'));
+                document.head.appendChild(s);
+            });
+            return true;
+        }
+
+        // Storage
+        function saveMediaLibrary() {
+            const libraryData = mediaLibrary.map(media => ({
+                ...media,
+                file: null, // Don't store file objects
+                url: null    // Don't store blob URLs
+            }));
+            localStorage.setItem('mediaSharing_library', JSON.stringify(libraryData));
+            localStorage.setItem('mediaSharing_stats', JSON.stringify(playStats));
+        }
+
+        function loadMediaLibrary() {
+            const saved = localStorage.getItem('mediaSharing_library');
+            const savedStats = localStorage.getItem('mediaSharing_stats');
+            
+            if (saved) {
+                mediaLibrary = JSON.parse(saved);
+            }
+            
+            if (savedStats) {
+                playStats = JSON.parse(savedStats);
+            }
+            
+            renderMediaGrid();
+        }
+    </script>
+</body>
+</html>

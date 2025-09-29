@@ -1,0 +1,5 @@
+ls -la backend-health-check.js
+ls -la package.json
+pwd
+ls -la | grep backend
+exit

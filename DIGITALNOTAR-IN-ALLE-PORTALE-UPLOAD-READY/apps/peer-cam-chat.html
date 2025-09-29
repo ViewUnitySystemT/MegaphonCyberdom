@@ -1,0 +1,853 @@
+<!-- TODO: Replacement character detected () - verify source encoding -->
+<!DOCTYPE html>
+<html lang="de" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PeerCam & Live Chat - TELCO Hub</title>
+<h1 style="position: absolute; left: -9999px;">PeerCam & Live Chat - TELCO Hub</h1>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .peer-cam-chat {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .chat-layout {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+            height: 80vh;
+        }
+        .video-section {
+            background: #000;
+            border-radius: 12px;
+            overflow: visible;
+            position: relative;
+        }
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+            height: 100%;
+        }
+        .video-container {
+            position: relative;
+            background: #1a1a1a;
+            border-radius: 8px;
+            overflow: visible;
+        }
+        .video-element {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .video-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            padding: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .control-button {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .control-button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .control-button.active {
+            background: #dc3545;
+        }
+        .video-label {
+            position: absolute;
+            top: 0.5rem;
+            left: 0.5rem;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+        .chat-section {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-header {
+            padding: 1rem;
+            border-bottom: 1px solid #ddd;
+            background: #f8f9fa;
+            border-radius: 12px 12px 0 0;
+        }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+        .message {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+        .message.own {
+            background: #007bff;
+            color: white;
+            margin-left: auto;
+        }
+        .message.other {
+            background: #f1f3f4;
+            color: #333333;
+        }
+        .message-header {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-bottom: 0.25rem;
+        }
+        .message-content {
+            word-wrap: break-word;
+        }
+        .chat-input {
+            padding: 1rem;
+            border-top: 1px solid #ddd;
+            display: flex;
+            gap: 0.5rem;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .chat-input button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .chat-input button:hover {
+            background: #0056b3;
+        }
+        .main-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            padding: 1rem;
+            border-radius: 50px;
+            display: flex;
+            gap: 1rem;
+            z-index: 1000;
+        }
+        .main-control-button {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 1rem;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .main-control-button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .main-control-button.active {
+            background: #dc3545;
+        }
+        .screenshot-preview {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+            z-index: 2000;
+            max-width: 80vw;
+            max-height: 80vh;
+        }
+        .screenshot-preview img {
+            max-width: 100%;
+            max-height: 60vh;
+            border-radius: 4px;
+        }
+        .screenshot-preview button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0.5rem 0.5rem 0 0;
+        }
+        .participants-list {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .participant {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+        .participant.online {
+            background: #d4edda;
+        }
+        .participant.offline {
+            background: #f8d7da;
+        }
+        .participant-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #007bff;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .settings-panel {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .settings-group {
+            margin-bottom: 1rem;
+        }
+        .settings-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        .settings-group select, .settings-group input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .recording-indicator {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: #dc3545;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            z-index: 1000;
+            display: block;
+        }
+        .recording-indicator.active {
+            display: block;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <div class="peer-cam-chat">
+        <header class="top-app-bar">
+            <div class="top-app-bar-content">
+                <button class="icon-button" onclick="window.history.back()" title="Action Button">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                    </svg>
+                </button>
+                <h1 class="app-title">📹 PeerCam & Live Chat</h1>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="chat-layout">
+                <!-- Video Section -->
+                <div class="video-section">
+                    <div class="video-grid" id="video-grid">
+                        <!-- Local video -->
+                        <div class="video-container" id="local-video-container">
+                            <video class="video-element" id="local-video" autoplay muted></video>
+                            <div class="video-label">Du</div>
+                            <div class="video-controls">
+                                <button aria-label="🎤" class="control-button" id="mute-audio" onclick="toggleAudio()" title="Action Button">🎤</button>
+                                <button aria-label="📹" class="control-button" id="mute-video" onclick="toggleVideo()" title="Action Button">📹</button>
+                                <button aria-label="📸" class="control-button" onclick="takeScreenshot()" title="Action Button">📸</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Remote videos will be added here -->
+                    </div>
+                </div>
+
+                <!-- Chat Section -->
+                <div class="chat-section">
+                    <div class="chat-header">
+                        <h3>💬 Live Chat</h3>
+                        <div class="participants-list">
+                            <h4>Teilnehmer</h4>
+                            <div id="participants-list">
+                                <div class="participant online">
+                                    <div class="participant-avatar">Du</div>
+                                    <span>Du (Du)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="message other">
+                            <div class="message-header">System • Jetzt</div>
+                            <div class="message-content">Willkommen im PeerCam Chat! Starte deine Kamera und lade andere ein.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-input">
+                        <input type="text" id="message-input" placeholder="Nachricht eingeben..." onkeypress="handleKeyPress(event)" aria-label="Input Field">
+                        <button aria-label="📤" onclick="sendMessage()" title="Action Button">📤</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Controls -->
+            <div class="main-controls">
+                <button aria-label="📹" class="main-control-button" id="start-camera" onclick="startCamera()" title="Action Button">📹</button>
+                <button aria-label="🖥️" class="main-control-button" id="start-screen-share" onclick="startScreenShare()" title="Action Button">🖥️</button>
+                <button aria-label="🔴" class="main-control-button" id="start-recording" onclick="startRecording()" title="Action Button">🔴</button>
+                <button aria-label="👥" class="main-control-button" onclick="inviteParticipants()" title="Action Button">👥</button>
+                <button aria-label="⚙️" class="main-control-button" onclick="openSettings()" title="Action Button">⚙️</button>
+                <button aria-label="🚀" class="main-control-button" onclick="initializeEnhancedPeerCam()" class="optimized-style" title="Action Button">🚀</button>
+            </div>
+
+            <!-- Recording Indicator -->
+            <div class="recording-indicator" id="recording-indicator">
+                🔴 Aufnahme läuft
+            </div>
+        </main>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="optimized-style">
+        <div class="optimized-style">
+            <h3>⚙️ Einstellungen</h3>
+            
+            <div class="settings-panel">
+                <div class="settings-group">
+                    <label>Kamera:</label>
+                    <select id="camera-select">
+                        <option value="default">Standard-Kamera</option>
+                    </select>
+                </div>
+                
+                <div class="settings-group">
+                    <label>Mikrofon:</label>
+                    <select id="microphone-select">
+                        <option value="default">Standard-Mikrofon</option>
+                    </select>
+                </div>
+                
+                <div class="settings-group">
+                    <label>Video-Qualität:</label>
+                    <select id="video-quality">
+                        <option value="720p">720p HD</option>
+                        <option value="480p">480p</option>
+                        <option value="1080p">1080p Full HD</option>
+                    </select>
+                </div>
+                
+                <div class="settings-group">
+                    <label>Audio-Qualität:</label>
+                    <select id="audio-quality">
+                        <option value="high">Hoch</option>
+                        <option value="medium">Mittel</option>
+                        <option value="low">Niedrig</option>
+                    </select>
+                </div>
+                
+                <div class="settings-group">
+                    <label>Chat-Benachrichtigungen:</label>
+                    <input type="checkbox" id="chat-notifications" checked aria-label="Input Field">
+                </div>
+                
+                <div class="settings-group">
+                    <label>Automatische Aufnahme:</label>
+                    <input type="checkbox" id="auto-recording" aria-label="Input Field">
+                </div>
+            </div>
+            
+            <div class="optimized-style">
+                <button aria-label="Abbrechen" onclick="closeSettings()" class="optimized-style" title="Action Button">Abbrechen</button>
+                <button aria-label="Speichern" onclick="saveSettings()" class="optimized-style" title="Action Button">Speichern</button>
+            </div>
+        </div>
+    </div>
+
+    <script async>
+        // Global variables
+        let localStream = null;
+        let remoteStreams = new Map();
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        let isRecording = false;
+        let isAudioMuted = false;
+        let isVideoMuted = false;
+        let chatMessages = [];
+        let participants = new Map();
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSettings();
+            updateParticipantsList();
+        });
+
+        // Camera functionality
+        async function startCamera() {
+            const btn = document.getElementById('start-camera');
+            
+            try {
+                const constraints = {
+                    video: {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        frameRate: { ideal: 30 }
+                    },
+                    audio: true
+                };
+                
+                localStream = await navigator.mediaDevices.getUserMedia(constraints);
+                const localVideo = document.getElementById('local-video');
+                localVideo.srcObject = localStream;
+                
+                btn.classList.add('active');
+                btn.innerHTML = '⏹️';
+                btn.onclick = stopCamera;
+                
+                addChatMessage('System', 'Kamera gestartet', 'other');
+                
+            } catch (error) {
+                console.error('Camera error:', error);
+                alert('Kamera-Zugriff verweigert oder nicht verfügbar');
+            }
+        }
+
+        function stopCamera() {
+            const btn = document.getElementById('start-camera');
+            
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+            
+            const localVideo = document.getElementById('local-video');
+            localVideo.srcObject = null;
+            
+            btn.classList.remove('active');
+            btn.innerHTML = '📹';
+            btn.onclick = startCamera;
+            
+            addChatMessage('System', 'Kamera gestoppt', 'other');
+        }
+
+        // Screen sharing
+        async function startScreenShare() {
+            const btn = document.getElementById('start-screen-share');
+            
+            try {
+                const screenStream = await navigator.mediaDevices.getDisplayMedia({
+                    video: true,
+                    audio: true
+                });
+                
+                // Create new video container for screen share
+                const videoGrid = document.getElementById('video-grid');
+                const screenContainer = document.createElement('div');
+                screenContainer.className = 'video-container';
+                screenContainer.id = 'screen-share-container';
+                
+                const screenVideo = document.createElement('video');
+                screenVideo.className = 'video-element';
+                screenVideo.autoplay = true;
+                screenVideo.srcObject = screenStream;
+                
+                const screenLabel = document.createElement('div');
+                screenLabel.className = 'video-label';
+                screenLabel.textContent = 'Bildschirm';
+                
+                screenContainer.appendChild(screenVideo);
+                screenContainer.appendChild(screenLabel);
+                videoGrid.appendChild(screenContainer);
+                
+                btn.classList.add('active');
+                btn.innerHTML = '⏹️';
+                btn.onclick = stopScreenShare;
+                
+                addChatMessage('System', 'Bildschirmfreigabe gestartet', 'other');
+                
+                // Handle screen share end
+                screenStream.getVideoTracks()[0].addEventListener('ended', () => {
+                    stopScreenShare();
+                });
+                
+            } catch (error) {
+                console.error('Screen share error:', error);
+                alert('Bildschirmfreigabe nicht verfügbar');
+            }
+        }
+
+        function stopScreenShare() {
+            const btn = document.getElementById('start-screen-share');
+            const screenContainer = document.getElementById('screen-share-container');
+            
+            if (screenContainer) {
+                const screenVideo = screenContainer.querySelector('video');
+                if (screenVideo && screenVideo.srcObject) {
+                    screenVideo.srcObject.getTracks().forEach(track => track.stop());
+                }
+                screenContainer.remove();
+            }
+            
+            btn.classList.remove('active');
+            btn.innerHTML = '🖥️';
+            btn.onclick = startScreenShare;
+            
+            addChatMessage('System', 'Bildschirmfreigabe gestoppt', 'other');
+        }
+
+        // Recording functionality
+        async function startRecording() {
+            const btn = document.getElementById('start-recording');
+            const indicator = document.getElementById('recording-indicator');
+            
+            if (!localStream) {
+                alert('Bitte starte zuerst die Kamera');
+                return;
+            }
+            
+            try {
+                recordedChunks = [];
+                mediaRecorder = new MediaRecorder(localStream, {
+                    mimeType: 'video/webm;codecs=vp9'
+                });
+                
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        recordedChunks.push(event.data);
+                    }
+                };
+                
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    // Create download link
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `recording_${Date.now()}.webm`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                };
+                
+                mediaRecorder.start();
+                isRecording = true;
+                
+                btn.classList.add('active');
+                btn.innerHTML = '⏹️';
+                btn.onclick = stopRecording;
+                
+                indicator.classList.add('active');
+                
+                addChatMessage('System', 'Aufnahme gestartet', 'other');
+                
+            } catch (error) {
+                console.error('Recording error:', error);
+                alert('Aufnahme nicht verfügbar');
+            }
+        }
+
+        function stopRecording() {
+            const btn = document.getElementById('start-recording');
+            const indicator = document.getElementById('recording-indicator');
+            
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+            }
+            
+            btn.classList.remove('active');
+            btn.innerHTML = '🔴';
+            btn.onclick = startRecording;
+            
+            indicator.classList.remove('active');
+            
+            addChatMessage('System', 'Aufnahme gestoppt', 'other');
+        }
+
+        // Audio/Video controls
+        function toggleAudio() {
+            const btn = document.getElementById('mute-audio');
+            
+            if (localStream) {
+                const audioTrack = localStream.getAudioTracks()[0];
+                if (audioTrack) {
+                    audioTrack.enabled = !audioTrack.enabled;
+                    isAudioMuted = !audioTrack.enabled;
+                    
+                    btn.classList.toggle('active', isAudioMuted);
+                    btn.innerHTML = isAudioMuted ? '🔇' : '🎤';
+                }
+            }
+        }
+
+        function toggleVideo() {
+            const btn = document.getElementById('mute-video');
+            
+            if (localStream) {
+                const videoTrack = localStream.getVideoTracks()[0];
+                if (videoTrack) {
+                    videoTrack.enabled = !videoTrack.enabled;
+                    isVideoMuted = !videoTrack.enabled;
+                    
+                    btn.classList.toggle('active', isVideoMuted);
+                    btn.innerHTML = isVideoMuted ? '📹' : '📹';
+                }
+            }
+        }
+
+        // Screenshot functionality
+        function takeScreenshot() {
+            const localVideo = document.getElementById('local-video');
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = localVideo.videoWidth;
+            canvas.height = localVideo.videoHeight;
+            
+            ctx.drawImage(localVideo, 0, 0);
+            
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                showScreenshotPreview(url);
+            });
+        }
+
+        function showScreenshotPreview(imageUrl) {
+            const preview = document.createElement('div');
+            preview.className = 'screenshot-preview';
+            preview.innerHTML = `
+                <h4>📸 Screenshot</h4>
+                <img alt="Image" loading="lazy"  src="${imageUrl}" alt="TELCO Hub Image" alt="Screenshot">
+                <div>
+                    <button aria-label="💾 Herunterladen" onclick="downloadScreenshot('${imageUrl}')" title="Action Button">💾 Herunterladen</button>
+                    <button aria-label="❌ Schließen" onclick="closeScreenshotPreview()" title="Action Button">❌ Schließen</button>
+                </div>
+            `;
+            
+            document.body.appendChild(preview);
+        }
+
+        function downloadScreenshot(imageUrl) {
+            const a = document.createElement('a');
+            a.href = imageUrl;
+            a.download = `screenshot_${Date.now()}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function closeScreenshotPreview() {
+            const preview = document.querySelector('.screenshot-preview');
+            if (preview) {
+                preview.remove();
+            }
+        }
+
+        // Chat functionality
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const message = input.value.trim();
+            
+            if (message) {
+                addChatMessage('Du', message, 'own');
+                input.value = '';
+                
+                // Simulate response (in real app, this would be sent to other participants)
+                setTimeout(() => {
+                    addChatMessage('Teilnehmer', 'Nachricht erhalten!', 'other');
+                }, 1000);
+            }
+        }
+
+        function addChatMessage(sender, content, type) {
+            const messagesContainer = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            
+            messageDiv.innerHTML = `
+                <div class="message-header">${sender} • ${timeString}</div>
+                <div class="message-content">${content}</div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            chatMessages.push({
+                sender,
+                content,
+                type,
+                timestamp: now
+            });
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Participants management
+        function updateParticipantsList() {
+            const container = document.getElementById('participants-list');
+            container.innerHTML = '<h4>Teilnehmer</h4>';
+            
+            participants.forEach((participant, id) => {
+                const div = document.createElement('div');
+                div.className = `participant ${participant.online ? 'online' : 'offline'}`;
+                div.innerHTML = `
+                    <div class="participant-avatar">${participant.name.charAt(0)}</div>
+                    <span>${participant.name}</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function inviteParticipants() {
+            const roomId = generateRoomId();
+            const inviteUrl = `${window.location.origin}${window.location.pathname}?room=${roomId}`;
+            
+            navigator.clipboard.writeText(inviteUrl).then(() => {
+                addChatMessage('System', `Einladungslink kopiert: ${inviteUrl}`, 'other');
+            }).catch(() => {
+                prompt('Einladungslink:', inviteUrl);
+            });
+        }
+
+        function generateRoomId() {
+            return Math.random().toString(36).substring(2, 15);
+        }
+
+        // Settings
+        function openSettings() {
+            document.getElementById('settings-modal').style.display = 'block';
+        }
+
+        function closeSettings() {
+            document.getElementById('settings-modal').style.display = 'none';
+        }
+
+        function saveSettings() {
+            const settings = {
+                camera: document.getElementById('camera-select').value,
+                microphone: document.getElementById('microphone-select').value,
+                videoQuality: document.getElementById('video-quality').value,
+                audioQuality: document.getElementById('audio-quality').value,
+                chatNotifications: document.getElementById('chat-notifications').checked,
+                autoRecording: document.getElementById('auto-recording').checked
+            };
+            
+            localStorage.setItem('peerCamChat_settings', JSON.stringify(settings));
+            closeSettings();
+            addChatMessage('System', 'Einstellungen gespeichert', 'other');
+        }
+
+        function loadSettings() {
+            const saved = localStorage.getItem('peerCamChat_settings');
+            if (saved) {
+                const settings = JSON.parse(saved);
+                document.getElementById('camera-select').value = settings.camera || 'default';
+                document.getElementById('microphone-select').value = settings.microphone || 'default';
+                document.getElementById('video-quality').value = settings.videoQuality || '720p';
+                document.getElementById('audio-quality').value = settings.audioQuality || 'high';
+                document.getElementById('chat-notifications').checked = settings.chatNotifications !== false;
+                document.getElementById('auto-recording').checked = settings.autoRecording || false;
+            }
+        }
+
+        // Enhanced WebRTC with TELCO Enhancements
+        function initializeEnhancedPeerCam() {
+            if (window.TELCOEnhancements) {
+                // Initialize enhanced PeerCam with WebSocket signaling
+                try {
+                    window.TELCOEnhancements.initPeerCam({
+                        container: '#enhanced-peercam',
+                        signalingUrl: 'wss://localhost:8080/ws', // Will be configured per environment
+                        room: 'telco-hub-demo',
+                        stun: [
+                            { urls: 'stun:stun.l.google.com:19302' },
+                            { urls: 'stun:stun.cloudflarestun.com:3478' }
+                        ]
+                    });
+                    
+                    // Add enhanced features indicator
+                    const indicator = document.createElement('div');
+                    indicator.style.cssText = 'position: fixed; top: 10px; right: 10px; background: #28a745; color: white; padding: 8px 12px; border-radius: 6px; font-size: 12px; z-index: 1000;';
+                    indicator.textContent = '🚀 Enhanced WebRTC Active';
+                    document.body.appendChild(indicator);
+                    setTimeout(() => indicator.remove(), 5000);
+                    
+                } catch (error) {
+                    console.warn('Enhanced PeerCam not available:', error.message);
+                }
+            }
+        }
+
+        // Cleanup
+        window.addEventListener('beforeunload', () => {
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
+            if (isRecording && mediaRecorder) {
+                mediaRecorder.stop();
+            }
+        });
+    </script>
+</body>
+</html>
