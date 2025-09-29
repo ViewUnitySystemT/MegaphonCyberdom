@@ -1,0 +1,131 @@
+name: GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: |
+          if [ -f package.json ]; then
+            npm ci
+          else
+            echo "No package.json found, skipping npm install"
+          fi
+      
+      - name: Build
+        run: |
+          echo "Building TEL Portal App for GitHub Pages..."
+          
+          # Create build directory
+          mkdir -p dist
+          
+          # Copy web files if they exist
+          if [ -d "web" ]; then
+            cp -r web/* dist/
+            echo "✅ Copied web files"
+          fi
+          
+          # Copy root files if no web directory
+          if [ ! -d "web" ] && [ -f "index.html" ]; then
+            cp index.html dist/
+            echo "✅ Copied index.html"
+          fi
+          
+          # Copy assets if they exist
+          if [ -d "assets" ]; then
+            cp -r assets dist/
+            echo "✅ Copied assets"
+          fi
+          
+          # Copy producer media if it exists
+          if [ -d "producer" ]; then
+            cp -r producer dist/
+            echo "✅ Copied producer media"
+          fi
+          
+          # Create a simple index.html if none exists
+          if [ ! -f "dist/index.html" ]; then
+            cat > dist/index.html << 'EOF'
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEL Portal App - GitHub Pages</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        h1 { color: #FFD700; }
+        .status { color: #90EE90; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 TEL Portal App</h1>
+        <p class="status">✅ GitHub Pages Deployment erfolgreich!</p>
+        <p>Raymond Demitrio Dr. Tel - MegaphonCyberdom</p>
+        <p>Deployment Hash: ${{ github.sha }}</p>
+        <p>Build Zeit: $(date)</p>
+    </div>
+</body>
+</html>
+EOF
+            echo "✅ Created default index.html"
+          fi
+          
+          echo "✅ Build completed"
+          ls -la dist/
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
